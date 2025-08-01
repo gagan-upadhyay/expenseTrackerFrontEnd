@@ -22,6 +22,7 @@ export function Button({children, className,href, ...rest}:ButtonProps){
         
     );
     return(
+        href ==""?<button className={classes} {...rest}>{children}</button>:
         <Link href={href}>
             <button className={classes} {...rest}>{children}</button>
         </Link>
