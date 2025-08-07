@@ -6,18 +6,17 @@ import { Button } from "../buttons";
 import {AtSymbolIcon, KeyIcon} from '@heroicons/react/24/outline'
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 import Link from "next/link";
+import { useAuth } from "@/app/context/authContext";
 
 
 
 export default function LoginForm(){
     const emailRef = useRef<HTMLInputElement>(null);
-    // const passwordRef = useRef(null);
-    
-    // const welcomeToDashboard=()=>toast(`Welcome ${email} to the App!`);
 
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const router = useRouter();
+    const {setAccessToken, setIsLoggedIn} = useAuth();
 
     useEffect(()=>{
         if (emailRef.current) {
@@ -30,26 +29,34 @@ export default function LoginForm(){
             console.log("No creds received");
             return;
         }
+        
         try{
-            const response = await fetch('http://localhost:5000/api/v1/auth/login/OAuth', {
+            const response = await fetch("http://localhost:5000/api/v1/auth/login/OAuth", {
                 method:"POST",
                 headers:
                 {
-                    // "Content-Type":"application/json",
                     "Authorization": `Bearer ${credentialResponse.credential}`
                     
                 },
-                // body:JSON.stringify({token:credentialResponse.credential}),
+                credentials:'include'
+
             });
             const data = await response.json();
             if(response.ok){
                 console.log('Google login success', data);
-                console.log(data);
-                
+                if(data.accessToken){
+                    console.log("accessToken from fetched data:\n", data.accessToken);
+                    setAccessToken(data.accessToken);
+                    document.cookie=`accessToken=${data.accessToken}; path=/;`
+                }
+                if(data.refreshToken){
+                    console.log("refreshToken from fetched data:\n", data.refreshToken);
+                    document.cookie=`refreshToken=${data.refreshToken}; path=/;`
+                }
+                setIsLoggedIn(true);
                 router.push('/dashboard');
             }else{
-                
-                alert(data.message || 'OAuth login failed');
+                toast.error(data.message || 'OAuth login failed');
             }
         }catch(err){
             console.error("OAuth login error:", err);
@@ -58,26 +65,37 @@ export default function LoginForm(){
     const handleLogin=async(e:React.FormEvent)=>{
         e.preventDefault();
         try{
-            const response = await fetch('http://localhost:5000/api/v1/auth/login',{
+            console.log("Value of email and password:\n", email, password);
+            const response = await fetch("http://localhost:5000/api/v1/auth/login",{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
                 body:JSON.stringify({email, password}),
             });
+            console.log("Value of response form login form:\n", response);
+            
+            // setAccessToken(token);
             const data = await response.json();
             if(response.ok){
+                const accessToken = data.accessToken;
+                const refreshToken = data.refreshToken;
+                
+                if(accessToken) {
+                    setAccessToken(accessToken);
+                    document.cookie=`accessToken=${accessToken}; path=/;`;
+                }
+                if (refreshToken) document.cookie = `refreshToken=${refreshToken}; path=/;`
+                setIsLoggedIn(true);
                 toast.success('Login Successful', {
                     position:'top-right',
                     autoClose:300,
                     theme:'colored'
-                })
+                });
                 console.log('Login Successful:', data);
                 router.push('/dashboard');
-                
             }
             else{
                 toast.error(data.message||"Login failed, Try again later")
-                router.push('/auth/register');
-                
+                router.push('/auth/register');   
             }
         }catch(err){
             toast.error("Something went wrong!!")

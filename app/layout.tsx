@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./ui/navbar";
 import Footer from "./ui/footer";
+import { AuthProvider } from "./context/authContext";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 
 const geistSans = Geist({
@@ -27,15 +29,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
       <body
         className={`min-h-screen flex flex-col ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <AuthProvider>
+          <GoogleOAuthProvider clientId={process.env.GOOGLE_CLIENT_ID ?? ""}>
         <Navbar/>
         <main className="flex-grow">
           {children}
         </main>
-        
         <Footer/>
+        </GoogleOAuthProvider>
+        </AuthProvider>
       </body>
     </html>
   );
