@@ -34,7 +34,7 @@ export default function RootLayout({
         className={`min-h-screen flex flex-col ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
-          <GoogleOAuthProvider clientId={process.env.GOOGLE_CLIENT_ID ?? ""}>
+          <GoogleOAuthProvider clientId="234932173375-gos9gguc3qfajie2iv8vid04jme5n0cu.apps.googleusercontent.com">
         <Navbar/>
         <main className="flex-grow">
           {children}

@@ -24,9 +24,10 @@ export default function LoginForm(){
         }
     },[])
     const handleGoogleLoginSuccess = async(credentialResponse: CredentialResponse)=>{
+        // console.log('value of credentialResponse:\n', credentialResponse.credential)
         if(!credentialResponse.credential){
             alert("No credentials received!!!");
-            console.log("No creds received");
+            console.log("No credentials received");
             return;
         }
         
@@ -36,11 +37,11 @@ export default function LoginForm(){
                 headers:
                 {
                     "Authorization": `Bearer ${credentialResponse.credential}`
-                    
                 },
                 credentials:'include'
 
             });
+            toast.loading("Logging with Google...")
             const data = await response.json();
             if(response.ok){
                 console.log('Google login success', data);
@@ -48,13 +49,24 @@ export default function LoginForm(){
                     console.log("accessToken from fetched data:\n", data.accessToken);
                     setAccessToken(data.accessToken);
                     document.cookie=`accessToken=${data.accessToken}; path=/;`
+                }else{
+                    console.log("No access token received");
                 }
                 if(data.refreshToken){
                     console.log("refreshToken from fetched data:\n", data.refreshToken);
                     document.cookie=`refreshToken=${data.refreshToken}; path=/;`
                 }
-                setIsLoggedIn(true);
-                router.push('/dashboard');
+
+                if(data.accessToken && data.refreshToken){
+                    setIsLoggedIn(true);
+                    toast.success('Login Successful', {
+                        position:'top-right',
+                        autoClose:300,
+                        theme:'colored'
+                    });
+                    router.push('/dashboard');
+                }
+                
             }else{
                 toast.error(data.message || 'OAuth login failed');
             }
@@ -128,7 +140,8 @@ export default function LoginForm(){
                 </div>
                     <div className="mt-10" >
                         <GoogleLogin onSuccess={handleGoogleLoginSuccess}
-                        onError ={()=>console.log('Google login Failed miserably')} />
+                        onError ={()=>console.log('Google login Failed miserably')} useOneTap={false} />
+                        <ToastContainer/>
                     </div>
                 <div>
                 </div>
