@@ -1,6 +1,8 @@
 import RegisterForm from "@/app/ui/auth/signUpForm";
 
 export default async function RegisterFormWrapper(){
-    await new Promise((resolve)=>setTimeout(resolve, 4000));
+    if(process.env.CLIENT_MODE==='development'){
+        await new Promise((resolve)=>setTimeout(resolve, 4000));
+    }
     return <RegisterForm/>;
 }

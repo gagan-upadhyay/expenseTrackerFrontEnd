@@ -20,6 +20,7 @@ export const AuthProvider=({children}:{children: ReactNode})=>{
         const cookieToken = document.cookie.split('; ').find(row=>row.startsWith('accessToken='))?.split('=')[1];
 
         if(cookieToken){
+            setIsLoggedIn(true);
             setAccessToken(cookieToken);
             setIsReady(true);
         }else{

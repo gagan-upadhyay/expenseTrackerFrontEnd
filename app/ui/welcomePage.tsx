@@ -1,11 +1,14 @@
 'use client';
 import Image from "next/image";
 import {useEffect, useState} from 'react';
-import { Button } from "./buttons";
+import { Button } from "./buttons/buttons";
+import { useAuth } from "../context/authContext";
 
 
 export default function WelcomePage(){
     const [loaded, setLoaded] = useState(false);
+    const {isLoggedIn} = useAuth();
+    console.log("Value of isLoggedIn", isLoggedIn);
 
     useEffect(()=>{
         const timer = setTimeout(()=>setLoaded(true), 300);
@@ -23,7 +26,7 @@ export default function WelcomePage(){
                 <h2 className="text-center text-white ">Take care of your expenses at one place.</h2>
             </div>
             <div>
-                <Button href='/auth/login' className="absolute top-30 bg-brand active:bg-brand-active sm:bottom-25  md:right-100 md:bottom-25 lg:right-140 bottom-45 right-[140px] lg:bottom-25 whitespace-nowrap">Get Started</Button>
+                <Button href={isLoggedIn?'/dashboard':'/auth/login'} className="absolute top-30 bg-brand active:bg-brand-active sm:bottom-25  md:right-100 md:bottom-25 lg:right-140 bottom-45 right-[270px] lg:bottom-25 whitespace-nowrap">Get Started</Button>
             </div>
         </main>
     )

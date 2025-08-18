@@ -1,8 +1,6 @@
 import NavLinks from "./navLinks";
 import NavLogo from "./NavLogo";
 
-// import { useAuth } from "../context/authContext";
-
 export default function Navbar(){
     
     return(

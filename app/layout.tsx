@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "./ui/navbar";
-import Footer from "./ui/footer";
-import { AuthProvider } from "./context/authContext";
+
+
+import { AuthProvider } from "../app/context/authContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import NavBarWrapper from "../app/wrappers/navbarWrapper";
+import FooterWrapper from "../app/wrappers/footerWrapper";
+import { ThemeProvider } from "./context/themeContext";
+
 
 
 const geistSans = Geist({
@@ -27,21 +31,24 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en">
       <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
       <body
         className={`min-h-screen flex flex-col ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <ThemeProvider>
         <AuthProvider>
           <GoogleOAuthProvider clientId="234932173375-gos9gguc3qfajie2iv8vid04jme5n0cu.apps.googleusercontent.com">
-        <Navbar/>
+        <NavBarWrapper/>
         <main className="flex-grow">
           {children}
         </main>
-        <Footer/>
         </GoogleOAuthProvider>
         </AuthProvider>
+        <FooterWrapper/>
+        </ThemeProvider>
       </body>
     </html>
   );

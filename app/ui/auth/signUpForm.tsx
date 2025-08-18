@@ -2,7 +2,7 @@
 import { UsersIcon } from "@heroicons/react/16/solid";
 import React, { useEffect, useRef, useState } from "react";
 import {AtSymbolIcon, KeyIcon} from '@heroicons/react/24/outline'
-import { Button } from "../buttons";
+import { Button } from "../buttons/buttons";
 import { toast, ToastContainer } from "react-toastify";
 import { useRouter } from "next/navigation";
 import Link from "next/link";

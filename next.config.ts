@@ -1,15 +1,17 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  async headers(){
-    return[
+  images: {
+    domains: ['lh3.googleusercontent.com'],
+  },
+  async headers() {
+    return [
       {
-        source: '/(.*)', //apply to all routes
-        headers:[
+        source: '/(.*)',
+        headers: [
           {
-            key:'Referrer-Policy',
-            value:'strict-origin', // or use ' or 'same-origin' no-referrer-when-downgrade
+            key: 'Referrer-Policy',
+            value: 'strict-origin',
           },
         ],
       },

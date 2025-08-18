@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
-import { Button } from "../buttons";
+import { Button } from "../buttons/buttons";
 import {AtSymbolIcon, KeyIcon} from '@heroicons/react/24/outline'
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 import Link from "next/link";
@@ -82,6 +82,7 @@ export default function LoginForm(){
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
                 body:JSON.stringify({email, password}),
+                credentials:'include'
             });
             console.log("Value of response form login form:\n", response);
             
@@ -122,21 +123,21 @@ export default function LoginForm(){
                 <div className="flex-1 ">                
                 
                     <div className="mb-4">
-                        <label htmlFor="email" className=" block text-sm font-medium text-gray-700">Email</label>
+                        <label htmlFor="email" className=" md:block hidden text-sm font-medium text-gray-700">Email</label>
 
                         <input type="email" onChange={(e)=>setEmail(e.target.value)} ref={emailRef} id="email" placeholder='Enter Email' name="email" required className=" peer py-[9px] placeholder:text-gray-500 pl-10 text-sm mt-1 block w-full px-3 border border-gray-300 rounded-md shadow-md focus:outline-none focus:shadow-xl focus:ring-blue-500 text-black sm:text-sm" />
-                        <AtSymbolIcon className="pointer-events-none text-gray-500 absolute top-33 ml-2 h-[18px] w-[18px]"/>
+                        <AtSymbolIcon className="pointer-events-none text-gray-500 absolute md:top-33 top-27 ml-2 h-[18px] w-[18px]"/>
                     </div>
                     <div className="mb-20">
-                        <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+                        <label htmlFor="password" className="hidden md:block text-sm font-medium text-gray-700">Password</label>
                         
                         <input type="password" onChange={(e)=>setPassword(e.target.value)} id="password" name="password" placeholder="Enter password" required className=" mt-1 block w-full border px-3 py-2 border-gray-300 focus:shadow-xl rounded-md shadow-md text-black pl-10 focus:outline-none sm:text-sm placeholder:text-gray-500" />
-                        <KeyIcon className=" pointer-events-none mr-3 h-[18px] w-[18px] absolute top-52 text-gray-500 ml-3"/>
+                        <KeyIcon className=" pointer-events-none mr-3 h-[18px] w-[18px] absolute md:top-52 top-41 text-gray-500 ml-3"/>
                     </div>
-                    <Button className="absolute left-66 top-63" href=''>Submit</Button>
+                    <Button className="absolute left-12 md:left-66 top-51 md:top-63" href=''>Submit</Button>
                     <ToastContainer/>
                     <div>
-                    <p className="text-gray-500 text-xs absolute top-63">Not Registered? <Link className="text-blue-400" href={'/auth/register'}>Register here</Link></p>
+                    <p className="text-gray-500 text-xs md:left-10 left-35 absolute top-50 md:top-63">Not Registered? <Link className="text-blue-400" href={'/auth/register'}>Register here</Link></p>
                 </div>
                     <div className="mt-10" >
                         <GoogleLogin onSuccess={handleGoogleLoginSuccess}
