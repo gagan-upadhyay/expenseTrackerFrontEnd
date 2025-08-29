@@ -8,8 +8,9 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import NavBarWrapper from "../components/navbar/navbarWrapper";
 import FooterWrapper from "../components/layout/footerWrapper";
 import { ThemeProvider } from "../context/themeContext";
+import ThemeSync from "../components/dashboard/ThemeSync";
 
-
+// import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,6 +27,8 @@ export const metadata: Metadata = {
   description: "Expense Tracker App",
 };
 
+// const queryClient = new QueryClient();
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -38,17 +41,20 @@ export default function RootLayout({
       <body
         className={`min-h-screen flex flex-col ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {/* <QueryClientProvider client={queryClient}> */}
         <ThemeProvider>
         <AuthProvider>
-          <GoogleOAuthProvider clientId="234932173375-gos9gguc3qfajie2iv8vid04jme5n0cu.apps.googleusercontent.com">
+        <GoogleOAuthProvider clientId="234932173375-gos9gguc3qfajie2iv8vid04jme5n0cu.apps.googleusercontent.com">
         <NavBarWrapper/>
-        <main className="flex-grow">
-          {children}
-        </main>
+        <ThemeSync/>
+          <main className="flex-grow">
+            {children}
+          </main>
+        <FooterWrapper/>
         </GoogleOAuthProvider>
         </AuthProvider>
-        <FooterWrapper/>
         </ThemeProvider>
+        {/* </QueryClientProvider> */}
       </body>
     </html>
   );

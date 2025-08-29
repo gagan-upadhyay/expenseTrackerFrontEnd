@@ -14,7 +14,6 @@ export const loginWithGoogle=async(credentialResponse:CredentialResponse)=>{
   const data = await response.json();
   console.log("Value of data from service", data);
   if(!response.ok) throw new Error(data.message||"OAuth login failed");
-
   return data;
 }
 

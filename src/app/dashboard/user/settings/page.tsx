@@ -1,5 +1,12 @@
+import AuthGuard from "@/src/components/AuthGuard";
+import UserProfile from "@/src/components/settings/userprofile";
+
 export default function Page(){
     return(
-        <h1>This is the setting page for user</h1>
+        <AuthGuard>
+            <UserProfile/>
+         </AuthGuard>
+        
+ 
     )
 }

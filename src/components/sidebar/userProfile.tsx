@@ -1,25 +1,20 @@
 import Image from "next/image";
 import clsx from "clsx";
-
-
-interface User {
-    firstname?: string;
-    lastname?: string;
-    profile_picture?: string;
-}
+import { AddedUser } from "@/src/utils/definitions";
 
 interface UserProfileProps {
     className?: string;
-    user?: User;
+    user?:AddedUser;
+    // loading:boolean;
 }
 
 export default function UserProfile({ className, user }: UserProfileProps){
 
-console.log("value of user form userProfile", user);
+// console.log("value of user form sidebar userProfile", user);
 const profilePicture=user?.profile_picture;
     return (
         <div className={clsx(className, 'flex flex-row px-5 md:flex-col md:w-60 md:py-2  items-center leading-none')}>
-        <Image src={profilePicture || '/backgroundImage.png'} alt="Profile Picture" width={50} height={50} className="border-none rounded-4xl md:w-20 w-12"/>
+        <Image src={profilePicture || '/backgroundImage.png'} alt="Profile Picture" width={50} height={50} className="border-none rounded-full md:w-20 w-12"/>
         <p className={clsx(className, "md:mt-3 md:ml-2 ml-4")}>{user?`${user?.firstname} ${user?.lastname}`:'Loading...'}</p>
         </div>
     )

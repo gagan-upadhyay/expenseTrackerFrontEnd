@@ -11,16 +11,17 @@ export const useGoogleOauthHandler =()=>{
     const handleGoogleLoginSuccess = async (credentialResponse:CredentialResponse)=>{
         try{
             toastShowLoading("Logging in...");
-            const data = await loginWithGoogle(credentialResponse);
+            const {tokens} = await loginWithGoogle(credentialResponse);
+            console.log("value of data from client:\n", tokens.accessToken)
             
-            if(data.accessToken){
-                setAccessToken(data.accessToken);
-                document.cookie = `accessToken=${data.accessToken};path=/;`
+            if(tokens.accessToken){
+                setAccessToken(tokens.accessToken);
+                document.cookie = `accessToken=${tokens.accessToken};path=/;`
             }
-            if(data.refreshToken){
-                document.cookie = `refreshToken=${data.refreshToken}; path=/;`;
+            if(tokens.refreshToken){
+                document.cookie = `refreshToken=${tokens.refreshToken}; path=/;`;
             }
-            if(data.accessToken && data.refreshToken){
+            if(tokens.accessToken && tokens.refreshToken){
                 setIsLoggedIn(true);
                 toastShowSuccess('Login successfull');
                 router.push("/dashboard");

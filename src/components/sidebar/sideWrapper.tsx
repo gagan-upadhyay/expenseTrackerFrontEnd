@@ -5,31 +5,19 @@ import clsx from 'clsx';
 import { lusitana } from "@/src/assets/fonts/fonts";
 import SideBarLinks from "./SideBarLinks";
 import SideBarActions from "./sideBarActions";
-import { useState, useEffect } from "react";
-import { getUserDetails } from "@/src/utils/data";
+import { useUser } from "@/src/context/userContext";
+// import { useState, useEffect } from "react";
+// import { getUserDetails } from "@/src/utils/data";
+// import { useUser } from "@/src/context/userContext";
+// import { useSession } from "@/src/Hooks/userHooks/userHook";
 
 export default function SidebarWrapper(){
     
     const {theme} = useTheme();
-    const[user, setUser] = useState(null);
-
-    useEffect(()=>{
-        const fetchUser = async()=>{
-            try{
-                const userData = await getUserDetails();
-                console.log("Value of userData from sideWrapper", userData);
-                if(!userData) console.error("Unable to fetch the userData:\n", userData);
-
-                setUser(userData.result);
-            }catch(err){
-                console.error('Error fetching user:', err);
-            }
-        };
-        fetchUser();
-    }, []);
-
-    console.log("Value of theme from sideBar:\n",theme);
-    console.log("Value of user:\n", user);
+    const {user} =useUser();
+    
+    // console.log("Value of theme from sideBar:\n",theme);
+    // console.log("Value of user and loading usinf hook useSession from sideWrapper :\n", user);
     const fontClass = `${lusitana.className}`;
     const isDark = "bg-slate-900 text-gray-400";
     const isLight = "bg-[#F1F5FB] text-gray-700";
@@ -49,7 +37,7 @@ export default function SidebarWrapper(){
     return(
         <>
             <div className={clsx(classes, "md:block hidden")}>
-                <UserProfile user={user ?? undefined} className = {classForUserProfile} />
+                <UserProfile  user={user ?? undefined} className = {classForUserProfile} />
                 <SideBarLinks theme={theme} className = {classForUserProfile} />
                 <SideBarActions theme={theme} className = {classForUserProfile}/>
             </div>
@@ -66,6 +54,5 @@ export default function SidebarWrapper(){
                 </div>
             </div>
         </>
-    
     )
 }

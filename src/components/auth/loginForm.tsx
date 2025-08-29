@@ -19,7 +19,8 @@ export default function LoginForm(){
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const router = useRouter();
-    const {setAccessToken, setIsLoggedIn} = useAuth();
+    const {setAccessToken, setIsLoggedIn, logout} = useAuth();
+    const [loading, setLoading] = useState(false);
 
     useEffect(()=>{
         if (emailRef.current) {
@@ -28,6 +29,11 @@ export default function LoginForm(){
     },[])
     const handleLogin=async(e:React.FormEvent)=>{
         e.preventDefault();
+        logout();
+        
+        if(loading) return;
+        setLoading(true);
+
         try{
             const data = await loginWithEmail(email, password);    
             if(data.accessToken) {
@@ -39,10 +45,12 @@ export default function LoginForm(){
             setIsLoggedIn(true);
             toastShowSuccess('Login Successful');
             console.log('Login Successful:', data);
-            router.push('/dashboard');
+            router.replace('/dashboard');
         }catch(err){
             toastShowError("Something went wrong!!")
             console.error('Error during login:', err);
+        }finally{
+            setLoading(false);
         }
     }
     return (
@@ -64,8 +72,8 @@ export default function LoginForm(){
                         <input type="password" onChange={(e)=>setPassword(e.target.value)} id="password" name="password" placeholder="Enter password" required className=" mt-1 block w-full border px-3 py-2 border-gray-300 focus:shadow-xl rounded-md shadow-md text-black pl-10 focus:outline-none sm:text-sm placeholder:text-gray-500" />
                         <KeyIcon className=" pointer-events-none mr-3 h-[18px] w-[18px] absolute md:top-52 top-41 text-gray-500 ml-3"/>
                     </div>
-                    <Button className="absolute left-12 md:left-66 top-51 md:top-63" href=''>Submit</Button>
-                    <ToastContainer/>
+                    <Button disabled={loading} className='absolute left-12 md:left-66 top-51 md:top-63' href=''>Submit</Button>
+                    
                     <div>
                     <p className="text-gray-500 text-xs md:left-10 left-35 absolute top-50 md:top-63">Not Registered? <Link className="text-blue-400" href={'/auth/register'}>Register here</Link></p>
                 </div>
@@ -73,7 +81,6 @@ export default function LoginForm(){
                         <Suspense fallback="Loading...">
                             <GoogleLogin onSuccess={handleGoogleLoginSuccess}/>
                         </Suspense>
-                        
                         <ToastContainer/>
                     </div>
                 <div>
