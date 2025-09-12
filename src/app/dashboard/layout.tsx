@@ -3,10 +3,6 @@ import SideBar from "@/src/components/dashboard/Sidebar";
 import ToggleTheme from "@/src/components/dashboard/ToggleTheme";
 import { UserProvider } from "@/src/context/userContext";
 import ThemeSync from "@/src/components/dashboard/ThemeSync";
-// import { AuthProvider } from "../context/authContext";
-// import { GoogleOAuthProvider } from "@react-oauth/google";
-
-
 
 export default function DashBoardLayout({children}: {children:React.ReactNode}){
     return (

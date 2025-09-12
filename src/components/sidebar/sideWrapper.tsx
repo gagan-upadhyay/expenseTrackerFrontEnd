@@ -6,27 +6,23 @@ import { lusitana } from "@/src/assets/fonts/fonts";
 import SideBarLinks from "./SideBarLinks";
 import SideBarActions from "./sideBarActions";
 import { useUser } from "@/src/context/userContext";
-// import { useState, useEffect } from "react";
-// import { getUserDetails } from "@/src/utils/data";
-// import { useUser } from "@/src/context/userContext";
-// import { useSession } from "@/src/Hooks/userHooks/userHook";
+
 
 export default function SidebarWrapper(){
     
     const {theme} = useTheme();
     const {user} =useUser();
     
-    // console.log("Value of theme from sideBar:\n",theme);
-    // console.log("Value of user and loading usinf hook useSession from sideWrapper :\n", user);
     const fontClass = `${lusitana.className}`;
     const isDark = "bg-slate-900 text-gray-400";
     const isLight = "bg-[#F1F5FB] text-gray-700";
     // const textClass =  "text-black"
-    const baseClass = "flex grow space-x-2 flex-col md:space-x-0 md:space-y-1 py-5  border-r-0 rounded-2xl h-full h-40";
+    const baseClass = "flex grow space-x-2 flex-col md:space-x-0 md:space-y-1 py-5  transition-all duration-500 ease-in-out border-r-0 rounded-2xl h-full h-40";
     
     const classForUserProfile = clsx(
         theme ==='light'?isLight:isDark,
-        fontClass
+        fontClass,
+        " transition-all duration-500 ease-in-out"
     )
     const classes = clsx(
         classForUserProfile,

@@ -4,6 +4,9 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { AddedUser } from "../utils/definitions";
 // import { useSession } from "../Hooks/userHooks/userHook";
 import { getUserDetails } from "../utils/data";
+import { useAuth } from "./authContext";
+
+// import {} from 'use-debounce'
 
 const UserContext = createContext<{
     user: AddedUser | null;
@@ -21,22 +24,45 @@ export const UserProvider=({children}:{children:React.ReactNode})=>{
     const [user, setUser] = useState<AddedUser|null>(null);
     const clearUser = ()=> setUser(null);
     const [loading, setLoading] = useState(true);
+    const {accessToken, logout, isTokenValid} = useAuth();
+    
+    
+    const fetchUserWithRetry = async (maxRetries = 3, delay = 500): Promise<AddedUser | null> => {
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+        const data = await getUserDetails();
+        if (data?.result) return data.result;
+        } catch (err) {
+        console.warn(`User fetch attempt ${attempt + 1} failed`, err);
+        await new Promise(res => setTimeout(res, delay * Math.pow(2, attempt))); // exponential backoff
+        }
+    }
+    return null;
+    };
+
+    // const debouncedLogout = debounce(()=>{
+
+    // })
+
     useEffect(()=>{
         const initUser = async()=>{
-            const data = await getUserDetails();
-           try{
-                if(data?.result){
-                    // console.log("Value of user details data.result from userCOntext:\n", data?.result);
-                    setUser(data.result);
-                    setLoading(false);
-                }
-           }catch(err){
-                console.error('unable to fetch userDetails, error from userCOntext.tsx file', err);
+            if(!accessToken){
+                console.warn('No access token available. Skipping userDetails fetch');
+                setLoading(false);
+                return;
             }
+            if(!isTokenValid(accessToken)){
+                console.warn('Access token is invalid. Waiting for refresh or Aborting..');
+                setLoading(false);
+                logout();
+                return;
+            }
+            const userData = await fetchUserWithRetry();
+            if(userData) setUser(userData);
+            setLoading(false);
         }
         initUser();
-    }, []);
-
+    }, [accessToken, isTokenValid, logout]);
 
 
     const contextValue = useMemo(

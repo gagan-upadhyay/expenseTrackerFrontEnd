@@ -3,7 +3,7 @@
 import classNames from "classnames";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import LogoutButton from "../buttons/logoutButton";
+import LogoutButton from "../ui/buttons/logoutButton";
 import { useAuth } from "@/src/context/authContext";
 import ToggleTheme from "../dashboard/ToggleTheme";
 import { useTheme } from "@/src/context/themeContext";

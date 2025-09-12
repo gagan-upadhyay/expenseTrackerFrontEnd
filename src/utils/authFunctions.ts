@@ -1,26 +1,18 @@
-// import { useRouter } from "next/navigation";
+'use server';
 
-// export const Logout = async( accessToken: string, setIsLoggedIn: (value: boolean) => void)=>{
-//     const router = useRouter();
-//         try{
-//             await fetch('http://localhost:5000/api/v1/auth/logout', {
-//                 method:'POST',
-//                 headers:{'Authorization': `Bearer ${accessToken || ''}`},
-//                 credentials:'include'
-//             });
+import { cookies } from "next/headers";
+import { jwtDecode } from "jwt-decode";
 
-//             document.cookie=`accessToken=; path=/; Max-Age=0`;
-//             document.cookie = `refreshToken=;Max-Age=0; path=/`;
-//             setIsLoggedIn(false);
-//             console.log("logout successful, cookies cleared");
-//             setTimeout(()=>router.replace('/'), 5000);
-        
-//         }catch(err){
-//             if(err instanceof Error) console.error(err.stack)
-//             console.error(err);
-//         }
-//     }
-    
-// export const GoToLogin = ()=>{
-//         router.replace('/dashboard');
-//     }
+export async function  getInitialAuth(){
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get('accessToken')?.value || null;
+    if(!accessToken) return null;
+
+    try{
+        const decoded = jwtDecode<{exp:number}>(accessToken);
+        const isValid = decoded.exp*1000>Date.now();
+        return isValid?accessToken:null;
+    }catch{
+        return null;
+    }
+}

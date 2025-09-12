@@ -1,0 +1,33 @@
+We have below endpoints that can be targted to perform different Auth operations:
+
+//   API route starter: /api/v1/auth/
+
+Post requests:  /api/v1/auth/register
+Post requests:  /api/v1/auth/login/OAuth
+Post requests:  /api/v1/auth/logout
+Post requests:  /api/v1/auth/login
+Post requests:  /api/v1/auth/otp/generate
+Post requests:  /api/v1/auth/otp/verify
+Post requests:  /api/v1/auth/refresh
+
+
+
+Create a middleware at root level of your app
+
+This middleware will check the available http-only cookie from browser.
+
+Check the presence of AccessToken in the cookie, 
+if it is not present ==> then redirect to /auth/login
+if it is present ==> check if the token is valid and has not reached its expiry
+if the token is expired ==> redirect to /auth/login
+else return next();
+
+Now in the authContext file:
+
+make sure to add initialToken in the AuthProvider with children as this will be the already present token that was check in the middleware.
+
+Make sure you set the AccessToken in the authContext file as the initialToken. Also set the isLoggedIn state as !!initialToken.
+
+Now, in the layout of the /app/layout.tsx, make the function async and fetch the value of initialToken from getInitialAuth and pass it with AuthProvider component as a prop like: initialToken={}
+
+Use AuthGuard and GuestGuard to restrict the user from getting into the unauthorized parts of the application.

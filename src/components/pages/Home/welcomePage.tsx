@@ -1,7 +1,7 @@
 'use client';
 import Image from "next/image";
 import {useEffect, useState} from 'react';
-import { Button } from "../../buttons/buttons";
+import { Button } from "../../ui/buttons/buttons";
 import { useAuth } from "../../../context/authContext";
 
 

@@ -1,0 +1,7 @@
+//change user profile
+// subscription: renew, cancel, expiry 
+// share and unshare data with roles like editor viewwer and admin
+// notification: toggle on-off and set alerts
+// password change.
+// email/phone number add/change.
+// splitwise

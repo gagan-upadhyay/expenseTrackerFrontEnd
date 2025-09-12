@@ -1,7 +1,7 @@
 import LoginSkeleton from "@/src/components/auth/loginSkeleton";
 import LoginFormWrapper from "@/src/components/auth/loginFormWrapper";
 import { Suspense } from "react";
-import GuestGuard from "@/src/components/GuestGuard";
+import GuestGuard from "@/src/components/auth/Guards/GuestGuard";
 
 const Login = async()=>{
     return (

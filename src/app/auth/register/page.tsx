@@ -1,7 +1,7 @@
 import RegisterFormSkeleton from "@/src/components/auth/registerSkeleton";
 import RegisterFormWrapper from "@/src/components/auth/registerFormWrapper";
 import { Suspense } from "react"
-import GuestGuard from "@/src/components/GuestGuard";
+import GuestGuard from "@/src/components/auth/Guards/GuestGuard";
 
 const Register = ()=>{
 

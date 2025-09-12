@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect, Suspense } from "react";
 import { ToastContainer} from "react-toastify";
-import { Button } from "../buttons/buttons";
+import { Button } from "../ui/buttons/buttons";
 import {AtSymbolIcon, KeyIcon} from '@heroicons/react/24/outline'
 import { GoogleLogin } from "@react-oauth/google";
 import Link from "next/link";
@@ -23,6 +23,7 @@ export default function LoginForm(){
     const [loading, setLoading] = useState(false);
 
     useEffect(()=>{
+
         if (emailRef.current) {
             emailRef.current.focus();
         }
@@ -54,7 +55,7 @@ export default function LoginForm(){
         }
     }
     return (
-            <form onSubmit={handleLogin} className="w-full px-6 pb-4 pt-8 bg-gray-50/70 md:bg-gray-50 rounded-lg mb-30 max-w-xs md:max-w-sm">
+            <form onSubmit={handleLogin} className="w-full px-6 pb-4 pt-8 bg-gray-50 rounded-lg mb-30 max-w-xs md:max-w-sm">
                 <h1 className="text-2xl text-gray-400 font-bold mb-4">
                     Login
                 </h1>

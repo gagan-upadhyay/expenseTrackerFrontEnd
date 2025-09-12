@@ -9,6 +9,7 @@ import NavBarWrapper from "../components/navbar/navbarWrapper";
 import FooterWrapper from "../components/layout/footerWrapper";
 import { ThemeProvider } from "../context/themeContext";
 import ThemeSync from "../components/dashboard/ThemeSync";
+import { getInitialAuth } from "../utils/authFunctions";
 
 // import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
@@ -29,12 +30,12 @@ export const metadata: Metadata = {
 
 // const queryClient = new QueryClient();
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
+  const initialToken = await getInitialAuth();
   return (
     <html lang="en">
       <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
@@ -43,8 +44,8 @@ export default function RootLayout({
       >
         {/* <QueryClientProvider client={queryClient}> */}
         <ThemeProvider>
-        <AuthProvider>
-        <GoogleOAuthProvider clientId="234932173375-gos9gguc3qfajie2iv8vid04jme5n0cu.apps.googleusercontent.com">
+        <AuthProvider initialToken={initialToken}>
+        <GoogleOAuthProvider clientId={process.env.GOOGLE_CLIENT_ID ?? ""}>
         <NavBarWrapper/>
         <ThemeSync/>
           <main className="flex-grow">

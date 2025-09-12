@@ -1,7 +1,7 @@
 
 import ToggleTheme from "@/src/components/dashboard/ToggleTheme"
 import { lusitana } from "@/src/assets/fonts/fonts"
-import AuthGuard from "@/src/components/AuthGuard";
+import AuthGuard from "@/src/components/auth/Guards/AuthGuard";
 import CardWrapper from "@/src/components/cards/cardDetails";
 
 export default function Page(){

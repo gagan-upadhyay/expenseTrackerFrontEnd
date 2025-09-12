@@ -2,7 +2,7 @@
 import { useAuth } from "@/src/context/authContext";
 import { ArrowRightEndOnRectangleIcon } from "@heroicons/react/24/outline";
 import {useRouter } from "next/navigation";
-import {logoutUser} from '../../services/authService'
+import {logoutUser} from '../../../services/authService'
 import { ToastContainer } from "react-toastify";
 import { toastShowLoading, toastShowSuccess } from "@/src/utils/toastUtils";
 

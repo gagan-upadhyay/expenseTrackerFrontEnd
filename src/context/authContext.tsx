@@ -1,6 +1,4 @@
 'use client';
-
-import { jwtDecode } from 'jwt-decode';
 import {
   createContext,
   ReactNode,
@@ -14,36 +12,32 @@ import { toastShowError, toastShowWarning } from '../utils/toastUtils';
 import { refreshToken } from '../utils/data';
 import { BounceLoader } from 'react-spinners';
 import { useTheme } from './themeContext';
-// import { useUser } from './userContext';
+import { JwtPayload } from '../utils/definitions';
+import { jwtDecode } from 'jwt-decode';
+import { AuthContextType } from '../utils/definitions';
+import { getCookie } from '../utils/getCookie';
 
 // import { SyncLoader } from 'react-spinners';
 
-interface AuthContextType {
-  accessToken: string | null;
-  setAccessToken: (token: string | null) => void;
-  isLoggedIn: boolean;
-  setIsLoggedIn: (loggedIn: boolean) => void;
-  isReady: boolean;
-  logout: () => void;
-}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+export const AuthProvider = ({ children, initialToken, }: { children: ReactNode; initialToken:string|null; }) => {
+  const [accessToken, setAccessToken] = useState<string | null>(initialToken);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(!!initialToken);
   const [isReady, setIsReady] = useState<boolean>(false);
   const {theme} = useTheme()
-  // const {loading}=useUser();
-
+  
+  
+  //moved to getCookie in utility
   // Cookie reader
-  const getCookie = useCallback((name: string): string | null => {
-    if (typeof document === 'undefined') return null;
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
-    return null;
-  }, []);
+  // const getCookie = useCallback((name: string): string | null => {
+  //   if (typeof document === 'undefined') return null;
+  //   const value = `; ${document.cookie}`;
+  //   const parts = value.split(`; ${name}=`);
+  //   if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+  //   return null;
+  // }, [])
 
   // Centralized logout
   const logout = useCallback(() => {
@@ -54,67 +48,57 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     document.cookie = 'refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
   }, []);
 
-    const isTokenValid = useCallback((token: string): boolean => {
+  const isTokenValid = useCallback((token: string): boolean => {
       const now = Date.now();
-    try {
-      const decoded = jwtDecode<JwtPayload>(token);
-      console.log("isToken Valid?", decoded.exp*1000>now);
-      return decoded.exp * 1000 > now;
-    } catch {
-      return false;
-    }
+      try {
+        const decoded = jwtDecode<JwtPayload>(token);
+        console.log("isToken Valid?", decoded.exp*1000>now);
+        return decoded.exp * 1000 > now;
+      } catch {
+        return false;
+      }
   }, []);
 
 
+
   useEffect(() => {
-    const initAuth = async () => {
+  const initAuth = async () => {
 
-      const accessToken = getCookie('accessToken');
-
-      if (accessToken && isTokenValid(accessToken)) {
-        // console.log("Inside initAuth with accessToken and token is valid", isLoggedIn);
-        setAccessToken(accessToken);
-        setIsLoggedIn(true);
-        // localStorage.setItem("isLoggedIn",'true');
+    const accessToken = getCookie('accessToken');
+    if (accessToken && isTokenValid(accessToken)) {
+      // console.log("Inside initAuth with accessToken and token is valid", isLoggedIn);
+      setAccessToken(accessToken);
+      setIsLoggedIn(true);
+      setIsReady(true);
+      return;
+    }
+    else if(accessToken && !isTokenValid(accessToken)){
+      // Try silent refresh
+      const refreshTokenCookie = getCookie('refreshToken');
+      if(refreshTokenCookie) {
+        try{  
+          const data = await refreshToken(refreshTokenCookie);
+          if (data.accessToken && isTokenValid(data.accessToken)) {
+            setAccessToken(data.accessToken);
+            document.cookie = `accessToken=${data.accessToken}; path=/;`;
+            setIsLoggedIn(true);
+            setIsReady(true);
+            console.log('🔄 Silent refresh succeeded on init');
+            return;
+          }
+        } catch (err) {
+          console.error('Silent refresh failed on init:', err);
+        }
+        // If all fails
+        logout();
         setIsReady(true);
-        return;
-      }else{
-        setIsLoggedIn(false);
-        // localStorage.setItem("isLoggedIn",'false');
-        setIsReady(true);
-      }
-
-
-      // const refreshToken = getCookie('refreshToken');
-      // if(refreshToken) {
-      //   try {
-      //     const res = await fetch('http://localhost:5000/api/v1/auth/refresh', {
-      //       method: 'POST',
-      //       headers: { 'Content-Type': 'application/json' },
-      //       credentials: 'include',
-      //       body: JSON.stringify({ refreshToken }),
-      //     });
-
-      //     const data = await res.json();
-      //     if (data.accessToken) {
-      //       setAccessToken(data.accessToken);
-      //       setIsLoggedIn(true);
-      //       document.cookie = `accessToken=${data.accessToken}; path=/;`;
-      //     } else {
-      //       setIsLoggedIn(false);
-      //     }
-      //   } catch {
-      //     setIsLoggedIn(false);
-      //   } finally {
-      //     setIsReady(true);
-      //   }
-      // } else {
-      //   setIsLoggedIn(false);
-      //   setIsReady(true);
-      // }
-    };
-    initAuth();
-  }, [getCookie, isTokenValid]);
+      };
+    }else{
+      setIsReady(true);
+    }
+  }
+  initAuth();
+  });
 
 //silent refresh and session expiry warning
   useEffect(()=>{
@@ -158,13 +142,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         clearTimeout(warningTimeout)
     };
 
-  }, [accessToken, logout, getCookie])
+  }, [accessToken, logout])
 
   // JWT validation
-  interface JwtPayload {
-    exp: number;
-    [key: string]: unknown;
-  }
+
 
   const contextValue = useMemo(
     () => ({
@@ -174,14 +155,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setIsLoggedIn,
       isReady,
       logout,
+      isTokenValid,
     }),
-    [accessToken, isLoggedIn, isReady, logout]
+    [accessToken, isLoggedIn, isReady, logout, isTokenValid]
   );
 
-  if (!isReady) return <div className="text-center flex flex-col items-center justify-center  mt-50">
+  if (!isReady) return <div className="text-center text-blue-500 flex flex-col items-center justify-center  mt-50">
     Checking Authentication from authcontext... 
     <BounceLoader  size={70}  color={theme ==='dark' ?'#0F172B':'#779dffff'} speedMultiplier={2}/>
-    </div>; //add a spinning animation
+    </div>; //add a spinning animation ...... DOne
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 };
