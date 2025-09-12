@@ -9,7 +9,7 @@ import Link from "next/link";
 import { useAuth } from "@/src/context/authContext";
 import { useGoogleOauthHandler } from "@/src/Hooks/authHooks/useGoogleAuthHandler";
 import { loginWithEmail } from "@/src/services/authService";
-import { toastShowError, toastShowSuccess } from "@/src/utils/toastUtils";
+import { toastShowError, toastShowSuccess, toastShowWarning } from "@/src/utils/toastUtils";
 
 
 
@@ -37,6 +37,7 @@ export default function LoginForm(){
 
         try{
             const data = await loginWithEmail(email, password);    
+            console.log("Value of data:\n", data);
             if(data.accessToken) {
                 setAccessToken(data.accessToken);
                 document.cookie=`accessToken=${data.accessToken}; path=/;`;
@@ -44,12 +45,25 @@ export default function LoginForm(){
             if (data.refreshToken) document.cookie = `refreshToken=${data.refreshToken}; path=/;`
             
             setIsLoggedIn(true);
-            toastShowSuccess('Login Successful');
+            toastShowSuccess('Login Successful', Number(600));
             console.log('Login Successful:', data);
             router.replace('/dashboard');
-        }catch(err){
-            toastShowError("Something went wrong!!")
-            console.error('Error during login:', err);
+            if(data ==='User doesn\'t exist, register first'){
+                toastShowError('User doesn\'t exist, register first', Number(600));
+            }
+        }catch (err) {
+            const message = err instanceof Error ? err.message : String(err);
+
+            if (message === "User doesn't exist, register first") {
+                toastShowError(message, Number(1500));
+                // console.error('Error during login:', message);
+            } else if (message === 'Wrong password') {
+                // console.error('Wrong password');
+                toastShowWarning('Wrong Password', Number(1000));
+            } else {
+                console.error('Unhandled error:', message);
+                toastShowError('Something went wrong!', Number(500));
+            }
         }finally{
             setLoading(false);
         }
