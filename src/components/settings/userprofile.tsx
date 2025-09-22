@@ -183,6 +183,7 @@ export default function UserProfile(){
         }
         
     };
+    console.log("Value of loading message and otp:", loading, message, otp);
     return (
         <form onSubmit={handleSubmit} className="space-y-6 select-none outline-none bg-gray-400/20 rounded-md p-2 w-full">
             <h1 className="text-xl underline px-2"> User settings</h1>
@@ -286,6 +287,7 @@ export default function UserProfile(){
                     validEmail===false && 'disable'
 
                 )}> 
+                
                     {otpStatus==='idle'?'Send OTP':validEmail===false?'Try Again'
                     :
                     // <MoonLoader size={18} className="md:top-1 md:left-4 top-8"/>
