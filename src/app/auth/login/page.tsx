@@ -1,5 +1,5 @@
 import LoginSkeleton from "@/src/components/auth/loginSkeleton";
-import LoginFormWrapper from "@/src/components/auth/loginFormWrapper";
+import LoginFormWrapper from "@/src/components/auth/loginFOrmWrapper";
 import { Suspense } from "react";
 import GuestGuard from "@/src/components/auth/Guards/GuestGuard";
 

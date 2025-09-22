@@ -33,10 +33,10 @@ export default function LogoutButton({isClass}:buttonProp){
     return(
         <div className={inheritClass} onClick={()=>{
                 if(isLoggedIn){
-                    toastShowLoading('Logging Out');
+                    toastShowLoading('Logging Out', Number(600));
                     setTimeout(()=>{
                         handleLogout();
-                        toastShowSuccess("Logged out Successfully");
+                        toastShowSuccess("Logged out Successfully", Number(600));
                     }, 6000);
                     
                 }else{
