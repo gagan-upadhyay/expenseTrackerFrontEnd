@@ -4,6 +4,7 @@ export async function updateUserProfile(data:{
     email:string,
     profilePicture?:File|null;
 }){
+    const IP = process.env.HOST_IP;
     try{
         const formData = new FormData();
         //creating a new formData for the values that are changed
@@ -12,7 +13,7 @@ export async function updateUserProfile(data:{
         });
         // const result = Object.keys(formData).includes('profilePicture');
 
-        const res = await fetch('http://localhost:5001/api/v1/user/update-user', {
+        const res = await fetch(`${IP}:5001/api/v1/user/update-user`, {
             method:'PUT',
             body:JSON.stringify({
                 firstName:data?.firstName,

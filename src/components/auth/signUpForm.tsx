@@ -8,11 +8,12 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/src/context/authContext";
 import {jwtDecode} from 'jwt-decode'
+import { toastShowError, toastShowSuccess } from "@/src/utils/toastUtils";
 
 
 export default function RegisterForm(){
     const nameRef = useRef<HTMLInputElement>(null);
-
+    const IP = process.env.HOST_IP;
     const [firstName, setFirstName] = useState<string>("");
     const [lastName, setLastName] = useState<string>("");
     const [password, setPassword] = useState<string>("");
@@ -56,15 +57,19 @@ export default function RegisterForm(){
     const handleRegister = async(e:React.FormEvent)=>{
         e.preventDefault();
         try{
-            const response = await fetch(`http://localhost:5000/api/v1/auth/register`,{
+            const response = await fetch(`${IP}:5000/api/v1/auth/register`,{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
                 body:JSON.stringify({firstName, lastName, email, password})
             });
             const data = await response.json();
             console.log('Value of Data after register event:\n', data)
-            if(response.ok){
+            if(data.message==="User already exists"){
+                toastShowError('User already registered, redirecting to login page', Number(1000));
+                router.push('/auth/login');
                 console.log("Value of data from signup form:", data)
+            }else if(data.message==="User registered successfully"){
+                console.log("Value of data:\n ", data);
                 if(data.accessToken){
                     setAccessToken(data.accessToken);
                     document.cookie=(`accessToken=${data.accessToken}; path=/;`);
@@ -72,15 +77,19 @@ export default function RegisterForm(){
                 if(data.refreshToken){
                     document.cookie=(`refreshToken=${data.refreshToken};path=/;`);
                 }
-                toast.success("User Registered successfully",{
-                    position:'top-right',
-                    autoClose:300,
-                    theme:'colored'
-                });
-                console.log("Value of data from client side at register phase:\n",data);
-                router.push('/auth/login')
+                toastShowSuccess("User Registered successfully", Number(500));
+                router.replace('/dashboard');
+                // if(data.accessToken){
+                //     setAccessToken(data.accessToken);
+                
+                // }
+                // 
+                // toastShowSuccess("User Registered successfully",Number(500));
+                // console.log("Value of data from client side at register phase:\n",data);
+                // router.push('/auth/login')
             }else{
                 toast.error(data.error.message|| "Something broke down, Try again later!");
+                toastShowError(data.error.message|| "Something broke down, Try again later!", Number(500));
             }
         }catch(err){
             toast.error("Something went Wrong!!");
@@ -111,8 +120,17 @@ export default function RegisterForm(){
                     <AtSymbolIcon className="pointer-events-none text-gray-500 absolute top-69 ml-2 h-[18px] w-[18px]"/>
                 </div>
                 <div className='mb-14'>
-                     <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-                    <input type="password" onChange={(e)=>setPassword(e.target.value)} id="password" name="password" placeholder="Enter password" required className=" mt-1 block w-full border px-3 py-2 border-gray-300 focus:shadow-xl rounded-md shadow-md text-black pl-10 focus:outline-none sm:text-sm placeholder:text-gray-500" />
+                    <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+
+                    <input type="password"
+                    id="password" 
+                    name="password" 
+                    placeholder="Enter password" 
+                    required 
+                    minLength={8}
+                    className="mt-1 block w-full border px-3 py-2 border-gray-300 focus:shadow-xl rounded-md shadow-md text-black pl-10 focus:outline-none sm:text-sm placeholder:text-gray-500"
+                    onChange={(e)=>setPassword(e.target.value)}
+                    />
                     <KeyIcon className=" pointer-events-none mr-3 h-[18px] w-[18px] absolute top-88 text-gray-500 ml-3"/>
                 </div>
                 <div>

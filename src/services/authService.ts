@@ -19,15 +19,19 @@ export const loginWithGoogle=async(credentialResponse:CredentialResponse)=>{
 
 
 export const loginWithEmail = async( email:string, password:string)=>{
-        const response = await fetch('http://localhost:5000/api/v1/auth/login',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({email, password}),
-        credentials:'include'
-    });
-    const data = await response.json();
-    if(!response.ok) throw new Error(data.message||"Login failed");
-    return data;   
+  const response = await fetch('http://localhost:5000/api/v1/auth/login',
+    {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email, password}),
+      credentials:'include'
+    }
+  );
+  const data = await response.json();
+  console.log("Value of data", await data);
+  console.log("Value of response:", response);
+  if(!response.ok) throw new Error(data.message||"Login failed");
+  return data;
 }
 
 export const logoutUser = async()=>{

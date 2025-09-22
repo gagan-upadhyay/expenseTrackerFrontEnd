@@ -8,8 +8,6 @@ import { useEffect } from "react";
 export default function AuthGuard({children}:{children:React.ReactNode}){
     const {isLoggedIn, isReady} = useAuth();
     const router = useRouter();
-    
-
     useEffect(()=>{
         if(isReady && !isLoggedIn) 
             {

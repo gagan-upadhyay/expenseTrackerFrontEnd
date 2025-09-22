@@ -122,19 +122,19 @@ export const AuthProvider = ({ children, initialToken, }: { children: ReactNode;
                 document.cookie=`accessToken=${data.accessToken}; path=/;`;
                 console.log('🔄 Access token refreshed silently');
             }else{
-                toastShowError("Session Expired, login again");
+                toastShowError("Session Expired, login again", Number(500));
                 logout();
             }
         }catch(err){
             console.error('Silent refresh Error:\n', err);
-            toastShowError('Session Expired, Please log in again');
+            toastShowError('Session Expired, Please log in again', Number(500));
             logout();
         }
 
     }, refreshTime);
 
     const warningTimeout = setTimeout(()=>{
-        toastShowWarning('Your session will expire soon. Stay active to remain logged in.');
+        toastShowWarning('Your session will expire soon. Stay active to remain logged in.', Number(500));
     }, warningTime);
 
     return()=>{
