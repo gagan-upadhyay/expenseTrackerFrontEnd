@@ -10,7 +10,7 @@ export const useGoogleOauthHandler =()=>{
     
     const handleGoogleLoginSuccess = async (credentialResponse:CredentialResponse)=>{
         try{
-            toastShowLoading("Logging in...");
+            toastShowLoading("Logging in...", Number(600));
             const {tokens} = await loginWithGoogle(credentialResponse);
             console.log("value of data from client:\n", tokens.accessToken)
             
@@ -23,15 +23,15 @@ export const useGoogleOauthHandler =()=>{
             }
             if(tokens.accessToken && tokens.refreshToken){
                 setIsLoggedIn(true);
-                toastShowSuccess('Login successfull');
+                toastShowSuccess('Login successfull', Number(600));
                 router.push("/dashboard");
             }
         }catch(err: unknown){
             console.error("Oauth login failed", err)
             if (err instanceof Error) {
-                toastShowError(err.message || "Something went wrong");
+                toastShowError(err.message || "Something went wrong", Number(600));
             } else {
-                toastShowError("Something went wrong");
+                toastShowError("Something went wrong", Number(600));
             }
         }
     };
