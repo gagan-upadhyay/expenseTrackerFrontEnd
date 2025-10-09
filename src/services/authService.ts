@@ -1,5 +1,7 @@
 import { CredentialResponse } from "@react-oauth/google";
 
+
+
 export const loginWithGoogle=async(credentialResponse:CredentialResponse)=>{
     if(!credentialResponse.credential) throw new Error("No credential received");
 
@@ -13,6 +15,7 @@ export const loginWithGoogle=async(credentialResponse:CredentialResponse)=>{
 
   const data = await response.json();
   console.log("Value of data from service", data);
+  
   if(!response.ok) throw new Error(data.message||"OAuth login failed");
   return data;
 }
@@ -28,7 +31,7 @@ export const loginWithEmail = async( email:string, password:string)=>{
     }
   );
   const data = await response.json();
-  console.log("Value of data", await data);
+  console.log("Value of data", await data.message);
   console.log("Value of response:", response);
   if(!response.ok) throw new Error(data.message||"Login failed");
   return data;

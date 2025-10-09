@@ -3,6 +3,7 @@ export type NewUser = {
     lastname: string;
     email: string;
     password?: string;
+    oldPassword?:string,
     profile_picture?: string | File;
 };
 

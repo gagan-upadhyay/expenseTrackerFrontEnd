@@ -11,6 +11,16 @@ export const getUserDetails = async()=>{
     return res.json();
 };
 
+export const checkPassword = async(email:string, password:string)=>{
+    const res = await fetch('http://localhost:5000/api/v1/getPassword',{
+        method:'GET',
+        credentials:'include',
+        body:JSON.stringify({email, password})
+    });
+    if(!res.ok) throw new Error('Failed to check password');
+    return res.json();
+}
+
 
 export const refreshToken = async(apiBody:string|null)=>{
     const res = await fetch('http://localhost:5000/api/v1/auth/refresh',{
@@ -23,15 +33,16 @@ export const refreshToken = async(apiBody:string|null)=>{
     return await res.json();
 }
 
-export const sendOTP = async(name:string, email:string)=>{
+export const sendOTP = async(name:string, email:string, type:string)=>{
     try{
+        
         const res = await fetch('http://localhost:5000/api/v1/auth/otp/generate',{
             method:'POST',
             credentials:'include',
             headers:{
                 'Content-Type':'application/json',
             },
-            body:JSON.stringify({name, email}),
+            body:JSON.stringify({name, email, ...(type==='emailChange' && {type})}),
         });
         const result= await res.json();
         console.log("Value of result from sendOTP:\n", result);

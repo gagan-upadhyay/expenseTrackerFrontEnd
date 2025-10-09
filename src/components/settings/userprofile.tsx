@@ -4,7 +4,7 @@ import { useUser } from "@/src/context/userContext";
 import { updateUserProfile } from "@/src/services/userService";
 import { NewUser } from "@/src/utils/definitions";
 import { validateEmail } from "@/src/utils/validators";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { EyeIcon, EyeSlashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import PencilIcon from "../ui/buttons/pencilIcon";
@@ -27,6 +27,7 @@ export default function UserProfile(){
         email: '',
         profile_picture: undefined,
         password:'',
+        oldPassword:'',
     });
     useEffect(() => {
         if(user) {
@@ -42,6 +43,10 @@ export default function UserProfile(){
         }
     }, [user]);
 
+    useEffect(()=>{
+        console.log("Value of FormData:\n",formData);
+    },[formData]);
+
     const [localInput, setLocalInput] = useState<Partial<NewUser>>({});
 
     const [preview, setPreview] = useState<string | null>(null);
@@ -51,13 +56,16 @@ export default function UserProfile(){
     const [otpStatus, setOtpStatus] = useState<'idle'| 'error'|'sending'|'usedEmail'|'sent'>('idle');
     const [otpResult, setOTPResult] = useState<'fetching'|'matched'| 'wrongOTP'| 'idle'| 'error'>('idle');
     const [validEmail, setValidEmail] = useState<boolean|''>('');
+    const [changeEmailOpen, setChangeEmailOpen] = useState<boolean>(false);
+    const [changePasswordOpen, setChangePasswordOpen] = useState<boolean>(false);
+    const [eyeOpen, setEyeOpen] = useState<boolean>(false); 
 
     const sendOTPfunction = async()=>{
         try{
             setOTPResult('idle');
             setOtpStatus("sending")
             setValidEmail('');
-            const result = await sendOTP(`${formData?.firstname}`, formData?.email)
+            const result = await sendOTP(`${formData?.firstname}`, formData?.email, 'emailChange');
             console.log("Value of result from sendOTP:\n", result);
             
             if(result==='Email is not valid'){
@@ -84,6 +92,11 @@ export default function UserProfile(){
             console.error(err);
             setOtpStatus('error');
         }
+    }
+
+    const toggleEyeOpen = ()=>{
+        console.log("Inside toggleEyeOpen");
+        setEyeOpen(!eyeOpen);
     }
 
     const OTPInputField = (e:React.ChangeEvent<HTMLInputElement>)=>{
@@ -137,9 +150,30 @@ export default function UserProfile(){
             setLocalInput(prev=>({...prev, [name]:value}));
             debouncedUpdate(name as keyof NewUser, value);
         }
-        
     };
 
+    const checkPasswordFunction=async(e:React.ChangeEvent<HTMLInputElement>)=>{
+        e.preventDefault();
+        const {name, value} = e.target;
+        console.log("Inside checkPassword");
+        console.log("Value of name and value", name, value);
+        
+        setLocalInput(prev=>({...prev,[name]:value}));
+        debouncedUpdate(name as keyof NewUser, value);
+        console.log("Value of password from check password function\n", formData.oldPassword);
+
+        //check the password
+    }
+
+    const toggleChangeEmail = ()=>{
+        console.log("inside toggleChangeEmail");
+        setChangeEmailOpen(!changeEmailOpen);
+    }
+
+    const toggleChangePassword=()=>{
+        console.log("Inside change Password toggle");
+        setChangePasswordOpen(!changePasswordOpen);
+    }
     const resetValues = (key: keyof NewUser)=>{
         if(key==='email'){
             setOtpStatus('idle');
@@ -183,7 +217,7 @@ export default function UserProfile(){
         }
         
     };
-    console.log("Value of loading message and otp:", loading, message, otp);
+    // console.log("Value of loading message and otp:", loading, message, otp);
     return (
         <form onSubmit={handleSubmit} className="space-y-6 select-none outline-none bg-gray-400/20 rounded-md p-2 w-full">
             <h1 className="text-xl underline px-2"> User settings</h1>
@@ -196,7 +230,7 @@ export default function UserProfile(){
                         <div className="flex">
                             <input id="firstname" name="firstname" className='border-b focus:outline-none focus:shadow-lg border-gray-300 rounded-md shadow-md w-40 pr-7 pl-3 text-lg  py-1 transition-all duration-500 ease-in-out' placeholder="First name" value={localInput.firstname ?? formData.firstname}
                             onChange={handleChange}/>
-                            <button type="button" onClick={()=>resetValues('firstname')} className="relative md:w-5 outline-none cursor-pointer w-4 h-4 left-[-20] md:left-[-26] top-2">
+                            <button type="button" onClick={()=>resetValues('firstname')} className="relative md:w-3 md:h-3 outline-none cursor-pointer w-4 h-4 left-[-20] md:left-[-26] top-4">
                                 <XMarkIcon/>
                             </button>
                         </div>
@@ -208,7 +242,7 @@ export default function UserProfile(){
                         <div className="flex">
                             <input id="lastname"  name="lastname" className='border-b focus:outline-none focus:shadow-lg border-gray-300 rounded-md shadow-md text-md w-40 pr-7 pl-3 text-lg py-1 transition-all duration-500 ease-in-out' placeholder="Last Name" value={localInput.lastname?? formData.lastname} onChange={handleChange} />
 
-                            <button onClick={()=>resetValues('lastname')} className="relative md:w-5 md:h-4 outline-none md:left-[-26] outline-none cursor-pointer md:top-2 w-4 left-[-20]">
+                            <button onClick={()=>resetValues('lastname')} className="relative md:w-3 md:h-3 outline-none md:left-[-26] outline-none cursor-pointer md:top-4 w-4 left-[-20]">
                                 <XMarkIcon/>
                             </button>
                         </div>
@@ -243,16 +277,22 @@ export default function UserProfile(){
             </div>
             {/** -----First Row: fName lName Image-------- */}
 
-            <div className="flex relative md:top-0 py-3 top-5 h-30  px-4"> {/** second div2: will check email with otp  */}
-                <div className="flex flex-col ">
-                    <p className="transition-all duration-500 ease-in-out md:text-lg text-sm">Wanna Change Email?</p>
-                        <div>
+            <div className={clsx(
+                "flex relative md:top-0 py-3 top-5  px-4",
+                changeEmailOpen===false && 'h-14',
+                changeEmailOpen===true && 'h-30'
+
+            )}> {/** second div2: will check email with otp  */}
+                <div className="flex flex-col">
+                    <p className="transition-all ease-in-out duration-500 cursor-pointer hover:underline md:text-lg text-sm" onClick={toggleChangeEmail}>Wanna Change Email?</p>
+                        
+                        {changeEmailOpen && <div>
                             <input
                             name="email"
                             type="email"
                             id="email"
                             className={clsx(
-                                "border-b focus:outline-none  focus:shadow-lg border-gray-300 rounded-md shadow-md md:w-50 md:pr-5 md:pl-3 py-1 md:mt-2 w-35 md:text-lg text-sm pl-2 pr-5 h-10 transition-all duration-500 ease-in-out", 
+                                "border-b focus:outline-none  focus:shadow-lg border-gray-300 rounded-md shadow-md md:w-50 md:pr-5 md:pl-3 py-1 md:mt-2 w-35 md:text-md text-sm pl-2 pr-5 h-10 transition-all duration-500 ease-in-out", 
                                 validEmail === false || otpStatus==='usedEmail'  && 'border-red-500',
                                 validEmail === true && 'border-green-500'
                                 // validEmail
@@ -264,7 +304,7 @@ export default function UserProfile(){
                             <button onClick={()=>resetValues('email')} className="relative cursor-pointer outline-none md:w-5 w-4 h-4 md:left-[-25] left-[-18] top-1">
                                 <XMarkIcon/>
                             </button> 
-                        </div>
+                        </div>}
                         {validEmail===false || otpStatus === 'usedEmail' ? 
                             <div className="relative md:top-2 md:w-50 md:text-md text-xs pb-2 top-1 text-red-400 transition-all duration -500 ease-in-out">
                                 {otpStatus==='usedEmail'? '❌ Email already used' 
@@ -281,7 +321,7 @@ export default function UserProfile(){
                     )}
 
                 </div>
-                {(otpStatus==='idle' || validEmail ===false) ? 
+                {(otpStatus==='idle' && changeEmailOpen || validEmail ===false) ? 
                 <button type="button" onClick={sendOTPfunction} className={clsx("md:w-20 md:h-8 md:mt-10 md:px-1 md:text-md cursor-pointer whitespace-nowrap hover:border-blue-400 focus:outline-none focus:shadow-lg w-15 h-8 md:text-md text-xs mt-7 border-1 rounded-md border-blue-700 transition-all duration-1600 ease-in-out",
     
                     validEmail===false && 'disable'
@@ -295,9 +335,9 @@ export default function UserProfile(){
                     }
                 </button>
                 :
-                otpStatus==="sending"?<MoonLoader size={20} className="md:top-11 md:ml-4 top-8"/>
+                otpStatus==="sending" && changeEmailOpen?<MoonLoader size={20} className="md:top-11 md:ml-4 top-8"/>
                 :
-                otpStatus==='sent'?
+                otpStatus==='sent'&& changeEmailOpen?
                 <div className={`flex h-10 mt-2 items-center justify-center`}> {/*OTP field for verification*/}
                     <input
                     name="email-otp"
@@ -319,25 +359,26 @@ export default function UserProfile(){
                     <ToastContainer/>
                 </div>
                 :
-                otpStatus==='error'?toastShowError('⚠️ Error while sending OTP', Number(600))
+                otpStatus==='error'&& changeEmailOpen?toastShowError('⚠️ Error while sending OTP', Number(600))
                 :''
                 // validEmail===false && toastShowError('❌ Invalid email')
                 
                 }
+                {/*---------------- Messages for email---------------------------*/ }
                 <div>
-                    {otpResult === 'matched' && (
+                    {otpResult === 'matched' && changeEmailOpen && (
                         <div className="flex md:mt-12 mt-10  ml-3 items-center  text-green-600 md:text-sm text-xs font-semibold">
                             ✅ <span>Email verified successfully</span>
                         </div>
                         )}
 
-                        {otpResult === 'wrongOTP' && otpStatus==='sent' && (
+                        {otpResult === 'wrongOTP' && otpStatus==='sent' && changeEmailOpen && (
                         <div className="flex md:mt-12 md:text-md md:ml-2 text-xs mt-10 ml-2 items-center gap-1 text-red-500 font-semibold  transition-all duration-500 ease-in-out">
                             ❌ <span>Incorrect OTP. Please try again.</span>
                         </div>
                         )}
 
-                        {otpResult === 'error' && (
+                        {otpResult === 'error' && changeEmailOpen && (
                         <div className="flex items-center gap-2 text-yellow-600 text-xs font-semibold">
                             ⚠️ <span>Something went wrong while verifying.</span>
                         </div>
@@ -346,20 +387,29 @@ export default function UserProfile(){
             </div>
 
             {/*div3: will check password with current password and new password, current password with check if it matches and then after match, it will match if new password is compliant under the password rules */}
-            <div className="flex bg-red-400/20 px-4"> 
+            <div className="flex flex-col px-4"> 
+                 <p className='transition-all duration-500 whitespace-nowrap md:w-54 cursor-pointer hover:underline ease-in-out md:text-lg text-sm' onClick={toggleChangePassword}>Wanna change Password?</p>
+                {changePasswordOpen && 
                 <div className="flex">
                     <input
-                    id="password"
-                    type="password"
-                    placeholder="Password"
-                    minLength={6}
-                    className="border-b focus:outline-none  focus:shadow-lg border-gray-300 rounded-md shadow-md md:w-50 md:pr-5 md:pl-3 py-1 md:mt-2 w-35 md:text-lg text-sm pl-2 pr-5 h-10 transition-all duration-500 ease-in-out"
+                    id="oldPassword"
+                    type={eyeOpen?"text":"password"}
+                    placeholder="Old Password"
+                    name="oldPassword"
+                    // minLength={6}
+                    className="border-b focus:outline-none  focus:shadow-lg border-gray-300 rounded-md shadow-md md:w-55 md:pr-5 md:pl-3 py-1 md:mt-2 w-35 md:text-md text-sm pl-2 pr-5 h-10 transition-all duration-500 ease-in-out"
+                    value={localInput.oldPassword??formData.oldPassword}
+                    onChange={checkPasswordFunction}
                     />
-                    <button onClick={()=>resetValues('password')} className="relative md:w-5 md:h-4 outline-none md:left-[-26] outline-none cursor-pointer md:top-5 w-4 left-[-20]">
+                    <button onClick={()=>resetValues('oldPassword')} className="relative md:w-3 md:h-3 outline-none md:left-[-35] outline-none cursor-pointer md:top-6 w-4 left-[-20]">
                         <XMarkIcon/>
                     </button>
+                    <button onClick={toggleEyeOpen} className="relative md:w-5 md:h-4 outline-none md:top-5 md:left-[-33]">
+                        {eyeOpen?<EyeIcon/>:<EyeSlashIcon/>}
+                    </button>
+                    
 
-                </div>
+                </div>}
             </div>
 
             <div> {/*Error screen*/}
