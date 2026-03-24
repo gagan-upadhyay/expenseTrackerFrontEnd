@@ -4,6 +4,15 @@ import { toastShowError, toastShowLoading, toastShowSuccess } from "@/src/utils/
 import { CredentialResponse } from "@react-oauth/google";
 import { useRouter } from "next/navigation";
 
+interface AuthTokens{
+    accessToken?:string,
+    refreshToken?:string,
+}
+
+interface LoginResponse{
+    tokens:AuthTokens;
+}
+
 export const useGoogleOauthHandler =()=>{
     const {setAccessToken, setIsLoggedIn} = useAuth();
     const router = useRouter();
@@ -12,7 +21,7 @@ export const useGoogleOauthHandler =()=>{
         try{
             const toastId = toastShowLoading("Logging in...");
             console.log('value of toasID', toastId, typeof(toastId));
-            const {tokens} = await loginWithGoogle(credentialResponse);
+            const {tokens}:LoginResponse = await loginWithGoogle(credentialResponse) as LoginResponse;
             console.log("value of data from client:\n", tokens.accessToken)
             
             if(tokens.accessToken){
