@@ -4,6 +4,7 @@ import clsx from "clsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import LogoutButton from "../ui/buttons/logoutButton";
+// import ToggleTheme from "../dashboard/ToggleTheme";
 
 interface UserProfileProps{
     className?:string;
@@ -43,6 +44,7 @@ export default function SideBarActions({className, theme}:UserProfileProps){
             <LogoutButton isClass={
                 clsx("transition-all duration-500 ease-in-out",theme==='dark'?'text-slate-300 hover:bg-slate-600 hover:text-white':' hover:bg-blue-200', ' flex sm:top-16 sm:py-1 sm:ml-[-10] cursor-pointer sm:w-[65%] rounded-xl')
             }/>
+            {/* <ToggleTheme/> */}
         </div>
     )
 }

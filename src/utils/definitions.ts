@@ -7,7 +7,7 @@ export type NewUser = {
     // password:string;
     newPassword?: string;
     oldPassword?:string,
-    profile_picture?: string | File;
+    profile_picture?: string | File | null;
 };
 
 export type fetchedUser={
