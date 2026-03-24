@@ -1,11 +1,12 @@
 import { Account, CardDetails } from "../utils/definitions";
 
 const ACCOUNT_SERVICE=process.env.NEXT_PUBLIC_ACCOUNT_SERVICE;
+console.log(`Value of ACCOUNT_SERVICE: ${ACCOUNT_SERVICE} from accountService.ts file`);
 
 export async function getAccounts(): Promise<Account[]>{
     if(!ACCOUNT_SERVICE) throw new Error('Missing NEXT_PUBLIC_ACCOUNT_SERVICE');
 
-    const res = await fetch(`${ACCOUNT_SERVICE}/api/v1/accounts`, {
+    const res = await fetch(`${ACCOUNT_SERVICE}/api/v1/accounts/`, {
         credentials:'include',
     });
     const data = await res.json();
@@ -15,7 +16,7 @@ export async function getAccounts(): Promise<Account[]>{
 }
 
 export async function getAccountById(accountId:string):Promise<Account[]>{
-    const res = await fetch(`${ACCOUNT_SERVICE}/api/v1/accounts/:${accountId}`,{
+    const res = await fetch(`${ACCOUNT_SERVICE}/api/v1/accounts/:${accountId}/`,{
         credentials:'include'
     });
 
@@ -44,7 +45,7 @@ const safeParseJson = async <T=unknown>(res:Response): Promise<T | null> =>{
 export async function getAccountByUser(): Promise<GetAccountByuserResult>{
     const controller = new AbortController();
     const timeout = setTimeout(()=> controller.abort(), 12_000);
-    const accountUrl = `${ACCOUNT_SERVICE}/api/v1/accounts`;
+    const accountUrl = `${ACCOUNT_SERVICE}/api/v1/accounts/`;
     const cardsUrl = `${ACCOUNT_SERVICE}/api/v1/accounts/cards/`;
     //will fetch an array of accounts and cards
 

@@ -6,6 +6,7 @@ export async function updateUserProfile(data:{
     profilePicture?:File|null;
 }){
     const USER_SERVICE= process.env.NEXT_PUBLIC_USER_SERVICE;
+    console.log(`VALUE OF USER_SERVICE: ${USER_SERVICE} from userService.ts`);
     try{    
         const formData = new FormData();
         // getLogger('userService').debug('received data', data);
@@ -15,7 +16,7 @@ export async function updateUserProfile(data:{
         });
         // const result = Object.keys(formData).includes('profilePicture');
         // getLogger('userService').debug('formData to submit', formData);
-        const res = await fetch(`${USER_SERVICE}/api/v1/user/update-user`, {
+        const res = await fetch(`${USER_SERVICE}/api/v1/user/update-user/`, {
             method:'PUT',
             body:JSON.stringify({
                 firstName:data?.firstName,

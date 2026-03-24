@@ -9,7 +9,7 @@ export default function LogoutClient(){
     useEffect(()=>{
         const logout = async()=>{
             try{
-                await fetch(`${Auth_Router}/api/v1/auth/logout`, {
+                await fetch(`${Auth_Router}/api/v1/auth/logout/`, {
                 method:'POST',
                 credentials:'include'
             });

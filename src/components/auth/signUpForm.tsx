@@ -53,7 +53,7 @@ export default function RegisterForm(){
         e.preventDefault();
         try{
             console.log('Register button clicked, target addr:', AUTH_SERVICE);
-            const response = await fetch(`${AUTH_SERVICE}/api/v1/auth/register`,{
+            const response = await fetch(`${AUTH_SERVICE}/api/v1/auth/register/`,{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
                 body:JSON.stringify({firstName, lastName, email, password})

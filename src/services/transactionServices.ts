@@ -1,19 +1,19 @@
 import { Transaction, TransacationError } from "../utils/definitions";
-
-const TRANSACTION_SERVICE = process.env.NEXT_PUBLIC_TRANSACTION_SERVICE;
-
 import {safeParseJson, safeParseJsonResult} from '../utils/safeParseJSON';
-
 import {TransactionSchema, TransactionsSchema} from '../utils/schemas/transaction';
 
+const TRANSACTION_SERVICE = process.env.NEXT_PUBLIC_TRANSACTION_SERVICE;
+console.log(`Value of TRANSACTION_SERVICE:${TRANSACTION_SERVICE} from transactionservice.ts`);
+
 export async function fetchSingleTransaction(id:string):Promise<Transaction|null> {
+
     const controller = new AbortController();
     const timeout = setTimeout(()=>controller.abort(), 12_000);
     
     if(!TRANSACTION_SERVICE) throw new Error('Missing Transaction_service Url');
 
     try{
-        const res = await fetch(`${TRANSACTION_SERVICE}/api/v1/transactions/${id}`,{
+        const res = await fetch(`${TRANSACTION_SERVICE}/api/v1/transactions/${id}/`,{
             credentials:'include',
             signal:controller.signal,
             // headers:{
@@ -37,7 +37,7 @@ export async function fetchAllTransactions():Promise<Transaction[]|TransacationE
     if(!TRANSACTION_SERVICE) throw new Error('Missing transaction_service URL');
 
     try{
-        const res = await fetch(`${TRANSACTION_SERVICE}/api/v1/transactions`, {
+        const res = await fetch(`${TRANSACTION_SERVICE}/api/v1/transactions/`, {
             credentials:'include',
             signal:controller.signal,
         });
