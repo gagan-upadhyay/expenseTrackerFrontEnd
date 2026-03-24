@@ -13,7 +13,7 @@ export const getUserDetails = async () => {
     console.log('Value of result from getUserDetails , data.ts', data?.result);
     return data?.result ?? null;
 };
-
+console.log(`Value of user_service: ${USER_SERVICE} and AUTH_SERVICE: ${AUTH_SERVICE} from data.ts`);
 
 export const getPasswordType = async () => {
     return apiFetch(`${USER_SERVICE}/api/v1/user/password-type`);

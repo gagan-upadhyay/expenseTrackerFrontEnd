@@ -3,6 +3,8 @@ import { refreshToken as fetchRefreshToken } from './data';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 
+console.log(`Value fof BASE_URL:${BASE_URL} from apiclient`);
+
 // Generic fetch wrapper that automatically includes credentials and handles
 // token refreshing when a 401 Unauthorized is returned.
 export async function apiFetch<T = unknown>(
