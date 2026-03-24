@@ -6,8 +6,8 @@ import GuestGuard from "@/src/components/auth/Guards/GuestGuard";
 const Login = async()=>{
     return (
         <GuestGuard>
-            <div className="flex justify-center h-screen items-center">
-                <div className="relative md:mx-auto md:left-1 left-6  flex flex-col w-full p-4 md:mt-10 max-w-[400px] md:space-y-2.5 mt-4">
+            <div className="flex justify-center">
+                <div className="relative md:mx-auto top-26 md:top-2 flex flex-col w-full p-4 max-w-[400px] transition-all duration-400 ease-in-out ">
                     <Suspense fallback={<LoginSkeleton/>}>
                         <LoginFormWrapper/>
                     </Suspense>

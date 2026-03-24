@@ -36,26 +36,31 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const initialToken = await getInitialAuth();
+  
   return (
     <html lang="en">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <body
-        className={`min-h-screen flex flex-col ${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`flex flex-col min-h-screen ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* <QueryClientProvider client={queryClient}> */}
         <ThemeProvider>
-        <AuthProvider initialToken={initialToken}>
-        <GoogleOAuthProvider clientId={process.env.GOOGLE_CLIENT_ID ?? ""}>
-        <NavBarWrapper/>
-        <ThemeSync/>
-          <main className="flex-grow">
-            {children}
-          </main>
-        <FooterWrapper/>
-        </GoogleOAuthProvider>
-        </AuthProvider>
+          <AuthProvider initialToken={initialToken}>
+            <GoogleOAuthProvider clientId={process.env.GOOGLE_CLIENT_ID ?? ""}>
+              
+              <NavBarWrapper />
+              <ThemeSync />
+
+              {/* 1. Main fills available space, pushing footer down */}
+              <main className="flex-grow">
+                {children}
+              </main>
+
+              {/* 2. Footer Wrapper follows the main flow */}
+              <FooterWrapper />
+
+            </GoogleOAuthProvider>
+          </AuthProvider>
         </ThemeProvider>
-        {/* </QueryClientProvider> */}
       </body>
     </html>
   );

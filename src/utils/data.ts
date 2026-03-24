@@ -1,69 +1,71 @@
 //fetch userData from users table
+// import '@dotenvx/dotenvx/config';
 
-export const getUserDetails = async()=>{
-    const res = await fetch('http://localhost:5001/api/v1/user', {
-        method:'GET',
-        credentials:'include',
-    });
-    // console.log("value of res from getUserDetails:", res)
-    // console.log("value of res from data.ts:", await res.json());
-    if(!res.ok) throw new Error ('Failed to fetch user Details');
-    return res.json();
+// import getLogger from "../services/logger-service";
+import apiFetch from "./apiClient";
+import { AddedUser } from "./definitions";
+
+const USER_SERVICE = process.env.NEXT_PUBLIC_USER_SERVICE;
+const AUTH_SERVICE = process.env.NEXT_PUBLIC_AUTH_SERVICE;
+
+export const getUserDetails = async () => {
+    const data:{result:AddedUser} = await apiFetch(`${USER_SERVICE}/api/v1/user`) as {result:AddedUser};
+    console.log('Value of result from getUserDetails , data.ts', data?.result);
+    return data?.result ?? null;
 };
 
-export const checkPassword = async(email:string, password:string)=>{
-    const res = await fetch('http://localhost:5000/api/v1/getPassword',{
-        method:'GET',
-        credentials:'include',
-        body:JSON.stringify({email, password})
-    });
-    if(!res.ok) throw new Error('Failed to check password');
-    return res.json();
+
+export const getPasswordType = async () => {
+    return apiFetch(`${USER_SERVICE}/api/v1/user/password-type`);
 }
 
 
-export const refreshToken = async(apiBody:string|null)=>{
-    const res = await fetch('http://localhost:5000/api/v1/auth/refresh',{
-        method:'POST',
-        credentials:'include',
-        body:JSON.stringify(apiBody)
-    });
-    // console.log("Value of res from data.ts for refreshToken:\n", await res.json());
-    if(!res.ok) throw new Error('Failed to fetch accessToken using refreshToken');
-    return await res.json();
-}
+//to compare and save password
+export const passwordUtitlity = async (
+    password: string | undefined,
+    action: string,
+    newPassword?: string | undefined
+) => {
+    if (!password) return "No Password received";
+    const url = action === 'checkPassword' ? 'check-password' : 'change-password';
+    const body =
+        action === 'checkPassword'
+            ? { password }
+            : { oldPassword: password, newPassword };
 
-export const sendOTP = async(name:string, email:string, type:string)=>{
-    try{
-        
-        const res = await fetch('http://localhost:5000/api/v1/auth/otp/generate',{
-            method:'POST',
-            credentials:'include',
-            headers:{
-                'Content-Type':'application/json',
-            },
-            body:JSON.stringify({name, email, ...(type==='emailChange' && {type})}),
+    if (action === 'checkPassword') {
+        const result = await apiFetch(`${USER_SERVICE}/api/v1/user/${url}`, {
+            method: 'POST',
+            body: JSON.stringify(body),
         });
-        const result= await res.json();
-        console.log("Value of result from sendOTP:\n", result);
-        return result.message;
-    }catch(err){
-        console.error('Value of error from sendOTP function:\n', err);
-        return 
+        return result;
+    } else {
+        return apiFetch(`${USER_SERVICE}/api/v1/user/${url}`, {
+            method: 'PUT',
+            body: JSON.stringify(body),
+        });
     }
 }
 
-export const verifyOTPStatus = async(otp:string, email:string)=>{
-    const useForLogin=false;
-    const res = await fetch('http://localhost:5000/api/v1/auth/otp/verify',{
-        method:'POST',
-        credentials:'include',
-        headers:{
-            'Content-Type':'application/json',
-        },
-        body:JSON.stringify({otp,email, useForLogin}),
+export const refreshToken = async (apiBody: string | null) => {
+    return apiFetch(`${AUTH_SERVICE}/api/v1/auth/refresh`, {
+        method: 'POST',
+        body: JSON.stringify(apiBody),
     });
-    console.log(JSON.stringify({email, otp, useForLogin}))
-    console.log('Value of res from verifyOTP:', res);
-    return await res.json();
+}
+
+export const sendOTP = async (name: string, email: string, type: string) => {
+    const result:{success:boolean, message:string} = await apiFetch(`${AUTH_SERVICE}/api/v1/auth/otp/generate`, {
+        method: 'POST',
+        body: JSON.stringify({ name, email, ...(type === 'emailChange' && { type }) }),
+    }) as {success:boolean, message:string};
+    return result?.message;
+}
+
+export const verifyOTPStatus = async (otp: string, email: string) => {
+    const useForLogin = false;
+    return apiFetch(`${AUTH_SERVICE}/api/v1/auth/otp/verify`, {
+        method: 'POST',
+        body: JSON.stringify({ otp, email, useForLogin }),
+    });
 }

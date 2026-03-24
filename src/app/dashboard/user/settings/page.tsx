@@ -1,16 +1,17 @@
 import AuthGuard from "@/src/components/auth/Guards/AuthGuard"
 import Accordion from "@/src/components/ui/accordion"
 import UserProfile from "@/src/components/settings/userprofile";
+import SettingThemes from "@/src/components/settings/themeSettings";
 
 export default function Page(){
     return(
         <AuthGuard>
-            <div className="flex flex-col items-center  md:px-1 md:py-2">
+            <div className="flex flex-col items-center md:px-1 md:py-2">
                 <Accordion title="User Profile">
                     <UserProfile/> 
                 </Accordion>
+                <SettingThemes/>
             </div>
-            
          </AuthGuard>
         
  

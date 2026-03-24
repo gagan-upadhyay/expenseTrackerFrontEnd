@@ -5,5 +5,9 @@ export default async function LoginFormWrapper(){
     //     await new Promise((resolve)=>setTimeout(resolve,4000));
     // }
     //intentional delay to show skeleton 
-    return <LoginForm/>;
+    return(
+        <div className="relative top-[-50] md:top-20">
+            <LoginForm/>
+        </div>
+    )
 }

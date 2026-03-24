@@ -1,11 +1,23 @@
+import { Timestamp } from "next/dist/server/lib/cache-handlers/types";
+
 export type NewUser = {
     firstname: string;
     lastname: string;
     email: string;
-    password?: string;
+    // password:string;
+    newPassword?: string;
     oldPassword?:string,
     profile_picture?: string | File;
 };
+
+export type fetchedUser={
+    firstname:string;
+    lastname:string;
+    email:string;
+    profile_picture:string|null;
+    password:string;
+    theme:'light'|'dark';
+}
 
 export type AddedUser = {
     id:string,
@@ -13,8 +25,11 @@ export type AddedUser = {
     lastname:string,
     email:string,
     password:string,
-    profile_picture:string
+    profile_picture:string,
+    theme:string
 }
+
+
 
 export interface JwtPayload {
 exp: number;
@@ -33,4 +48,48 @@ export interface AuthContextType {
 
 export type NavbarProps={
     theme:string;
+}
+export type AccountType = 'savings'| 'credit' | 'wallet';
+export interface Account{
+    id:string;
+    user_id:string;
+    account_name:AccountType;
+    currency_code:string;
+    opening_balance:string;
+    total_income:string;
+    total_expense:string;
+    remaining_balance:string;
+    created_at:Timestamp;
+}
+
+export interface CardDetails{
+    id:string;
+    brand:string;
+    cardnumber:string;
+    holder_name:string;
+    expiry_month:number;
+    expiry_year:number;
+    is_active:boolean;
+}
+
+export interface Transaction{
+    id:string;
+    user_id: string;
+    account_id: string;
+    category_id: string;
+    amount: string;
+    type: "credit"| "debit";
+    description: string;
+    reference: string;
+    occurred_at: string;
+    created_at: string;
+    is_active: boolean,
+    deleted_at: string | null;
+    display_name:string;
+    currency_code:string;
+}
+
+export type TransacationError={
+    err:string;
+    zodError:string|undefined;
 }

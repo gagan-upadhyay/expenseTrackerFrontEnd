@@ -1,37 +1,24 @@
-// services/logger.ts
-import winston from 'winston';
-import 'winston-daily-rotate-file'; // For file rotation
+// services/logger-service.ts
+// Simple cross-platform logger that merely wraps console methods. This
+// implementation avoids any Node-specific dependencies so the client bundle
+// stays clean. For server-side logging you can always replace this with a more
+// advanced solution (e.g. winston) in your API routes or edge functions.
 
-const getLogger = (filename: string): winston.Logger => {
-  const transports: winston.transport[] = [
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.simple()
-      ),
-    }),
-  ];
+interface Logger {
+  debug: (...args: unknown[]) => void;
+  info: (...args: unknown[]) => void;
+  warn: (...args: unknown[]) => void;
+  error: (...args: unknown[]) => void;
+}
 
-  if (process.env.CLIENT_MODE === 'development') {
-    transports.push(
-      new winston.transports.DailyRotateFile({
-        filename: `logs/%DATE%-${filename}.log`,
-        datePattern: 'YYYY-MM-DD',
-        zippedArchive: true,
-        maxSize: '20m',
-        maxFiles: '14d',
-      })
-    );
-  }
-
-  return winston.createLogger({
-    level: 'info',
-    format: winston.format.combine(
-      winston.format.timestamp(),
-      winston.format.json() // For production, JSON format is often preferred
-    ),
-    transports,
-  });
+const getLogger = (name: string): Logger => {
+  const prefix = `[${name}]`;
+  return {
+    debug: (...args) => console.debug(prefix, ...args),
+    info: (...args) => console.info(prefix, ...args),
+    warn: (...args) => console.warn(prefix, ...args),
+    error: (...args) => console.error(prefix, ...args),
+  };
 };
 
 export default getLogger;

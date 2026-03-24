@@ -13,7 +13,7 @@ import { toastShowError, toastShowSuccess } from "@/src/utils/toastUtils";
 
 export default function RegisterForm(){
     const nameRef = useRef<HTMLInputElement>(null);
-    const IP = process.env.HOST_IP;
+    const AUTH_SERVICE = process.env.NEXT_PUBLIC_AUTH_SERVICE;
     const [firstName, setFirstName] = useState<string>("");
     const [lastName, setLastName] = useState<string>("");
     const [password, setPassword] = useState<string>("");
@@ -24,27 +24,22 @@ export default function RegisterForm(){
     const {accessToken, setAccessToken} = useAuth();
 
     useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const token = document.cookie
-                .split('; ')
-                .find(row => row.startsWith('accessToken='))
-                ?.split('=')[1];
-                if(token && !accessToken){
-                    setAccessToken(token);
-                    try{
-                        interface DecodedToken {
-                            exp?: number;
-                            [key: string]: unknown;
-                        }
-                        const decoded: DecodedToken = jwtDecode(token);
-                        if(decoded.exp && decoded.exp*1000 > Date.now()){
-                            router.replace('/')
-                        }
-                    }catch(err){console.log(err)}
+        const token = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('accessToken='))
+            ?.split('=')[1];
+        if(token && !accessToken){
+            setAccessToken(token);
+            try{
+                interface DecodedToken {
+                    exp?: number;
+                    [key: string]: unknown;
                 }
-            if (token && !accessToken) {
-                setAccessToken(token);
-            }
+                const decoded: DecodedToken = jwtDecode(token);
+                if(decoded.exp && decoded.exp*1000 > Date.now()){
+                    router.replace('/')
+                }
+            }catch(err){console.log(err)}
         }
     }, [accessToken, setAccessToken, router]);
 
@@ -57,7 +52,8 @@ export default function RegisterForm(){
     const handleRegister = async(e:React.FormEvent)=>{
         e.preventDefault();
         try{
-            const response = await fetch(`${IP}:5000/api/v1/auth/register`,{
+            console.log('Register button clicked, target addr:', AUTH_SERVICE);
+            const response = await fetch(`${AUTH_SERVICE}/api/v1/auth/register`,{
                 method:'POST',
                 headers:{'Content-Type':'application/json'},
                 body:JSON.stringify({firstName, lastName, email, password})
@@ -98,29 +94,29 @@ export default function RegisterForm(){
     }
 
     return(
-        <form onSubmit={handleRegister} className="absolute w-screen top-25 px-6 pb-4 pt-8 bg-gray-50/70 md:bg-gray-50 rounded-lg max-w-xs md:max-w-sm">
-            <h1 className="text-2xl text-gray-400 font-bold mb-4">
+        <form onSubmit={handleRegister} className="w-full px-6 transition-all ease-in-out duration-400 pt-8 bg-gray-50 rounded-lg mb-30 max-w-xs md:max-w-sm">
+            <h1 className="md:text-2xl text-lg text-gray-400 font-bold mb-4">
                 Register Here!
             </h1>
-            <div className="flex flex-col">
-                <div className="mb-4">
-                    <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">First Name</label>
+            <div className="flex-1">
+                <div className=" transition-all ease-in-out duration-700">
+                    <label htmlFor="firstName" className="md:block hidden text-sm font-medium text-gray-700">First Name</label>
                     <input type="text" ref={nameRef} id="firstName" placeholder="Enter First Name" required onChange={(e)=>setFirstName(e.target.value)} className=" peer py-[9px] placeholder:text-gray-500 pl-10 text-sm mt-1 block w-full px-3 border border-gray-300 rounded-md shadow-md focus:outline-none focus:shadow-xl focus:ring-blue-500 text-black sm:text-sm"/>
-                    <UsersIcon className="pointer-events-none text-gray-500 absolute top-29 ml-2 h-[18px] w-[18px] "/>
+                    <UsersIcon className="pointer-events-none text-gray-500 relative top-[-27] ml-2 h-[18px] w-[18px] "/>
                 </div>
 
-                <div className="mb-4">
-                    <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">Last Name</label>
+                <div className="">
+                    <label htmlFor="firstName" className="md:block hidden text-sm font-medium text-gray-700">Last Name</label>
                     <input type="text"  id="lastName" placeholder="Enter Last Name" required onChange={(e)=>setLastName(e.target.value)} className=" peer py-[9px] placeholder:text-gray-500 pl-10 text-sm mt-1 block w-full px-3 border border-gray-300 rounded-md shadow-md focus:outline-none focus:shadow-xl focus:ring-blue-500 text-black sm:text-sm"/>
-                    <UsersIcon className="pointer-events-none text-gray-500 absolute top-49 ml-2 h-[18px] w-[18px] "/>
+                    <UsersIcon className="pointer-events-none text-gray-500 relative top-[-27] ml-2 h-[18px] w-[18px] "/>
                 </div>
-                <div className='mb-4'>
-                    <label htmlFor="email" className=" block text-sm font-medium text-gray-700">Email</label>
+                <div className=''>
+                    <label htmlFor="email" className=" md:block hidden text-sm font-medium text-gray-700">Email</label>
                     <input type="email" onChange={(e)=>setEmail(e.target.value)} id="email" placeholder='Enter Email' name="email" required className=" peer py-[9px] placeholder:text-gray-500 pl-10 text-sm mt-1 block w-full px-3 border border-gray-300 rounded-md shadow-md focus:outline-none focus:shadow-xl focus:ring-blue-500 text-black sm:text-sm" />
-                    <AtSymbolIcon className="pointer-events-none text-gray-500 absolute top-69 ml-2 h-[18px] w-[18px]"/>
+                    <AtSymbolIcon className="pointer-events-none text-gray-500 relative top-[-27] ml-2 h-[18px] w-[18px]"/>
                 </div>
-                <div className='mb-14'>
-                    <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+                <div className=''>
+                    <label htmlFor="password" className="md:block hidden text-sm font-medium text-gray-700">Password</label>
 
                     <input type="password"
                     id="password" 
@@ -128,17 +124,17 @@ export default function RegisterForm(){
                     placeholder="Enter password" 
                     required 
                     minLength={8}
-                    className="mt-1 block w-full border px-3 py-2 border-gray-300 focus:shadow-xl rounded-md shadow-md text-black pl-10 focus:outline-none sm:text-sm placeholder:text-gray-500"
+                    className="mt-1 w-full border px-3 py-2 border-gray-300 focus:shadow-xl rounded-md shadow-md text-black pl-10 focus:outline-none text-sm placeholder:text-gray-500"
                     onChange={(e)=>setPassword(e.target.value)}
                     />
-                    <KeyIcon className=" pointer-events-none mr-3 h-[18px] w-[18px] absolute top-88 text-gray-500 ml-3"/>
+                    <KeyIcon className=" pointer-events-none mr-3 h-[18px] w-[18px] relative top-[-27] text-gray-500 ml-3"/>
                 </div>
                 <div>
-                    <Button className="absolute top-97 mt-2 left-54 md:left-70" href="">Register</Button>
+                    <Button href='' className="relative left-48 md:left-59">Register</Button>
                 </div>
                 <ToastContainer/>
                 <div>
-                    <p className="text-gray-500 text-xs absolute top-98">Already Registered? <Link className="text-blue-400" href={'/auth/login'}>Login here</Link></p>
+                    <p className="text-gray-500 text-xs md:text-sm relative top-[-44] md:top-[-39]">Already Registered? <Link className="text-blue-400" href={'/auth/login'}>Login here</Link></p>
                 </div>
             </div>
         </form>

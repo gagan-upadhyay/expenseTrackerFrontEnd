@@ -1,8 +1,16 @@
 'use client';
+import { useEffect } from 'react';
 import {useTheme} from '../../context/themeContext';
+// import { useUser } from '@/src/context/userContext';
 
 export default function ToggleTheme(){
     const {toggleTheme, theme} = useTheme();
+    // const {loading} = useUser();
+    useEffect(()=>{
+        if(localStorage.getItem('theme')){
+            
+        }
+    })
     // console.log("Value fo theme form toggletheme:", theme);
     return(
         <button onClick={toggleTheme}

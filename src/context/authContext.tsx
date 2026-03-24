@@ -8,7 +8,7 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { toastShowError, toastShowWarning } from '../utils/toastUtils';
+import { toastShowWarning } from '../utils/toastUtils';
 import { refreshToken } from '../utils/data';
 import { BounceLoader } from 'react-spinners';
 import { useTheme } from './themeContext';
@@ -16,6 +16,7 @@ import { JwtPayload } from '../utils/definitions';
 import { jwtDecode } from 'jwt-decode';
 import { AuthContextType } from '../utils/definitions';
 import { getCookie } from '../utils/getCookie';
+
 
 // import { SyncLoader } from 'react-spinners';
 
@@ -26,7 +27,7 @@ export const AuthProvider = ({ children, initialToken, }: { children: ReactNode;
   const [accessToken, setAccessToken] = useState<string | null>(initialToken);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(!!initialToken);
   const [isReady, setIsReady] = useState<boolean>(false);
-  const {theme} = useTheme()
+  const {theme, clearTheme} = useTheme()
   
   
   //moved to getCookie in utility
@@ -40,109 +41,120 @@ export const AuthProvider = ({ children, initialToken, }: { children: ReactNode;
   // }, [])
 
   // Centralized logout
+  
+
+
   const logout = useCallback(() => {
     setAccessToken(null);
     setIsLoggedIn(false);
+    clearTheme(); //if found issue in logout, remove this.
     // localStorage.setItem('isLoggedIn', 'false');
     document.cookie = 'accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
     document.cookie = 'refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
-  }, []);
+    localStorage.setItem('logout-event', Date.now().toString());
+  }, [clearTheme]);
 
   const isTokenValid = useCallback((token: string): boolean => {
       const now = Date.now();
       try {
         const decoded = jwtDecode<JwtPayload>(token);
-        console.log("isToken Valid?", decoded.exp*1000>now);
+        // console.log("isToken Valid?", decoded.exp*1000>now);
         return decoded.exp * 1000 > now;
       } catch {
         return false;
       }
   }, []);
 
-
-
-  useEffect(() => {
-  const initAuth = async () => {
-
-    const accessToken = getCookie('accessToken');
-    if (accessToken && isTokenValid(accessToken)) {
-      // console.log("Inside initAuth with accessToken and token is valid", isLoggedIn);
-      setAccessToken(accessToken);
-      setIsLoggedIn(true);
-      setIsReady(true);
-      return;
-    }
-    else if(accessToken && !isTokenValid(accessToken)){
-      // Try silent refresh
-      const refreshTokenCookie = getCookie('refreshToken');
-      if(refreshTokenCookie) {
-        try{  
-          const data = await refreshToken(refreshTokenCookie);
-          if (data.accessToken && isTokenValid(data.accessToken)) {
-            setAccessToken(data.accessToken);
-            document.cookie = `accessToken=${data.accessToken}; path=/;`;
-            setIsLoggedIn(true);
-            setIsReady(true);
-            console.log('🔄 Silent refresh succeeded on init');
-            return;
-          }
-        } catch (err) {
-          console.error('Silent refresh failed on init:', err);
-        }
-        // If all fails
-        logout();
-        setIsReady(true);
-      };
-    }else{
-      setIsReady(true);
-    }
-  }
-  initAuth();
-  });
-
-//silent refresh and session expiry warning
   useEffect(()=>{
-    if(!accessToken) return;
-    const decoded = jwtDecode<JwtPayload>(accessToken);
-    const expirtyTime= decoded.exp*1000;
-    const timeUntilExpiry = expirtyTime-Date.now();
+    const syncLogout=(e:StorageEvent)=>{
+      if(e.key==='logout-event')
+        logout();
+    };
+    window.addEventListener('storage', syncLogout);
 
-    const refreshTime = timeUntilExpiry-30*1000 // refresh 30s before expiry;
-    const warningTime = timeUntilExpiry-60*1000 //warn 60s before expiry;
+  }, [logout]);
 
-    if(refreshTime<=0){
+// 1. Wrap initAuth in a proper useEffect with an empty array
+  useEffect(() => {
+    const initAuth = async () => {
+      const token = getCookie('accessToken');
+      if (token && isTokenValid(token)) {
+        setAccessToken(token);
+        setIsLoggedIn(true);
+      } else {
+        const rt = getCookie('refreshToken');
+        if (rt) {
+          try {
+            const data:{accessToken:string} = await refreshToken(rt) as {accessToken:string};
+            if (data?.accessToken) {
+              setAccessToken(data.accessToken);
+              document.cookie = `accessToken=${data.accessToken}; path=/;`;
+              setIsLoggedIn(true);
+            } else {
+              logout();
+            }
+          } catch {
+            logout();
+          }
+        }
+      }
+      setIsReady(true); // Always set ready at the end
+    };
+    initAuth();
+  }, [isTokenValid, logout]); // Added dependencies
+
+  // 2. Adjust the Timer Logic
+  useEffect(() => {
+    if (!accessToken) return;
+
+    try {
+      const decoded = jwtDecode<JwtPayload>(accessToken);
+      const timeUntilExpiry = decoded.exp * 1000 - Date.now();
+
+      // If already expired, don't set timers, just logout or try immediate refresh
+      if (timeUntilExpiry <= 0) {
         logout();
         return;
-    }
-    const refreshTimeout = setTimeout(async()=>{
-        try{
-            const data = await refreshToken(getCookie('refreshToken'));;
-            if(data.accessToken){
-                setAccessToken(data.accessToken);
-                document.cookie=`accessToken=${data.accessToken}; path=/;`;
-                console.log('🔄 Access token refreshed silently');
-            }else{
-                toastShowError("Session Expired, login again", Number(500));
-                logout();
-            }
-        }catch(err){
-            console.error('Silent refresh Error:\n', err);
-            toastShowError('Session Expired, Please log in again', Number(500));
+      }
+
+      const refreshTime = Math.max(timeUntilExpiry - 30000, 0); // Refresh 30s before
+      const warningTime = Math.max(timeUntilExpiry - 60000, 0); // Warn 60s before
+
+      const refreshTimeout = setTimeout(async () => {
+        const rt = getCookie('refreshToken');
+        if(!rt) return logout();
+        try {
+          const data:{accessToken:string} = await refreshToken(rt) as {accessToken:string};
+          if (data?.accessToken) {
+            setAccessToken(data.accessToken);
+            document.cookie = `accessToken=${data.accessToken}; path=/;`;
+          } else {
             logout();
+          }
+        } catch(err) {
+          console.warn(`Error1 in the second useEffect in authContext: ${err}`);
+          logout();
         }
+      }, refreshTime);
 
-    }, refreshTime);
+      // Only set warning if there's actually time left
+      let warningTimeout: NodeJS.Timeout;
+      if (timeUntilExpiry > 60000) {
+        warningTimeout = setTimeout(() => {
+          toastShowWarning('Session expiring soon!', 500);
+        }, warningTime);
+      }
 
-    const warningTimeout = setTimeout(()=>{
-        toastShowWarning('Your session will expire soon. Stay active to remain logged in.', Number(500));
-    }, warningTime);
-
-    return()=>{
+      return () => {
         clearTimeout(refreshTimeout);
-        clearTimeout(warningTimeout)
-    };
+        if (warningTimeout) clearTimeout(warningTimeout);
+      };
+    } catch (e) {
+      console.warn(`Error2 in the second useEffect in authContext: ${e}`);
+      logout();
+    }
+  }, [accessToken, logout]);
 
-  }, [accessToken, logout])
 
   // JWT validation
 
@@ -162,9 +174,9 @@ export const AuthProvider = ({ children, initialToken, }: { children: ReactNode;
 
   if (!isReady) return <div className="text-center text-blue-500 flex flex-col items-center justify-center  mt-50">
     Checking Authentication from authcontext... 
-    <BounceLoader  size={70}  color={theme ==='dark' ?'#0F172B':'#779dffff'} speedMultiplier={2}/>
+    <BounceLoader className='relative top-10'  size={70}  color={theme ==='dark' ?'#0F172B':'#779dffff'} speedMultiplier={2}/>
     </div>; //add a spinning animation ...... DOne
-
+    
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 };
 

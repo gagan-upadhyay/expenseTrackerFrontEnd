@@ -17,17 +17,27 @@ export default function WelcomePage(){
 
 
     return (
-        <div className={`flex items-center justify-center h-screen transition-opacity ease-in-out ${loaded ? 'opacity-90':'opacity-0'}`}>
+        <div className={`flex justify-center h-screen transition-opacity ease-in-out ${loaded ? 'opacity-90':'opacity-0'}`}>
             <div className="w-full absolute min-h-screen">
                 <Image priority={true} className={`absolute w-full h-full  pointer-events-none`} alt='background image' width={500} height={500} src='/backgroundImage_new.png'/>
             </div>
-            <div className="absolute items-center top-30">
-                <h1 className="text-white sm:text-xl md:text-2xl text-lg lg:text-4xl">Welcome to the Expense Tracker App</h1>
-                <h2 className="text-center text-white ">Take care of your expenses at one place.</h2>
+            <div className="relative flex flex-col top-10 text-center gap-2 px-4">
+                <h1 className="text-white animate-pulsate transitions-all ease-in-out duration-400 sm:text-xl md:text-2xl text-lg lg:text-4xl ">
+                    Welcome to the Expense Tracker App
+                </h1>
+
+                <h2 className="text-white lg:text-2xl transitions-all ease-in-out duration-400">
+                    Take care of your expenses at one place.
+                </h2>
+
+                <Button
+                    href={isLoggedIn ? '/dashboard' : '/auth/login'}
+                    className="text-xs md:text-sm lg:text-lg text-xs md:text-sm bg-brand active:bg-brand-active px-6 py-3"
+                >
+                    Get Started
+                </Button>
             </div>
-            <div className="items-center justify-center ml-[-90]">
-                <Button href={isLoggedIn?'/dashboard':'/auth/login'} className="absolute top-50 sm:bottom-25 bottom-45 lg:bottom-25 bg-brand active:bg-brand-active whitespace-nowrap">Get Started</Button>
-            </div>
+            
         </div>
     )
 }

@@ -10,7 +10,7 @@ export default function Accordion({ title, children }: { title: string; children
 
   return (
     <div className={clsx(
-        "w-3/4 px-4 py-2 items-center justify-center border rounded-xl transform-all ease-in-out duration-1500",
+        "w-3/4 px-4 py-2 items-center mb-4 justify-center border rounded-xl transform-all ease-in-out duration-1500",
         isOpen?'':'hover:scale-102'
     )}>
       <button

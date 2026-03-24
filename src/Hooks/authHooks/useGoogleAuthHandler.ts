@@ -10,7 +10,8 @@ export const useGoogleOauthHandler =()=>{
     
     const handleGoogleLoginSuccess = async (credentialResponse:CredentialResponse)=>{
         try{
-            toastShowLoading("Logging in...", Number(600));
+            const toastId = toastShowLoading("Logging in...");
+            console.log('value of toasID', toastId, typeof(toastId));
             const {tokens} = await loginWithGoogle(credentialResponse);
             console.log("value of data from client:\n", tokens.accessToken)
             
@@ -23,7 +24,7 @@ export const useGoogleOauthHandler =()=>{
             }
             if(tokens.accessToken && tokens.refreshToken){
                 setIsLoggedIn(true);
-                toastShowSuccess('Login successfull', Number(600));
+                toastShowSuccess('Login successful', Number(600), String(toastId));
                 router.push("/dashboard");
             }
         }catch(err: unknown){

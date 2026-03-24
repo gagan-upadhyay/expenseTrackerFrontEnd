@@ -1,10 +1,13 @@
-
+'use client';
 import ToggleTheme from "@/src/components/dashboard/ToggleTheme"
 import { lusitana } from "@/src/assets/fonts/fonts"
 import AuthGuard from "@/src/components/auth/Guards/AuthGuard";
 import CardWrapper from "@/src/components/cards/cardDetails";
+import { useAccounts } from "@/src/context/accountContext";
 
 export default function Page(){
+    const {accounts} = useAccounts();
+    console.log('Value of accounts:', accounts);
     return (
         <AuthGuard>
             <main>
@@ -12,21 +15,67 @@ export default function Page(){
                 <div className="flex absolute top-5 right-10">
                     <ToggleTheme/>
                 </div>
-                <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>Dashboard</h1>
-                <div>
-                    <div className="grid grid-cols-6 grid-rows-6 gap-0">
-                        <div className="col-start-1 row-start-1 col-end-3 row-end-3"> <CardWrapper title={"Card Details"}/> </div> {/** card details*/}
-                        <div className="col-start-3 row-start-1 col-end-5 row-end-3"> <CardWrapper title={"Wallet"}/> </div> {/** wallet*/}
-                        <div className="row-start-3 col-start-3 row-end-5 col-end-5 "><CardWrapper title={"Monthly Earnings"}/> </div> {/** monthly earnings*/}
-                        <div className="row-start-5 col-start-3 row-end-7 col-end-5 "> <CardWrapper title={"Earnings"}/> </div> {/** earnings*/}
-                        <div className="row-start-3 col-start-1 row-end-7 col-end-3 "> <CardWrapper title={"Transactions"}/></div> {/** transactions*/}
-                        <div className="row-start-1 col-start-5 row-end-7 col-end-7 ">  <CardWrapper title={"Payable accounts, receipts"}/></div> {/** payable accounts, receipts, payables*/}
-                    </div> 
-                </div>
+                { accounts && 
+                    <>
+                        <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
+                            Dashboard
+                        </h1>
+                    
+                        <div className="w-full">
+                            <div
+                                className="
+                                grid 
+                                gap-4
+                                /* Small (stack everything) */
+                                grid-cols-1
+                                /* Medium (2 columns layout) */
+                                md:grid-cols-2
+                                /* Large layout: 6 columns, 6 rows */
+                                lg:grid-cols-6
+                                lg:grid-rows-6
+                                "
+                                >
+                                {/* Card Details */}
+                                <div className="lg:col-start-1 lg:col-end-3 lg:row-start-1 lg:row-end-2">
+                                <CardWrapper pageClass="" title="Card Details" />
+                                </div>
+
+                                {/* Wallet */}
+                                <div className="lg:col-start-3 lg:col-end-5 lg:row-start-1 lg:row-end-2">
+                                <CardWrapper pageClass="" title="Wallet" />
+                                </div>
+
+                                {/* Monthly Earnings */}
+                                <div className="lg:col-start-3 lg:col-end-5 lg:row-start-2 lg:row-end-5">
+                                <CardWrapper pageClass="" title="Monthly Earnings" />
+                                </div>
+
+                                {/* Earnings */}
+                                <div className="lg:col-start-3 lg:col-end-5 lg:row-start-4 lg:row-end-7">
+                                <CardWrapper pageClass="" title="Earnings" />
+                                </div>
+
+                                {/* Transactions */}
+                                <div className="lg:col-start-1 lg:col-end-3 lg:row-start-2 lg:row-end-7">
+                                <CardWrapper pageClass="" title="Transactions" />
+                                </div>
+
+                                {/* Payables */}
+                                <div className="lg:col-start-5 lg:col-end-7 lg:row-start-1 lg:row-end-7">
+                                <CardWrapper pageClass="" title="Payable Accounts, Receipts" />
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                }
+
             </main>
         </AuthGuard>
     )
 }
+
+
+
 
 // .div1 { grid-area: 1 / 1 / 3 / 3; }
 // .div2 { grid-area: 1 / 3 / 3 / 5; }
