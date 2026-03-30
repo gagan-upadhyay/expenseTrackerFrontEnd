@@ -42,12 +42,11 @@ export const AuthProvider = ({ children, initialToken, }: { children: ReactNode;
 
   // Centralized logout
   
-
-
   const logout = useCallback(() => {
     setAccessToken(null);
     setIsLoggedIn(false);
     clearTheme(); //if found issue in logout, remove this.
+    console.log(`Value of document.cookie: ${document.cookie}`);
     // localStorage.setItem('isLoggedIn', 'false');
     document.cookie = 'accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
     document.cookie = 'refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
@@ -85,7 +84,7 @@ export const AuthProvider = ({ children, initialToken, }: { children: ReactNode;
         const rt = getCookie('refreshToken');
         if (rt) {
           try {
-            const data:{accessToken:string} = await refreshToken(rt) as {accessToken:string};
+            const data:{accessToken:string} = await refreshToken() as {accessToken:string};
             if (data?.accessToken) {
               setAccessToken(data.accessToken);
               document.cookie = `accessToken=${data.accessToken}; path=/;`;
@@ -122,12 +121,13 @@ export const AuthProvider = ({ children, initialToken, }: { children: ReactNode;
 
       const refreshTimeout = setTimeout(async () => {
         const rt = getCookie('refreshToken');
+        console.log('Value of refeshToken from authCOntext using getCOokie fn:', rt);
         if(!rt) return logout();
         try {
-          const data:{accessToken:string} = await refreshToken(rt) as {accessToken:string};
+          const data:{accessToken:string} = await refreshToken() as {accessToken:string};
           if (data?.accessToken) {
             setAccessToken(data.accessToken);
-            document.cookie = `accessToken=${data.accessToken}; path=/;`;
+            document.cookie = `accessToken=${data.accessToken}; path=/;`; 
           } else {
             logout();
           }
@@ -172,10 +172,11 @@ export const AuthProvider = ({ children, initialToken, }: { children: ReactNode;
     [accessToken, isLoggedIn, isReady, logout, isTokenValid]
   );
 
-  if (!isReady) return <div className="text-center text-blue-500 flex flex-col items-center justify-center  mt-50">
+  if (!isReady) return 
+  <div className="text-center text-blue-500 flex flex-col items-center justify-center  mt-50">
     Checking Authentication from authcontext... 
     <BounceLoader className='relative top-10'  size={70}  color={theme ==='dark' ?'#0F172B':'#779dffff'} speedMultiplier={2}/>
-    </div>; //add a spinning animation ...... DOne
+  </div>; 
     
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 };

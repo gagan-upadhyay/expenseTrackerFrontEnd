@@ -6,10 +6,10 @@ import GuestGuard from "@/src/components/auth/Guards/GuestGuard";
 const Login = async()=>{
     return (
         <GuestGuard>
-            <div className="flex justify-center">
-                <div className="relative md:mx-auto top-26 md:top-2 flex flex-col w-full p-4 max-w-[400px] transition-all duration-400 ease-in-out ">
-                    <Suspense fallback={<LoginSkeleton/>}>
-                        <LoginFormWrapper/>
+            <div className="flex justify-center items-center min-h-screen px-4">
+              <div className="relative w-full max-w-sm">
+                    <Suspense fallback={<LoginSkeleton />}>
+                    <LoginFormWrapper />
                     </Suspense>
                 </div>
             </div>
@@ -18,3 +18,18 @@ const Login = async()=>{
 }
 
 export default Login;
+
+// 'use client';
+
+// import { useEffect } from "react";
+// import { useAuthModal } from "@/src/context/authModalContext";
+
+// export default function LoginPage() {
+//   const { openModal } = useAuthModal();
+
+//   useEffect(() => {
+//     openModal("login");
+//   }, []);
+
+//   return null;
+// }

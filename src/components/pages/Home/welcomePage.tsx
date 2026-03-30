@@ -3,17 +3,27 @@ import Image from "next/image";
 import {useEffect, useState} from 'react';
 import { Button } from "../../ui/buttons/buttons";
 import { useAuth } from "../../../context/authContext";
+import { useRouter } from "next/navigation";
 
 
 export default function WelcomePage(){
     const [loaded, setLoaded] = useState(false);
     const {isLoggedIn} = useAuth();
+    const router = useRouter();
     console.log("Value of isLoggedIn", isLoggedIn);
 
     useEffect(()=>{
         const timer = setTimeout(()=>setLoaded(true), 300);
         return ()=> clearTimeout(timer)
     }, []);
+
+    const handleSubmit=()=>{
+        if (isLoggedIn){
+            router.push('/dashboard');
+        }else{
+            router.push('/auth/login');
+        }
+    }
 
 
     return (
@@ -29,13 +39,18 @@ export default function WelcomePage(){
                 <h2 className="text-white lg:text-2xl transitions-all ease-in-out duration-400">
                     Take care of your expenses at one place.
                 </h2>
-
+{/* 
                 <Button
                     href={isLoggedIn ? '/dashboard' : '/auth/login'}
                     className="text-xs md:text-sm lg:text-lg text-xs md:text-sm bg-brand active:bg-brand-active px-6 py-3"
                 >
                     Get Started
+                </Button> */}
+                <Button onClick={handleSubmit} className="mt-10">
+                    Get Started
                 </Button>
+
+
             </div>
             
         </div>

@@ -1,56 +1,63 @@
 'use client';
 
-import { useTheme } from "@/src/context/themeContext";
 import { FaCcVisa } from "react-icons/fa";
 import CreditCard from "./creditCards";
 import { lusitana } from "@/src/assets/fonts/fonts";
 import clsx from "clsx";
 import WalletCard from "./walletCard";
-// import TransactionCard from "./transactionCard";
-// import TransactionCardWrapper from "./transactionCardWrapper";
 import TransactionCard from "./transactionCard";
 import { ExpenseChart } from "../ui/charts/charts";
-import {EarningsChart } from "../ui/charts/lineChart";
-// import { ChartContainer, ChartPieDonutText } from "../ui/charts/charts";
-// import { useAccounts } from "@/src/context/accountContext";
+import { SavingsChart } from "../ui/charts/lineChart";
+import AddAccountCard from "./addAccountCard";
+import AddTransactionCard from "./AddTransaction";
+import AccountDetailsCard from "./AccountDetailsCard";
 
-interface CardProps{
-    title:string;
-    pageClass:string;
+interface CardProps {
+  title: string;
 }
 
-export default function CardWrapper({title, pageClass}:CardProps){
-    const {theme}= useTheme();
-    const fontClass = `${lusitana.className} `;
-    const isDark = " bg-gradient-to-r from-silverGray to-darkBlueGray text-gray-400 border-sky-200 focus:ring-sky-300";
-    const isLight = "bg-[#F1F5FB] text-gray-700 border-blue-900 focus:ring-blue-400";
+export default function CardWrapper({ title }: CardProps) {
+  const fontClass = lusitana.className;
 
-    const ParentClass = clsx(
-        theme==='light'? isLight : isDark,
-        fontClass,
-        pageClass!==''? pageClass:'');
-    const transitionClass ='transition-all ease-in-out duration-500'
+  const parentClass = clsx(
+    // 🌞 Light (default via CSS variables)
+    "bg-[var(--color-primary)] text-[var(--color-text)] border-[var(--color-border)]",
 
-    
-    return (
-        <>
-            {title === 'Card Details' ? (
-                <CreditCard parentClass={ParentClass} transitionClass={transitionClass} />
-            ) : title ==='Wallet'? 
-            <WalletCard  parentClass={ParentClass} transitionClass={transitionClass} />
-            :title==='Transactions'?
-            <TransactionCard pageClass={ParentClass} transitionClass={transitionClass} />
-            : title ==='Monthly Earnings'? 
-            // <ChartPieDonutText/>
-            <ExpenseChart/>
-            : title ==='Earnings'?<EarningsChart/>
-            :
-            (
-                <div className={`border rounded-lg p-4 shadow-md`}>
-                    <h3 className="text-lg text-center font-semibold"> {title} </h3>
-                    <FaCcVisa size={60}/>
-                </div>
-            )}
-        </>
-    )
+    // 🌙 Dark override (only where needed)
+    "dark:bg-gradient-to-r dark:from-gray-300 dark:to-gray-700",
+
+    // Common styles
+    "border rounded-lg p-4 shadow-md transition-all duration-500",
+    //glass theme
+    "glass glass-hover  smooth-theme relative flex flex-col rounded-2xl p-6 overflow-hidden",
+    fontClass
+  );
+
+  return (
+    <>
+      {title === 'Card Details' ? (
+        <CreditCard parentClass={parentClass} />
+      ) : title === 'Wallet' ? (
+        <WalletCard parentClass={parentClass} />
+      ) : title === 'Transactions' ? (
+        <TransactionCard pageClass={parentClass} />
+      ) : title === 'Monthly Spent' ? (
+        <ExpenseChart />
+      ) : title === 'Savings' ? (
+        <SavingsChart />
+      ) : title==='add account'?(
+        <AddAccountCard parentClass={parentClass}/>
+      ) : title==='add transaction'?(
+        <AddTransactionCard/>
+      ): title === 'account details'?(
+        <AccountDetailsCard parentClass={parentClass}/>
+      ):
+      (
+        <div className={parentClass}>
+          <h3 className="text-lg text-center font-semibold">{title}</h3>
+          <FaCcVisa size={60} />
+        </div>
+      )}
+    </>
+  );
 }

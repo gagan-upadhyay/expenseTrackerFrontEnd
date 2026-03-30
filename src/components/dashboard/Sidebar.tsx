@@ -1,4 +1,4 @@
-import SidebarWrapper from "../sidebar/sideWrapper";
+import SidebarWrapper from "../sidebar/SidebarWrapper";
 
 export default function SideBar(){
     return(

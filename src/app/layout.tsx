@@ -10,6 +10,9 @@ import FooterWrapper from "../components/layout/footerWrapper";
 import { ThemeProvider } from "../context/themeContext";
 import ThemeSync from "../components/dashboard/ThemeSync";
 import { getInitialAuth } from "../utils/authFunctions";
+// import { SidebarProvider } from "../context/sidebarContext";
+// import { AuthModalProvider } from "../context/authModalContext";
+// import AuthModal from "../components/auth/authModal";
 
 // import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
@@ -46,18 +49,17 @@ export default async function RootLayout({
         <ThemeProvider>
           <AuthProvider initialToken={initialToken}>
             <GoogleOAuthProvider clientId={process.env.GOOGLE_CLIENT_ID ?? ""}>
-              
               <NavBarWrapper />
               <ThemeSync />
-
+              {/* <AuthModalProvider> */}
               {/* 1. Main fills available space, pushing footer down */}
               <main className="flex-grow">
                 {children}
               </main>
-
+              {/* <AuthModal/> */}
               {/* 2. Footer Wrapper follows the main flow */}
+              {/* </AuthModalProvider> */}
               <FooterWrapper />
-
             </GoogleOAuthProvider>
           </AuthProvider>
         </ThemeProvider>

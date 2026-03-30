@@ -1,53 +1,66 @@
 'use client';
-import { ChartPieIcon, MagnifyingGlassCircleIcon, Square3Stack3DIcon, Squares2X2Icon, WalletIcon } from "@heroicons/react/24/outline"
-import clsx from "clsx";
-import Link from "next/link";
+
 import { usePathname } from "next/navigation";
+import Link from "next/link";
+import clsx from "clsx";
+import { useTheme } from "@/src/context/themeContext";
+import { SIDEBAR_SECTIONS } from "@/src/components/sidebar/sidebar.config";
 
+export default function SideBarLinks({ expanded }: { expanded: boolean }) {
+  const pathname = usePathname();
+  const { theme } = useTheme();
 
-const links = [
-    {name:'Dashboard', href:'/dashboard', icon:Squares2X2Icon},
-    {name:'Wallet', href:'/wallet', icon:WalletIcon},
-    {name:'Transactions' , href:'/transactions' , icon:Square3Stack3DIcon ,},
-    {name:'Revenue Analytics' , href:'/revenue-analytics' , icon: ChartPieIcon,},
-    {name:'Search' , href:'/search' , icon:MagnifyingGlassCircleIcon ,},
-]
+  const isExpanded = expanded;
 
-interface UserProfileProps {
-    className?: string;
-    theme?:string
-}
+  return (
+    <div className="flex flex-col gap-2 mt-6">
+      {SIDEBAR_SECTIONS.flatMap((section) =>
+        section.items.map((link) => {
+          const Icon = link.icon;
+          const isActive = pathname === link.href;
 
-export default function SideBarLinks({ className, theme }: UserProfileProps){
+          return (
+            <Link
+              key={link.name}
+              href={link.href}
+              className={clsx(
+                "group relative flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200",
+                isActive
+                  ? "bg-indigo-600/40 text-white"
+                  : theme === "dark"
+                  ? "text-slate-200 hover:text-white hover:bg-white/10"
+                  : "text-slate-700 hover:text-slate-900 hover:bg-slate-200",
+                isExpanded ? "" : "justify-center"
+              )}
+              aria-label={link.name}
+            >
+              <span
+                className={clsx(
+                  "absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full transition-all duration-300",
+                  isActive ? "bg-indigo-400" : "bg-transparent"
+                )}
+              />
 
-    const pathname = usePathname();
-    
-    return(
-        <div className="flex flex-row sm:flex-col sm:items-center sm:pb-11 sm:mt-10 ml-3  transition-all duration-500 ease-in-out">
-        {links.map((link)=>{
-            const Icon = link.icon;
-            return(
-                <Link 
-                key={link.name}
-                href={link.href}
-                className={clsx('flex px-4 py-1 mx-1 my-1 transition-all hover:scale-110 ease-in-out duration-300 justify-center sm:justify-start relative rounded-xl w-[80%]',
-                pathname===link.href?
-                (theme==='dark'?
-                     'bg-slate-100 text white'
-                    :
-                     'bg-blue-300')
-                :
-                (theme==='dark'?
-                    ' text-slate-300 hover:bg-slate-600 hover:text-white':'hover:bg-blue-200'),
-                className)}>
-                <Icon title={link.name} className="sm:w-4 w-7"/>
-                <p className="hidden ml-1 sm:block">{link.name}</p>
-                </Link>
-            )
-        })}
-        <div className="hidden sm:block sm:w-[80%] border-b-1 mt-5 ml-[-20]  transition-all duration-500 ease-in-out">
-        </div>
-        </div>
-        
-    )
+              <Icon className="w-5 h-5" />
+
+              <span
+                className={clsx(
+                  "duration-200 whitespace-nowrap",
+                  isExpanded ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2"
+                )}
+              >
+                {link.name}
+              </span>
+
+              {!isExpanded && (
+                <span className="pointer-events-none absolute left-full ml-2 hidden rounded-md bg-slate-950 px-2 py-1 text-xs text-white shadow-xl group-hover:block">
+                  {link.name}
+                </span>
+              )}
+            </Link>
+          );
+        })
+      )}
+    </div>
+  );
 }

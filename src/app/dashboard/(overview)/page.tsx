@@ -1,85 +1,97 @@
 'use client';
-import ToggleTheme from "@/src/components/dashboard/ToggleTheme"
-import { lusitana } from "@/src/assets/fonts/fonts"
+
+import { lusitana } from "@/src/assets/fonts/fonts";
 import AuthGuard from "@/src/components/auth/Guards/AuthGuard";
 import CardWrapper from "@/src/components/cards/cardDetails";
+import { Button } from "@/src/components/ui/buttons/buttons";
 import { useAccounts } from "@/src/context/accountContext";
 
-export default function Page(){
-    const {accounts} = useAccounts();
-    console.log('Value of accounts:', accounts);
-    return (
-        <AuthGuard>
-            <main>
-                {/* <Search placeholder="Search month"/> */}
-                <div className="flex absolute top-5 right-10">
-                    <ToggleTheme/>
+
+export default function Page() {
+  const { accounts } = useAccounts();
+
+  return (
+    <AuthGuard>
+      <main className="relative p-4">
+        {/* Theme Toggle */}
+
+        {accounts?.length===0 ?
+        <div className="h-screen bg-gray-100/4 hover:shadow-xl hover:shadow-gray-100/20 rounded-xl w-full flex transition-all duration-500 ease-in-out justify-center items-center">
+          <div className=" top-10">
+            <Button href="/account/add-account-details" className="p-4 hover:shadow-xl hover:shadow-blue-100/10">Click here to add Account details</Button>
+          </div>
+        </div>
+        
+        : (
+          <>
+            <h1 className={`${lusitana.className} mb-4 mt-7 font-bold text-xl md:text-2xl`}>
+                <u>Dashboard</u>
+            </h1>
+
+            <div className="w-full">
+              <div
+                className="
+                  grid gap-5
+                  grid-cols-1
+                  md:grid-cols-2
+                  lg:grid-cols-6 auto-rows-[minmax(120px,auto)]
+                "
+              >
+                {/* Card Details */}
+                {/* <div className="lg:col-start-1 lg:col-end-3 lg:row-start-1 lg:row-end-1">
+                  <CardWrapper title="Card Details" />
+                </div> */}
+
+                {/* Wallet */}
+                {/* <div className="lg:col-start-3 lg:col-end-5 lg:row-start-1 lg:row-end-2 h-full">
+                  <CardWrapper title="Wallet" />
+                </div> */}
+
+                {/* Monthly Spent */}
+                {/* <div className="lg:col-start-3 lg:col-end-5 lg:row-start-2 lg:row-end-3">
+                  <CardWrapper title="Monthly Spent" />
+                </div> */}
+
+                {/* Earnings (FIXED - no overlap now) */}
+                {/* <div className="lg:col-start-3 lg:col-end-5 lg:row-start-3 lg:row-end-7">
+                  <CardWrapper title="Savings" />
+                </div> */}
+
+                {/* Transactions */}
+                {/* <div className="lg:col-start-1 lg:col-end-3 lg:row-start-[2] lg:row-end-7">
+                  <CardWrapper title="Transactions" />
+                </div> */}
+
+                {/* Payables */}
+                {/* <div className="lg:col-start-5 lg:col-end-7 lg:row-start-1 lg:row-end-7">
+                  <CardWrapper title="Payable Accounts, Receipts" />
+                </div> */}
+
+                <div className="lg:col-span-2">
+                  <CardWrapper title="Card Details" />
                 </div>
-                { accounts && 
-                    <>
-                        <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
-                            Dashboard
-                        </h1>
-                    
-                        <div className="w-full">
-                            <div
-                                className="
-                                grid 
-                                gap-4
-                                /* Small (stack everything) */
-                                grid-cols-1
-                                /* Medium (2 columns layout) */
-                                md:grid-cols-2
-                                /* Large layout: 6 columns, 6 rows */
-                                lg:grid-cols-6
-                                lg:grid-rows-6
-                                "
-                                >
-                                {/* Card Details */}
-                                <div className="lg:col-start-1 lg:col-end-3 lg:row-start-1 lg:row-end-2">
-                                <CardWrapper pageClass="" title="Card Details" />
-                                </div>
+                <div className="lg:col-span-2">
+                  <CardWrapper title="Wallet" />
+                </div>
+                <div className="lg:col-span-2 lg:row-span-3">
+                  <CardWrapper title="Payable Accounts, Receipts" />
+                </div>
 
-                                {/* Wallet */}
-                                <div className="lg:col-start-3 lg:col-end-5 lg:row-start-1 lg:row-end-2">
-                                <CardWrapper pageClass="" title="Wallet" />
-                                </div>
-
-                                {/* Monthly Earnings */}
-                                <div className="lg:col-start-3 lg:col-end-5 lg:row-start-2 lg:row-end-5">
-                                <CardWrapper pageClass="" title="Monthly Earnings" />
-                                </div>
-
-                                {/* Earnings */}
-                                <div className="lg:col-start-3 lg:col-end-5 lg:row-start-4 lg:row-end-7">
-                                <CardWrapper pageClass="" title="Earnings" />
-                                </div>
-
-                                {/* Transactions */}
-                                <div className="lg:col-start-1 lg:col-end-3 lg:row-start-2 lg:row-end-7">
-                                <CardWrapper pageClass="" title="Transactions" />
-                                </div>
-
-                                {/* Payables */}
-                                <div className="lg:col-start-5 lg:col-end-7 lg:row-start-1 lg:row-end-7">
-                                <CardWrapper pageClass="" title="Payable Accounts, Receipts" />
-                                </div>
-                            </div>
-                        </div>
-                    </>
-                }
-
-            </main>
-        </AuthGuard>
-    )
+                <div className="lg:col-span-2 lg:row-span-4">
+                  <CardWrapper title="Transactions" />
+                </div>
+                <div className="lg:col-span-2">
+                  <CardWrapper title="Monthly Spent" />
+                </div>
+                <div className="lg:col-span-2 lg:row-span-2">
+                  <CardWrapper title="Savings" />
+                </div>
+              </div>
+            </div>
+          </>
+        )
+      }
+      </main>
+    </AuthGuard>
+  );
 }
-
-
-
-
-// .div1 { grid-area: 1 / 1 / 3 / 3; }
-// .div2 { grid-area: 1 / 3 / 3 / 5; }
-// .div3 { grid-area: 3 / 3 / 5 / 5; }
-// .div4 { grid-area: 5 / 3 / 7 / 5; }
-// .div5 { grid-area: 3 / 1 / 7 / 3; }
-// .div6 { grid-area: 1 / 5 / 7 / 7; }

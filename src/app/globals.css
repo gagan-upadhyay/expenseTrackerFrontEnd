@@ -1,34 +1,46 @@
 @import "tailwindcss";
 
+/* 🌞 Light Theme (default) */
 :root {
   --background: #e6edf7;
   --foreground: #171717;
-}
 
-/* Moved custom properties to :root for compatibility */
-/* --color-background: var(--background); */
-:root {
-  --color-foreground: var(--foreground);
+  --color-primary: #F1F5FB;
+  --color-text: #374151;
+  --color-border: #1e3a8a;
+
+  --color-chrome: #db9797;
+  --color-safari: #5a2e2e;
+  --color-firefox: #804f4f;
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #242a38;
-    --foreground: #ededed;
-  }
+/* 🌙 Dark Theme (controlled via class) */
+.dark {
+  --background: #242a38;
+  --foreground: #ededed;
+
+  --color-primary: linear-gradient(to right, #c0c0c0, #2f3e46);
+  --color-text: #9ca3af;
+  --color-border: #bae6fd;
 }
 
+/* Base styles */
 body {
-  /* background: var(--background); */
+  background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Smooth transition globally */
+* {
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
 
-/*removing the up-dpwn arrow on number input*/
-no-spinner::-webkit-outer-spin-button,
+/* Remove number input spinner */
+.no-spinner::-webkit-outer-spin-button,
 .no-spinner::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
@@ -36,5 +48,154 @@ no-spinner::-webkit-outer-spin-button,
 
 .no-spinner {
   appearance: textfield;
-  -moz-appearance: textfield; /* Firefox */
+  -moz-appearance: textfield;
+}
+
+
+/*-------------------------------------------------------------------*/
+
+/* 🧊 Glassmorphism Base */
+/* .glass {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+} */
+
+/* 🌙 Dark mode glass */
+/* .dark .glass {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+} */
+
+
+
+/* 🧊 Glassmorphism Base (LIGHT FIXED) */
+.glass {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  /* ✅ subtle bluish tint instead of plain white */
+  background: rgba(96, 77, 173, 0.249);
+
+  /* ✅ softer but visible border */
+  border: 1px solid rgba(0, 0, 0, 0.08);
+
+  /* ✅ layered shadow for depth */
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* 🌙 Dark mode (keep strong contrast) */
+.dark .glass {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+
+
+/* ✨ Hover effect */
+.glass-hover {
+  transition: all 0.4s ease;
+}
+
+.glass-hover:hover {
+  transform: scale(1.02);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* 🔮 Glow accents (optional reusable) */
+.glow-indigo {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  background: rgba(99, 102, 241, 0.2);
+  border-radius: 9999px;
+  filter: blur(60px);
+}
+
+.glow-purple {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  background: rgba(168, 85, 247, 0.2);
+  border-radius: 9999px;
+  filter: blur(60px);
+}
+
+/* 🔥 Strong glass */
+.glass-strong {
+  backdrop-filter: blur(24px);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+/* 🪶 Light glass */
+.glass-light {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* 🌙 Dark variants */
+.dark .glass-strong {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.dark .glass-light {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+
+/*Skeleton effectL*/
+
+/* ✨ Skeleton shimmer */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.dark .skeleton {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+.dark .skeleton::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.15),
+    transparent
+  );
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+.skeleton-no-shimmer::after{
+  display: none;
 }

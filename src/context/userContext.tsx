@@ -34,14 +34,14 @@ export const UserProvider=({children}:{children:React.ReactNode})=>{
     const {accessToken, logout, isTokenValid} = useAuth();
     
 
-    console.log('Value of userTheme from userCOntext:\n', userTheme);
+    // console.log('Value of userTheme from userCOntext:\n', userTheme);
     
     
     const fetchUserWithRetry = useCallback(async (maxRetries:number,delay:number ): Promise<fetchedUser | null> => {
         for (let attempt = 0; attempt < maxRetries; attempt++) {
             try {
                 const data = await getUserDetails();
-                console.log(`value of data from userCOntext:${data}`);
+                // console.log(`value of data from userCOntext:${data}`);
                 if (data) return data as fetchedUser;
             }catch(err) {
                 console.error('Error fetching user:\n', err)

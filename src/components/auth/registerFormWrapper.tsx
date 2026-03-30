@@ -4,9 +4,8 @@ export default async function RegisterFormWrapper(){
         await new Promise((resolve)=>setTimeout(resolve, 4000));
     }
     return(
-        <div className="relative top-20">
-                <RegisterForm/>
-        </div>
+        <RegisterForm/>
+
     )
         
 }

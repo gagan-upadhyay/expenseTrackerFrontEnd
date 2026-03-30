@@ -17,7 +17,7 @@ export default function GuestGuard({ children }: { children: React.ReactNode }) 
     }
 
     const initGuestGuard = ()=>{
-      console.log('inside initGuestGiard')
+      // console.log('inside initGuestGiard')
       if(!accessToken){
         console.warn('No access token available. Skipping redirecting to dashboard');
         setIsLoading(false);

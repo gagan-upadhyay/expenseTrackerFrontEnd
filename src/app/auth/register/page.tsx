@@ -6,10 +6,11 @@ import GuestGuard from "@/src/components/auth/Guards/GuestGuard";
 const Register = ()=>{
     return(
         <GuestGuard>
-            <div className="flex  bg-gray-300 h-auto">
-                <div className="mx-auto flex flex-col w-full p-4 max-w-[400px] ">
-                    <Suspense fallback={<RegisterFormSkeleton/>}>
-                        <RegisterFormWrapper/>
+
+            <div className="flex justify-center items-center min-h-screen px-4">
+                <div className="relative w-full max-w-sm">
+                    <Suspense fallback={<RegisterFormSkeleton />}>
+                        <RegisterFormWrapper />
                     </Suspense>
                 </div>
             </div>
@@ -17,3 +18,18 @@ const Register = ()=>{
     )
 }
 export default Register;
+
+// 'use client';
+
+// import { useEffect } from "react";
+// import { useAuthModal } from "@/src/context/authModalContext";
+
+// export default function LoginPage() {
+//   const { openModal } = useAuthModal();
+
+//   useEffect(() => {
+//     openModal("register");
+//   }, []);
+
+//   return null;
+// }

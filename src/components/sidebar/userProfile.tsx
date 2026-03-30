@@ -1,21 +1,33 @@
-import Image from "next/image";
+// import { useSidebar } from "@/src/context/sidebarContext";
+import { useUser } from "@/src/context/userContext";
 import clsx from "clsx";
-import { fetchedUser } from "@/src/utils/definitions";
+import Image from "next/image";
 
-interface UserProfileProps {
-    className?: string;
-    user?:fetchedUser;
-    // loading:boolean;
+interface UserProfileInterface{
+    expanded:boolean;
 }
 
-export default function UserProfile({ className, user }: UserProfileProps){
+export default function UserProfile({ expanded }: UserProfileInterface) {
+        const {loading, user}=useUser();
+  return (
+    <div className="flex flex-col items-center mb-6">
+      <Image
+      alt="User Image"
+        width={65}
+        height={65}
+        src={user?.profile_picture || "/profilePicture.jpg"}
+        className=" rounded-full border-2 border-indigo-500"
+      />
 
-// console.log("value of user form sidebar userProfile", user);
-const profilePicture=user?.profile_picture;
-    return (
-        <div className={clsx(className, 'flex flex-row px-5 sm:flex-col sm:w-60 sm:py-2 items-center leading-none ')}>
-            <Image src={profilePicture || '/profilePicture.jpg'} alt="Profile Picture" width={50} height={50} className="border border-4 border-blue-800 hover:border-blue-400 transition-all ease-in-out duration-600 focus:border-blue-700 rounded-full sm:w-20 w-12 "/>
-            <p className={clsx(className, "sm:mt-3 sm:ml-2 ml-4  transition-all duration-500 ease-in-out")}>{user?`${user?.firstname} ${user?.lastname}`:'Loading...'}</p>
-        </div>
-    )
+      <p
+        className={clsx(
+          "mt-3 text-sm text-white transition-all duration-300",
+          expanded ? "opacity-100" : "opacity-0",
+          loading?"skeleton":"",
+        )}
+      >
+        {user ? `${user.firstname} ${user.lastname}` : ''}
+      </p>
+    </div>
+  );
 }

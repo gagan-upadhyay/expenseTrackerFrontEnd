@@ -2,6 +2,7 @@
 // import '@dotenvx/dotenvx/config';
 
 // import getLogger from "../services/logger-service";
+import { success } from "zod";
 import apiFetch from "./apiClient";
 import { AddedUser } from "./definitions";
 
@@ -10,7 +11,7 @@ const AUTH_SERVICE = process.env.NEXT_PUBLIC_AUTH_SERVICE;
 
 export const getUserDetails = async () => {
     const data:{result:AddedUser} = await apiFetch(`${USER_SERVICE}/api/v1/user/`) as {result:AddedUser};
-    console.log('Value of result from getUserDetails , data.ts', data?.result);
+    // console.log('Value of result from getUserDetails , data.ts', data?.result);
     return data?.result ?? null;
 };
 console.log(`Value of user_service: ${USER_SERVICE} and AUTH_SERVICE: ${AUTH_SERVICE} from data.ts`);
@@ -37,35 +38,59 @@ export const passwordUtitlity = async (
         const result = await apiFetch(`${USER_SERVICE}/api/v1/user/${url}/`, {
             method: 'POST',
             body: JSON.stringify(body),
+            credentials:'include',
         });
         return result;
     } else {
         return apiFetch(`${USER_SERVICE}/api/v1/user/${url}/`, {
             method: 'PUT',
             body: JSON.stringify(body),
+            credentials:'include',
         });
     }
 }
 
-export const refreshToken = async (apiBody: string | null) => {
+export const refreshToken = async () => {
     return apiFetch(`${AUTH_SERVICE}/api/v1/auth/refresh/`, {
         method: 'POST',
-        body: JSON.stringify(apiBody),
+        credentials:'include',
     });
 }
 
 export const sendOTP = async (name: string, email: string, type: string) => {
-    const result:{success:boolean, message:string} = await apiFetch(`${AUTH_SERVICE}/api/v1/auth/otp/generate/`, {
+    try{
+        const result:{success:boolean, message:string} = await apiFetch(`${AUTH_SERVICE}/api/v1/auth/otp/generate/`, {
         method: 'POST',
+        credentials:'include',
         body: JSON.stringify({ name, email, ...(type === 'emailChange' && { type }) }),
-    }) as {success:boolean, message:string};
-    return result?.message;
+        }) as {success:boolean, message:string};
+        return result;
+    }catch(err){
+        let errorMessage = 'Something went wrong! Try again later.'
+        console.warn(`error while fetching OTP: ${err}`);
+
+        if(err instanceof Error){
+            errorMessage=err.message;
+        }
+        return {success:false, message:errorMessage};
+    }
 }
 
 export const verifyOTPStatus = async (otp: string, email: string) => {
-    const useForLogin = false;
-    return apiFetch(`${AUTH_SERVICE}/api/v1/auth/otp/verify/`, {
+    try{
+        console.log(`value of otp from dfata.ts: ${otp}`);
+        const useForLogin = false;
+        return apiFetch(`${AUTH_SERVICE}/api/v1/auth/otp/verify/`, {
         method: 'POST',
         body: JSON.stringify({ otp, email, useForLogin }),
+        credentials:'include'
     });
+
+    }catch(err){
+        let errorMessage='Something went wrong! Try again later';
+        if(err instanceof Error){
+            errorMessage=err.message;
+        }
+        return{success:false, message:errorMessage};
+    }
 }

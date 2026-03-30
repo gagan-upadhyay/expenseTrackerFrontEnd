@@ -4,10 +4,11 @@ import React, { createContext, useContext, useEffect, useState, useCallback, use
 
 import { Account, CardDetails } from '../utils/definitions';
 import { getAccountByUser } from '../services/accountServices';
+// import { useAuth } from './authContext';
 // import { useUser } from './userContext';
 
 interface AccountContextType {
-    accounts: Account[] | null;
+    accounts: Account[] | undefined;
     loading: boolean;
     error: string | null;
     cards:CardDetails[] | null;
@@ -17,10 +18,11 @@ interface AccountContextType {
 const AccountContext = createContext<AccountContextType | undefined>(undefined);
 
 export const AccountProvider=({ children}:{ children:React.ReactNode }) => {
-    const [accounts, setAccounts] = useState<Account[] | null>(null);
+    const [accounts, setAccounts] = useState<Account[] | undefined>(undefined);
     const [cards, setCard] = useState<CardDetails[] | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    // const {setIsLoggedIn, logout} = useAuth();
 
     const fetchAccounts = useCallback(async () => {
         try {
@@ -28,12 +30,14 @@ export const AccountProvider=({ children}:{ children:React.ReactNode }) => {
             setError(null);
             const data = await getAccountByUser();
             if(data?.account){
-                console.log('value of data from context:', data);
+                // console.log('value of data from context:', data);
             }
             setCard(data?.cards?.result ?? null);
-            console.log('value of cards from accountContext:\n', data?.cards?.result);
-            setAccounts(data.account?.data ?? null);
+            // console.log('value of cards from accountContext:\n', data?.cards?.result);
+            setAccounts(data.account?.data ?? undefined);
         } catch (err) {
+            // setIsLoggedIn(false);
+            // logout();
             console.error(`Error occured while fetching accounts details:\n ${err}`);
             setError(err instanceof Error ? err.message : 'An error occurred');
         } finally {

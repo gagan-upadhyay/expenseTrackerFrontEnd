@@ -63,13 +63,15 @@ export interface Account{
 }
 
 export interface CardDetails{
-    id:string;
+    // id:string;
     brand:string;
     cardnumber:string;
     holder_name:string;
     expiry_month:number;
     expiry_year:number;
+    cvv?:string;
     is_active:boolean;
+    type:'debit'|'credit';
 }
 
 export interface Transaction{

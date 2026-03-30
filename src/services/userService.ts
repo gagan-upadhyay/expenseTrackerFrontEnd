@@ -18,11 +18,7 @@ export async function updateUserProfile(data:{
         // getLogger('userService').debug('formData to submit', formData);
         const res = await fetch(`${USER_SERVICE}/api/v1/user/update-user/`, {
             method:'PUT',
-            body:JSON.stringify({
-                firstName:data?.firstName,
-                lastName:data?.lastName,
-            }),
-            headers:{'Content-Type':'application/json'},
+            body:formData,
             credentials:'include'
         });
         const json = await res.json();

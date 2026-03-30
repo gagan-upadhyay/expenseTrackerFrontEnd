@@ -10,7 +10,7 @@ import { BounceLoader } from "react-spinners";
 export default function AuthGuard({children}:{children:React.ReactNode}){
     const {isLoggedIn, isReady} = useAuth();
     const {theme} =useTheme()
-    console.log('Value of isLoggedIn and isReady from authGurad:\n', isLoggedIn, isReady);
+    // console.log('Value of isLoggedIn and isReady from authGurad:\n', isLoggedIn, isReady);
     const router = useRouter();
     useEffect(()=>{
         if(isReady && !isLoggedIn) 

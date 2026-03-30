@@ -29,7 +29,7 @@ export async function apiFetch<T = unknown>(
     const refreshCookie = getCookie('refreshToken');
     if (refreshCookie) {
       try {
-        const data:{accessToken:string|null} = await fetchRefreshToken(refreshCookie) as {accessToken:string|null};
+        const data:{accessToken:string|null} = await fetchRefreshToken() as {accessToken:string|null};
         // console.log("Value of data from apiCLient.ts", data)
         if (data && data?.accessToken) {
           // update cookie and retry original request

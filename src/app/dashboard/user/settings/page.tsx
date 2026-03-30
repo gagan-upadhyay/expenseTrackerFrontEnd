@@ -1,23 +1,45 @@
+'use client';
+
 import AuthGuard from "@/src/components/auth/Guards/AuthGuard"
 import Accordion from "@/src/components/ui/accordion"
-import UserProfile from "@/src/components/settings/userprofile";
+// import UserProfile from "@/src/components/settings/userprofile";
 import SettingThemes from "@/src/components/settings/themeSettings";
+import Preferences from "@/src/components/settings/Preferences";
+import ProfileSettings from "@/src/components/settings/ProfileSettings";
+import SecuritySettings from "@/src/components/settings/SecuritySettings";
+import { useState } from "react";
 
-export default function Page(){
-    return(
-        <AuthGuard>
-            <div className="flex flex-col items-center md:px-1 md:py-2">
-                <Accordion title="User Profile">
-                    <UserProfile/> 
-                </Accordion>
-                <SettingThemes/>
-            </div>
-         </AuthGuard>
-        
- 
-    )
+export default function Page() {
+  const [openAccordion, setOpenAccordion] = useState<string | null>(null);
+
+  const toggleAccordion = (title: string) => {
+    setOpenAccordion(openAccordion === title ? null : title);
+  };
+
+  return (
+    <AuthGuard>
+      <div className="max-w-3xl glass glass-hover flex flex-col h-auto items-center rounded-3xl mx-auto space-y-4 p-4">
+
+        <Accordion title="Profile" isOpen={openAccordion === "Profile"} onToggle={() => toggleAccordion("Profile")}>
+          <ProfileSettings />
+        </Accordion>
+
+        <Accordion title="Security" isOpen={openAccordion === "Security"} onToggle={() => toggleAccordion("Security")}>
+          <SecuritySettings/>
+        </Accordion>
+
+        <Accordion title="Appearance" isOpen={openAccordion === "Appearance"} onToggle={() => toggleAccordion("Appearance")}>
+          <SettingThemes />
+        </Accordion>
+
+        <Accordion title="Preferences" isOpen={openAccordion === "Preferences"} onToggle={() => toggleAccordion("Preferences")}>
+          <Preferences/>
+        </Accordion>
+
+      </div>
+    </AuthGuard>
+  );
 }
-
 
 
 

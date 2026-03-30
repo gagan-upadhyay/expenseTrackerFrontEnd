@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 export default function ThemeSync(){
     const {theme} = useTheme();
-    console.log('Value of theme from themesync:', theme);
+    // console.log('Value of theme from themesync:', theme);
 
     useEffect(()=>{
         const body=document.body;

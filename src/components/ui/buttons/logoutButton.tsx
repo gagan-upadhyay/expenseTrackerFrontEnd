@@ -46,8 +46,6 @@ export default function LogoutButton({isClass}:buttonProp){
                 }
             }}>
             <ArrowRightEndOnRectangleIcon className="sm:w-5 w-7"/>
-            <button className="cursor-pointer" > <p className="hidden text-sm sm:text-sm sm:block">logout</p>
-            </button>
             <ToastContainer/>
         </div>
     )

@@ -2,7 +2,7 @@ import { CredentialResponse } from "@react-oauth/google";
 import apiFetch from "@/src/utils/apiClient";
 
 const AUTH_SERVICE = process.env.NEXT_PUBLIC_AUTH_SERVICE;
-console.log(`Vlaue of AUTH_SERVICE:${AUTH_SERVICE} from authservice.ts`);
+// console.log(`Vlaue of AUTH_SERVICE:${AUTH_SERVICE} from authservice.ts`);
 export const loginWithGoogle = async (credentialResponse: CredentialResponse) => {
   if (!credentialResponse.credential) throw new Error("No credential received");
 

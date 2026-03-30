@@ -1,127 +1,132 @@
-'use client'
+'use client';
+
 import { useTransactions } from "@/src/context/transactionContext";
 import { getCurrencySymbol } from "@/src/utils/getCurrencySymbol";
-import { ArrowTrendingDownIcon, ArrowTrendingUpIcon } from "@heroicons/react/16/solid";
+import { ArrowTrendingDownIcon, ArrowTrendingUpIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import TransacationSkeleton from "../skeletons/transactionSkeleton";
 import { usePathname } from "next/navigation";
 import { GrTransaction } from "react-icons/gr";
-import { Button } from "../ui/buttons/buttons";
+// import { Button } from "../ui/buttons/buttons";
 import { useTheme } from "@/src/context/themeContext";
 import { convertToMMYY } from "@/src/utils/timeConverter";
+import { Button } from "../ui/buttons/buttons";
 
-interface TransactionCardProps{
-    pageClass:string;
-    transitionClass?:string;
+interface TransactionCardProps {
+  pageClass: string;
 }
 
-export default function TransactionCard({pageClass, transitionClass = ''}:TransactionCardProps){
-    // console.log("Value of parentClass form transitionCard:", pageClass);
-    const {transactions, errorMsg, loading} = useTransactions();
-    console.log('Value of transactions, errorMsg and loading from transactionCard:\n', transactions, errorMsg);
-    const path = usePathname();
-    const {theme}=useTheme();
-    // const walletPage = path.includes('wallet');
-    if(!loading){
-        console.log('value of transactions after loading is done:', transactions?.length===0);
-    }
-    
-    const transactionPage=path.includes('transactions');
-    const dashboardPage = path.includes('dashboard');
-    // const walletPage = path.includes('wallet');
-    return(
-        <>
-        {/* PrefixMin Widthsm:640pxmd:768pxlg:1024pxxl:1280px2xl:1536px */}
-        {
-            loading
-            ?
-            <TransacationSkeleton pageClass={pageClass} skeleton={true}/>
-            : transactions?.length===0 
-            ? 
-            <TransacationSkeleton skeleton={false} pageClass={pageClass}/>
-            :
-            <div className={clsx("rounded-xl shadow-xl focus:outline-none focus:ring-2",
-                !transactionPage && 'border-1', 
-                !dashboardPage && 'p-2 mt-10',
-                // walletPage && 'mt-10',
-                pageClass, transitionClass,
-                )}>
-                <div className={clsx(
-                    'flex rounded-lg',
-                    theme==='dark'?"bg-gray-100/10":"bg-gray-300/40"
-                )}>
-                    <div className={clsx("flex w-full p-4",
-                        transactionPage?"justify-between":"justify-center"
-                    )}>
-                        <div className="flex gap-2 "> {/**div for icon and transactiuon */}
-                            {transactionPage && 
-                                <GrTransaction className="
-                                border w-8 h-8 mx-2 rounded-xl p-1.5 mt-1"/>
-                            }
-                            <div className="flex flex-col ">
-                                <h3 className="text-xl leading-tight font-bold"><u>Transactions</u></h3>
-                                {transactionPage && <h4 className="md:block hidden text-sm text-gray-600 max-w-auto">
-                                    Track and view all transactions your transactions with clear and detailed view</h4>}
-                            </div>
-                        </div>
-                        {
-                            transactionPage && 
-                            <Button href='/' className={clsx("text-lg md:px-5 md:py-3 md:text-sm md:text-base px-7 py-1 mt-1 whitespace-nowrap ",
-                                
-                            )}> 
-                                <span className="lg:hidden">
-                                    +
-                                </span>
-                                <span className="hidden lg:inline">
-                                    Add Transactions
-                                </span>
-                            </Button>
-                        }
-                        
-                    </div>
+export default function TransactionCard({ pageClass }: TransactionCardProps) {
+  const { transactions, errorMsg, loading } = useTransactions();
+  const path = usePathname();
+  const { theme } = useTheme();
+  // const router = useRouter();
 
+  const transactionPage = path.includes('transactions');
+  const dashboardPage = path.includes('dashboard');
+
+  if (loading) {
+    return <TransacationSkeleton pageClass={pageClass} skeleton />;
+  }
+
+  if (!transactions || transactions.length === 0) {
+    return <TransacationSkeleton skeleton={false} pageClass={pageClass} />;
+  }
+
+  return (
+    <div
+      className={clsx(
+        "relative flex flex-col rounded-2xl p-6", // ✅ SAME AS WALLET
+        "glass glass-hover smooth-theme",        // ✅ SAME DESIGN SYSTEM
+        "overflow-hidden",
+        pageClass,
+        !dashboardPage && "mt-6"
+      )}
+    >
+      {/* Glow (same as wallet/card) */}
+      <div className="glow glow-indigo -top-10 -right-10"></div>
+      <div className="glow glow-purple -bottom-10 -left-10 "></div>
+
+      {/* Header */}
+      <div
+        className={clsx(
+          "flex items-center justify-between mb-4 p-3 rounded-xl",
+          theme === "dark" ? "bg-white/5" : "bg-black/5"
+        )}
+      >
+        <div className={clsx("flex items-center gap-2", !transactionPage&&"w-full justify-center")}>
+          {transactionPage && (
+            <GrTransaction className="w-7 h-7 p-1.5 rounded-lg border" />
+          )}
+
+          <div>
+            <h3 className={clsx("text-lg font-semibold" )}>Transactions</h3>
+            {transactionPage && (
+              <p className="hidden md:block text-xs opacity-70">
+                Track and view all your transactions
+              </p>
+            )}
+          </div>
+        </div>
+
+        {transactionPage && (
+          <Button
+          href="/transactions/add"
+          className="relative z-10"
+          >
+            <span className="lg:hidden">+</span>
+            <span className="hidden lg:inline">Add</span>
+          </Button>
+        )}
+      </div>
+
+      {/* List */}
+      {!errorMsg && (
+        <div className="flex flex-col gap-2">
+          <ul className="divide-y divide-gray-500/20">
+            {transactions.map((transaction, index) => (
+              <li
+                key={transaction.id || index}
+                className="grid grid-cols-4 items-center gap-2 py-3 px-2 hover:bg-white/5 rounded-lg transition-all"
+              >
+                {/* Icon */}
+                <div
+                  className={clsx(
+                    "flex items-center justify-center w-8 h-8 rounded-xl",
+                    transaction.type === "credit" && "bg-green-400/20 text-green-500",
+                    transaction.type === "debit" && "bg-red-400/20 text-red-500"
+                  )}
+                >
+                  {transaction.type === "credit" ? (
+                    <ArrowTrendingUpIcon className="w-5 h-5" />
+                  ) : (
+                    <ArrowTrendingDownIcon className="w-5 h-5" />
+                  )}
                 </div>
-                {
-                    !loading && !errorMsg && transactions?.length!==0 &&
-                    <div className="flex flex-col bg-gray-400/5 justify-center mt-3">
-                        <ul className="divide-y divide-gray-600">
-                            {
-                                transactions?.map((transaction, index)=>(
-                                    <li key={transaction.id||index} className="flex justify-between mb-2 px-2 py-2">
-                                        {/* <div > */}
-                                            
-                                            <>
-                                            <div className={clsx("flex items-center ml-1 p-1 border-1 rounded-3xl justify-center",
-                                                transaction.type==='credit' && 'bg-green-400/70',
-                                                transaction.type==='debit'  && 'bg-red-400/50',
 
-                                            )}>
-                                                {transaction.type==='credit'?<ArrowTrendingUpIcon className="h-5 w-5 md:m-[1]"/>:<ArrowTrendingDownIcon className="h-5 w-5 md:m-[1]"/>}
-                                            </div>
-                                            <div className="sm:text-md lg:text-[14px] md:text-xs md:ml-2 md:mr-2 md:whitespace-nowrap">
-                                                <p className={clsx(
-                                                    ''
-                                                )}>{transaction.display_name.length>7?transaction.display_name.slice(0,7)+'..':transaction.display_name}</p>
-                                            </div>
-                                            <div className="sm:text-md text-sm lg:text-md md:text-[13px]">
-                                                {convertToMMYY(transaction.occurred_at)}
-                                            </div>
-                                            <div className="sm:text-md lg:text-md md:text-[13px]">
-                                                {getCurrencySymbol(transaction.currency_code)}{transaction.amount}
-                                            </div>
-                                            </>
-                                        {/* </div> */}
-                                    </li>
-                                ))
-                            }
-                            
-                        </ul>
-                    </div>
-                }      
-            </div>
-            
-            
-        }
-        </>
-    )
+                {/* Name */}
+                <div className="relative group truncate text-sm">
+                  {transaction.display_name}
+                  <div className="absolute left-0 bottom-full mb-1 opacity-0 group-hover:opacity-100 transition-all bg-black text-white text-xs px-2 py-1 rounded whitespace-nowrap z-10">
+                    {transaction.display_name}
+                  </div>
+                </div>
+
+                {/* Date */}
+                <div className="text-xs text-center opacity-70">
+                  {convertToMMYY(transaction.occurred_at)}
+                </div>
+
+                {/* Amount */}
+                <div className="text-sm text-right font-medium">
+                  {getCurrencySymbol(transaction.currency_code)}
+                  {transaction.amount}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
 }

@@ -1,28 +1,34 @@
 import React from "react";
 import SideBar from "@/src/components/dashboard/Sidebar";
-import ToggleTheme from "@/src/components/dashboard/ToggleTheme";
+// import ToggleTheme from "@/src/components/dashboard/ToggleTheme";
 import { UserProvider } from "@/src/context/userContext";
 import ThemeSync from "@/src/components/dashboard/ThemeSync";
 import { AccountProvider } from "@/src/context/accountContext";
 // import { TransactionProvider } from "@/src/context/transactionContext";
+import { SidebarProvider } from "@/src/context/sidebarContext";
+import MainContent from "@/src/components/layout/MainContent";
+import Breadcrumbs from "@/src/components/ui/Breadcrumbs";
 
-export default function AccountLayout({children}: {children:React.ReactNode}){
+export default function DashBoardLayout({children}: {children:React.ReactNode}){
     return (
         <UserProvider>
             <AccountProvider>
                 {/* <TransactionProvider> */}
                     <ThemeSync/>
-                    <div className="flex h-screen flex-col md:flex-row md:overflow-hidden">
-                        <div className="w-full flex-none md:w-64">
-                            <SideBar/>
-                        </div>
-                        <div className="flex-grow p-6 md:p-12 md:overflow-y-auto">
-                            <div className="flex absolute top-5 right-10">
-                                <ToggleTheme/>
-                            </div>
-                            {children}
-                        </div>
-                    </div>
+                    <SidebarProvider>
+                        
+                        {/* <div className="flex h-screen flex-col sm:flex-row sm:overflow-hidden"> */}
+                            
+                            {/* <div className="flex-grow p-6 sm:p-12 sm:overflow-y-auto"> */}
+                                <SideBar/>
+                                
+                                <MainContent>
+                                    <Breadcrumbs/>
+                                {children}
+                                </MainContent>
+                            {/* </div> */}
+                        {/* </div> */}
+                    </SidebarProvider>
                 {/* </TransactionProvider> */}
             </AccountProvider>
         </UserProvider>

@@ -1,23 +1,21 @@
 'use client';
-import { useEffect } from 'react';
-import {useTheme} from '../../context/themeContext';
-// import { useUser } from '@/src/context/userContext';
 
-export default function ToggleTheme(){
-    const {toggleTheme, theme} = useTheme();
-    // const {loading} = useUser();
-    useEffect(()=>{
-        if(localStorage.getItem('theme')){
-            
-        }
-    })
-    // console.log("Value fo theme form toggletheme:", theme);
-    return(
-        <button onClick={toggleTheme}
-            className={ `${theme ==='light'?'bg-gray-400':'bg-neutral-700'} p-2 rounded-full text-black  transition`}
-            aria-label="Toggle Theme"
-        >
-            {theme==='dark'? '🌙' : '🌞'  }
-        </button>
-    )
+import { useTheme } from "@/src/context/themeContext";
+import clsx from "clsx";
+
+export default function ToggleTheme() {
+  const { toggleTheme, theme } = useTheme();
+
+  return (
+    <button
+      onClick={toggleTheme}
+      className={clsx(
+        "p-2 rounded-full transition-colors",
+        theme === "dark" ? "bg-gray-700 text-yellow-400" : "bg-gray-200 text-gray-800"
+      )}
+      aria-label="Toggle theme"
+    >
+      {theme === "dark" ? "🌞" : "🌙"}
+    </button>
+  );
 }
