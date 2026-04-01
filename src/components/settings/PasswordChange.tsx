@@ -18,8 +18,10 @@ export default function PasswordChange() {
     passwordStatus,
     loading,
     loadingPassCheck,
-    toggleEyeOpen,
-    eyeOpen,
+    toggleNewEye,
+    toggleOldEye,
+    oldEyeOpen,
+    newEyeOpen,
   } = usePassword();
   // const [passwordStatus, setPasswordStatus] = useState<'Matched'|'!Matched'|'issue'|"">("");
   // const [newPasswordStatus, setNewPasswordStatus] = useState<"Compliant"|"!Compliant"|"">("");
@@ -71,7 +73,7 @@ export default function PasswordChange() {
       <div className="space-y-1 flex"> 
         <div className="relative w-full flex items-center justify-between">
           <input
-            type={eyeOpen?"text":"password"}
+            type={oldEyeOpen?"text":"password"}
             placeholder="Current Password"
             value={oldPassword}
             onChange={(e) => setOldPassword(e.target.value)}
@@ -79,6 +81,7 @@ export default function PasswordChange() {
             onBlur={checkPassword}
             className={clsx("w-full bg-transparent border-b  py-2 text-sm focus:outline-none", 
                 passwordError?'border-red-500':'border-[var(--color-border)]',
+
                 passwordStatus === 'Matched' && 'border-green-500 ', 
             )}
           />
@@ -89,11 +92,11 @@ export default function PasswordChange() {
             <button
               onClick={(e) => {
                   e.preventDefault();
-                  toggleEyeOpen();
+                  toggleOldEye();
               }}
               className="absolute mr-2 right-3 top-2.5"
               >
-              {eyeOpen ? (
+              {oldEyeOpen ? (
                   <EyeIcon className="w-4 h-4 opacity-60" />
               ) : (
                   <EyeSlashIcon className="w-4 h-4 opacity-60" />
@@ -108,17 +111,34 @@ export default function PasswordChange() {
 
 
       {/* NEW PASSWORD */}
-      <input
-        type="password"
+      <div className="relative">
+        <input
+        type={newEyeOpen?"text":"password"}
         placeholder="New Password"
         value={newPassword}
         onChange={(e) => setNewPassword(e.target.value)}
-        
+        minLength={8}
         disabled={passwordStatus!=='Matched'}
-        className="w-full bg-transparent border-b border-[var(--color-border)] py-2 text-sm focus:outline-none"
-      />
-
-
+        className={clsx("w-full bg-transparent border-b py-2 text-sm focus:outline-none",
+          passwordError==='Password already in use'?"border-red-400":"border-[var(--color-border)]"
+        )}
+        />
+        {newPassword && (
+          <button
+            onClick={(e) => {
+                e.preventDefault();
+                toggleNewEye();
+            }}
+            className="absolute mr-2 right-3 top-2.5"
+            >
+            {oldEyeOpen ? (
+                <EyeIcon className="w-4 h-4 opacity-60" />
+            ) : (
+                <EyeSlashIcon className="w-4 h-4 opacity-60" />
+            )}
+          </button>
+        )}
+      </div>
       {/* 🔥 STRENGTH BAR */}
       {newPassword && (
         <div>
@@ -133,6 +153,7 @@ export default function PasswordChange() {
           </p>
         </div>
       )}
+      
       
       
       {/* BUTTON */}

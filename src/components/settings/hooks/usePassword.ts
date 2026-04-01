@@ -10,10 +10,14 @@ export function usePassword() {
     const [loadingPassCheck, setLoadingPassCheck]=useState<boolean>(false);
     const [loading, setLoading] =useState<boolean>(false);
     const [passwordStatus, setPasswordStatus] = useState<'Matched'|'Password changed'|null>(null);
-    const [eyeOpen, setEyeOpen] = useState<boolean>(false);
+    const [oldEyeOpen, setOldEyeOpen] = useState<boolean>(false);
+    const [newEyeOpen, setNewEyeOpen] = useState<boolean>(false);
 
-    const toggleEyeOpen = ()=>{
-        setEyeOpen(!eyeOpen);
+    const toggleOldEye = ()=>{
+        setOldEyeOpen(prev=>!prev);
+    }
+    const toggleNewEye=()=>{
+        setNewEyeOpen(prev=>!prev);
     }
 
     useEffect(()=>{
@@ -47,9 +51,14 @@ export function usePassword() {
     }
 
     const updatePassword = async () => {
-        setLoading(true);
         if(!newPassword) return "New Password is Required!";
+        if(oldPassword===newPassword){
+            return setPasswordError("Password already in use")
+        }
+        setLoading(true);
+        
         try{
+            
             const result:{success:boolean, message:string, error:string} = await passwordUtility(oldPassword, 'changePassword', newPassword) as {success:boolean, message:string, error:string};
 
             if(result.success){
@@ -84,7 +93,9 @@ export function usePassword() {
         passwordStatus,
         loading,
         loadingPassCheck,
-        eyeOpen,
-        toggleEyeOpen,
+        toggleOldEye,
+        toggleNewEye,
+        newEyeOpen,
+        oldEyeOpen,
     };
 }
