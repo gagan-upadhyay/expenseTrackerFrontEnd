@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { toastShowError, toastShowSuccess } from "@/src/utils/toastUtils";
 import { saveOneTransaction } from "@/src/services/transactionServices";
-import { useAccounts } from "@/src/context/accountContext";
+// import { useAccounts } from "@/src/context/accountContext";
 
 
 export default function AddTransactionCard() {
@@ -15,7 +15,7 @@ export default function AddTransactionCard() {
   const [newCategory, setNewCategory] = useState("");
   const [error, setError] = useState<string| null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const {accounts} = useAccounts();
+  // const {accounts} = useAccounts();
 
   const [form, setForm] = useState({
     category: "",

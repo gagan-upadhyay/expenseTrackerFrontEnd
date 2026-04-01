@@ -5,6 +5,7 @@ import clsx from "clsx";
 import { RedirectingButton } from "../ui/buttons/redirectingButton";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
+import { useAccounts } from "@/src/context/accountContext";
 
 interface TransactionCardSkeletonProps {
   pageClass: string;
@@ -20,6 +21,8 @@ export default function TransacationSkeleton({
 
   const transactionPage = useMemo(() => path.includes("transactions"), [path]);
   const dashboardPage = useMemo(() => path.includes("dashboard"), [path]);
+  const {accounts} = useAccounts();
+  const redirectingPath = accounts?.length===0||'undefined'?'/accounts/add':'/transactions/add';
 
   return (
     <div
@@ -40,7 +43,7 @@ export default function TransacationSkeleton({
         <div className="absolute inset-0 flex items-center justify-center z-10">
           <RedirectingButton
             theme={theme}
-            target={"/transactions/add-transactions"}
+            target={redirectingPath}
             title={"transactions"}
           />
         </div>

@@ -94,11 +94,11 @@ export async function getAccountByUser(): Promise<GetAccountByuserResult>{
 }
 
 export type NewAccountPayload = {
-    account_name: string;
-    currency_code: string;
-    opening_balance: number;
-    total_income: number;
-    total_expense: number;
+    accountType: string;
+    currencyCode: string,
+    openingBalance:number,
+    totalIncome: number,
+    totalExpense: number,
 };
 
 export async function createAccount(payload: NewAccountPayload): Promise<Account>{
@@ -120,7 +120,7 @@ export async function createAccount(payload: NewAccountPayload): Promise<Account
 }
 
 export type NewCardPayload = {
-    account_id: string;
+    // account_id: string;
     brand: string;
     cardnumber: string;
     holder_name: string;
@@ -131,10 +131,10 @@ export type NewCardPayload = {
     type: 'credit' | 'debit';
 };
 
-export async function createCard(payload: NewCardPayload): Promise<CardDetails> {
+export async function createCard(accountId:string, payload: NewCardPayload): Promise<CardDetails> {
     if(!ACCOUNT_SERVICE) throw new Error('Missing NEXT_PUBLIC_ACCOUNT_SERVICE');
 
-    const res = await fetch(`${ACCOUNT_SERVICE}/api/v1/accounts/cards/`, {
+    const res = await fetch(`${ACCOUNT_SERVICE}/api/v1/accounts/${accountId}/cards/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

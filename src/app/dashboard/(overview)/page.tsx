@@ -18,7 +18,7 @@ export default function Page() {
         {accounts?.length===0 ?
         <div className="h-screen bg-gray-100/4 hover:shadow-xl hover:shadow-gray-100/20 rounded-xl w-full flex transition-all duration-500 ease-in-out justify-center items-center">
           <div className=" top-10">
-            <Button href="/account/add-account-details" className="p-4 hover:shadow-xl hover:shadow-blue-100/10">Click here to add Account details</Button>
+            <Button href="/account/add" className="p-4 hover:shadow-xl hover:shadow-blue-100/10">Click here to add Account details</Button>
           </div>
         </div>
         

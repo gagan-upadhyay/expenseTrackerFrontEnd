@@ -1,55 +1,10 @@
-// 'use client';
-
-// import { usePassword } from "./hooks/usePassword";
-
-// export default function PasswordChange() {
-//   const {
-//     oldPassword,
-//     newPassword,
-//     setOldPassword,
-//     setNewPassword,
-//     updatePassword
-//   } = usePassword();
-
-//   return (
-//     <div className="glass glass-hover p-5 rounded-2xl space-y-4">
-//       <h2 className="text-lg font-semibold">Security</h2>
-
-//       <input
-//         type="password"
-//         placeholder="Current Password"
-//         value={oldPassword}
-//         onChange={(e) => setOldPassword(e.target.value)}
-//         className="w-full bg-transparent border-b border-[var(--color-border)] py-2 focus:outline-none"
-//       />
-
-//       <input
-//         type="password"
-//         placeholder="New Password"
-//         value={newPassword}
-//         onChange={(e) => setNewPassword(e.target.value)}
-//         className="w-full bg-transparent border-b border-[var(--color-border)] py-2 focus:outline-none"
-//       />
-      
-
-//       <div className="flex justify-end">
-//         <button
-//           onClick={updatePassword}
-//           className="px-4 py-2 rounded-lg border border-[var(--color-border)] hover:bg-white/10 transition"
-//         >
-//           Update
-//         </button>
-//       </div>
-//     </div>
-//   );
-// }
-
 'use client';
 
 import { usePassword } from "./hooks/usePassword";
 import { Button } from "../ui/buttons/buttons";
 import { getPasswordStrength } from "@/src/utils/passwordStrength";
 import clsx from "clsx";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 export default function PasswordChange() {
   const {
@@ -58,23 +13,99 @@ export default function PasswordChange() {
     setOldPassword,
     setNewPassword,
     updatePassword,
+    passwordError,
+    checkPassword,
+    passwordStatus,
+    loading,
+    loadingPassCheck,
+    toggleEyeOpen,
+    eyeOpen,
   } = usePassword();
+  // const [passwordStatus, setPasswordStatus] = useState<'Matched'|'!Matched'|'issue'|"">("");
+  // const [newPasswordStatus, setNewPasswordStatus] = useState<"Compliant"|"!Compliant"|"">("");
+
+
+    // -------------------------------------------------------------
+  // ✅ CHECK PASSWORD
+  // -------------------------------------------------------------
+  // const checkPasswordFunction = async (
+  //   action: "checkPassword" | "changePassword"
+  // ) => {
+    
+
+  //   const result =
+  //     (await passwordUtility(
+  //       oldPassword,
+  //       action,
+  //       action === "changePassword" ? newPassword : undefined
+  //     )) ?? "";
+
+  //   if (action === "checkPassword") {
+  //     if (!result || result === "No Password received")
+  //       setPasswordStatus("issue");
+  //     else if (result === "Wrong Password") setPasswordStatus("!Matched");
+  //     else if (result === "Password Matched") setPasswordStatus("Matched");
+  //     else setPasswordStatus("");
+  //   }
+
+  //   if (action === "changePassword") {
+  //     if (typeof result === "object" && result !== null && "message" in result) {
+  //       if (result.message === "Password changed")
+  //         setNewPasswordStatus("Compliant");
+  //       else setNewPasswordStatus("!Compliant");
+  //     } else {
+  //       setNewPasswordStatus("!Compliant");
+  //     }
+  //   }
+  // };
 
   const strength = getPasswordStrength(newPassword);
+  console.log(`Value of passwordStatus:${passwordStatus}`);
 
   return (
     <div className="glass glass-hover p-4 sm:p-5 rounded-2xl space-y-4">
 
-      <h2 className="text-base sm:text-lg font-semibold">Security</h2>
+      <h2 className="text-base sm:text-lg font-semibold">Change Password</h2>
 
       {/* OLD PASSWORD */}
-      <input
-        type="password"
-        placeholder="Current Password"
-        value={oldPassword}
-        onChange={(e) => setOldPassword(e.target.value)}
-        className="w-full bg-transparent border-b border-[var(--color-border)] py-2 text-sm focus:outline-none"
-      />
+      <div className="space-y-1 flex"> 
+        <div className="relative w-full flex items-center justify-between">
+          <input
+            type={eyeOpen?"text":"password"}
+            placeholder="Current Password"
+            value={oldPassword}
+            onChange={(e) => setOldPassword(e.target.value)}
+            disabled={passwordStatus==='Matched'}
+            onBlur={checkPassword}
+            className={clsx("w-full bg-transparent border-b  py-2 text-sm focus:outline-none", 
+                passwordError?'border-red-500':'border-[var(--color-border)]',
+                passwordStatus === 'Matched' && 'border-green-500 ', 
+            )}
+          />
+
+          {loadingPassCheck && <div className="h-4 w-4 animate-spin transition-all duration-500 rounded-full border-2 border-gray-300/30 border border-t-gray"/>}
+
+          {oldPassword && (
+            <button
+              onClick={(e) => {
+                  e.preventDefault();
+                  toggleEyeOpen();
+              }}
+              className="absolute mr-2 right-3 top-2.5"
+              >
+              {eyeOpen ? (
+                  <EyeIcon className="w-4 h-4 opacity-60" />
+              ) : (
+                  <EyeSlashIcon className="w-4 h-4 opacity-60" />
+              )}
+            </button>
+          )}
+        </div>      
+      </div>
+            {passwordStatus === 'Matched' && !passwordError && (
+        <p className="text-[10px] text-green-500">Current password verified</p>
+      )}
+
 
       {/* NEW PASSWORD */}
       <input
@@ -82,8 +113,11 @@ export default function PasswordChange() {
         placeholder="New Password"
         value={newPassword}
         onChange={(e) => setNewPassword(e.target.value)}
+        
+        disabled={passwordStatus!=='Matched'}
         className="w-full bg-transparent border-b border-[var(--color-border)] py-2 text-sm focus:outline-none"
       />
+
 
       {/* 🔥 STRENGTH BAR */}
       {newPassword && (
@@ -99,11 +133,19 @@ export default function PasswordChange() {
           </p>
         </div>
       )}
-
+      
+      
       {/* BUTTON */}
-      <div className="flex justify-end">
+      <div className="flex justify-between pt-2">
+         <div className="">
+            {passwordError && <p className="text-xs text-red-500 animate-pulse">{passwordError}</p>}
+            {passwordStatus === 'Password changed' && (
+                <p className="text-xs text-green-400 font-medium">✨ Updated </p>
+            )}
+        </div>
         <Button onClick={updatePassword} className="px-4 py-2 text-xs sm:text-sm">
-          Update
+          {loading && <div className="h-3 w-3 animate-spin rounded-full border-2 border-gray-300/30 border border-t-gray"/>}
+          <span>{loading?"Updating":"Update"}</span>
         </Button>
       </div>
     </div>

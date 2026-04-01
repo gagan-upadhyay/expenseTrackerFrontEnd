@@ -49,7 +49,7 @@ export function useProfileForm() {
       firstName: formData.firstname,
       lastName: formData.lastname,
       email: formData.email,
-      profilePicture: formData.profile_picture,
+    //   profilePicture: formData.profile_picture,
     });
 
     setLoading(false);

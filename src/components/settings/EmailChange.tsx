@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { useOTP } from "./hooks/useOTP";
 import { Button } from "../ui/buttons/buttons";
 import { useEffect, useRef, useState } from "react";
+import { updateUserProfile } from "@/src/services/userService";
 
 export default function EmailChange() {
   const {
@@ -20,6 +21,8 @@ export default function EmailChange() {
     loading,
     userEmail,
   } = useOTP();
+  const [emailChanged, setEmailChanged]=useState<boolean>(false);
+  const [emailChangeLoading, setEmailChangeLoading]=useState<boolean|null>(null);
   
     //--------retry limit brute force----
     
@@ -41,12 +44,49 @@ export default function EmailChange() {
         setStatus("idle");
         setAttempts(0);
         setTimer(30);
+        // setEmailChangeLoading(false);
+        
 
         inputsRef.current.forEach((input) => {
             if (input) input.value = "";
         });
     };
 
+    const handleResetErrormsgs=()=>{
+        setEmailChanged(false);
+    }
+
+    const changeEmail = async () => {
+        console.log("Value of newEmail:", email);
+        try{
+            setEmailChangeLoading(true);
+            const result = await updateUserProfile({
+            email: email,
+            firstName: null,
+            lastName: null,
+            });
+
+            if (result?.success) {
+                
+                setEmailChanged(true);
+                handleReset();
+                setTimeout(()=>{
+                    handleResetErrormsgs();
+                }, 4000);
+                
+            }
+        }catch(err){
+            let errorMessage="Something went wrong."
+            if(err instanceof Error){
+                errorMessage=err.message;
+                setError({type:"changeEmail", error:errorMessage});
+            }
+
+        }finally{
+            setEmailChangeLoading(false);
+            
+        }
+    };
     //OTP UI UPGRADE
     const OTP_LENGTH = 4;
 
@@ -123,7 +163,7 @@ export default function EmailChange() {
   return (
     <div className="glass glass-hover p-4 sm:p-5 rounded-2xl space-y-4">
 
-      <h2 className="text-base sm:text-lg font-semibold">Email</h2>
+      <h2 className="text-base sm:text-lg font-semibold">Change Email</h2>
 
       {/* EMAIL INPUT */}
       <input
@@ -165,27 +205,28 @@ export default function EmailChange() {
             )}
             onPaste={handlePaste}
             >
-            {[...Array(OTP_LENGTH)].map((_, i) => (
-                <input
-                key={i}
-                type="text"
-                maxLength={1}
-                ref={(el) => {
-                    inputsRef.current[i] = el;
-                }}
-                value={otp[i] || ""}
-                disabled={isLocked}
-                onChange={(e) => handleOTPChange(e.target.value, i)}
-                onKeyDown={(e) => handleKeyDown(e, i)}
-                className={clsx("w-12 h-12 text-center text-lg rounded-lg border  focus:border-blue-400 focus:outline-none",
-                    error?.type==="verifyOTP"? 'border-red-400 bg-red-700':'border border-[var(--color-border)]'
-                )}
-                />
-            ))}
-        </div>
+                {[...Array(OTP_LENGTH)].map((_, i) => (
+                    <input
+                        key={i}
+                        type="text"
+                        maxLength={1}
+                        ref={(el) => {
+                            inputsRef.current[i] = el;
+                        }}
+                        value={otp[i] || ""}
+                        disabled={isLocked}
+                        onChange={(e) => handleOTPChange(e.target.value, i)}
+                        onKeyDown={(e) => handleKeyDown(e, i)}
+                        className={clsx("w-12 h-12 text-center text-lg rounded-lg border  focus:border-blue-400 focus:outline-none",
+                            error?.type==="verifyOTP"? 'border-red-400 bg-red-700':'border border-[var(--color-border)]'
+                        )}
+                    />
+                ))}
+            </div>
+            {error?.type==='verifyOTP'?<p>{error?.error}</p>:''}
 
             {/* ERROR / INFO */}
-            {isLocked    ? (
+            {isLocked ? (
                 <p className="text-red-400 text-xs">
                     Too many attempts. Please request a new OTP.
                 </p>
@@ -196,14 +237,7 @@ export default function EmailChange() {
             )}
 
             <div className="flex justify-between items-center text-xs">
-                {isLocked ? (
-                    <button
-                    onClick={handleSendOTP}
-                    className="text-blue-400 hover:underline"
-                    >
-                    Resend OTP
-                    </button>
-                ) : timer > 0 ? (
+                {isLocked && timer > 0 ? (
                     <p className="opacity-60">Resend in {timer}s</p>
                 ) : (
                     <button
@@ -221,53 +255,28 @@ export default function EmailChange() {
         </div>
     )}
 
-
-
-
-    {/* <div className="flex justify-end gap-2">
-        {status === "verified" ? (
-            <>
-            <Button
-                onClick={() => {
-                console.log("Change email API call");
-                // 🔥 call your update email API here
-                }}
-                className="px-4 py-2 text-xs sm:text-sm"
-            >
-                Change Email
-            </Button>
-
-            <Button
-                onClick={handleReset}
-                className="px-4 py-2 text-xs sm:text-sm bg-red-500/20 hover:bg-red-500/30"
-            >
-                Reset
-            </Button>
-            </>
-        ) : (
-            <Button
-            onClick={() => {
-                sendOTP();
-                setError(null);
-            }}
-            className="px-4 py-2 text-xs sm:text-sm"
-            >
-            Send OTP
-            </Button>
-        )}
-    </div> */}
     <div className="flex justify-end gap-2">
 
     {/* ✅ VERIFIED */}
         {status === "verified" ? (
             <>
             <Button
-                onClick={() => {
-                console.log("Change email API call");
-                }}
+                onClick={changeEmail}
                 className="px-4 py-2 text-xs sm:text-sm"
+                disabled={loading}
             >
-                Change Email
+                {emailChangeLoading ?
+                (
+                    <>
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Changing..
+                    </>
+                    
+                ):(
+                    "Change Email?"
+                )
+
+                }
             </Button>
 
             <Button
@@ -276,17 +285,10 @@ export default function EmailChange() {
             >
                 Reset
             </Button>
+            
+
             </>
         ) : status === "idle" ? (
-
-            /* ✅ INITIAL STATE */
-            // <Button
-            // onClick={handleSendOTP}
-            // className="px-4 py-2 text-xs sm:text-sm"
-            // disabled={!email}
-            // >
-            // Send OTP
-            // </Button>
             <Button
                 onClick={handleSendOTP}
                 disabled={!email || loading}
@@ -316,6 +318,8 @@ export default function EmailChange() {
             </>
         )}
     </div>
+        {error?.type==='changeEmail'?<p className="text-xs text-red-400">{error.error}</p>:''}
+        {emailChanged?<p className="text-xs text-green-400">Email changed Successfully</p>:""}
 
 
 </div>

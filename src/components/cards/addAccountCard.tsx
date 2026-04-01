@@ -7,8 +7,7 @@ import AddCardDetails from "./addCard";
 import { useAccounts } from "@/src/context/accountContext";
 import { createAccount, createCard } from "@/src/services/accountServices";
 import { toastShowError, toastShowSuccess } from "@/src/utils/toastUtils";
-// import { CardDetails } from "@/src/utils/definitions";
-// import { useAccounts } from "@/src/context/accountContext";
+
 
 interface Props {
   parentClass: string;
@@ -47,47 +46,65 @@ export default function AddAccountCard({ parentClass }: Props) {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if(e.target.name==='cardnumber'){
-      const {name, value} = e.target;
-      console.log("Inside cardnumber");
+const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const { name, value } = e.target;
 
-      // 1. Remove all non-digit characters (including existing spaces)
+  if (name === "cardnumber") {
+    // Remove non-digits
     const rawValue = value.replace(/\D/g, "");
 
-    // 2. Limit to 16 digits (standard card length)
+    // Limit to 16 digits
     const limitedValue = rawValue.slice(0, 16);
 
-    // 3. Add a space after every 4 digits using regex
+    // Format with spaces
     const formattedValue = limitedValue.replace(/(\d{4})(?=\d)/g, "$1 ");
 
-    // 4. Update state with the formatted string
-    setCard((prev) => ({ ...prev, [name]: formattedValue }));
-    console.log(`value of cardnumber: ${card.cardnumber}`);
-  } else {
-    // Standard handling for other fields
-    setCard((prev) => ({ ...prev, [e.target.name]: value }));
-    
-  }
-    const value = ["expiry_month", "expiry_year"].includes(e.target.name) 
-      ? parseInt(e.target.value) || 0 
-      : e.target.value;
-    setCard({ ...card, [e.target.name]: value });
-  };
+    setCard((prev) => ({
+      ...prev,
+      [name]: formattedValue,
+    }));
+  } 
 
+  else if(name==='expiry_month'){
+    let val = value.replace(/\D/g, "").slice(0,2);
+    let num = parseInt(val);
+    if(!isNaN(num)){
+      if(num<1) num=1;
+      if(num>12) num=12;
+      val=num.toString().padStart(2, '0');
+    }
+    setCard((prev)=>({
+      ...prev, 
+      expiry_month:Number(val),
+    }));
+  }else if(name==='expiry_year'){
+    let val = value.replace(/\D/g,"").slice(0,2);
+
+    let num = parseInt(val);
+    if (!isNaN(num)){
+      if(num<26) num=26;
+      if(num>45) num=45;
+      val=num.toString();
+    }
+    setCard((prev)=>({
+      ...prev,
+      expiry_year:Number(val),
+    }))
+  }
+  else {
+    setCard((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }
+};
   const savedCardsRef = useRef<HTMLDivElement>(null);
 
-  const scrollSavedCards = (direction: 1 | -1) => {
-    if (!savedCardsRef.current) return;
-    savedCardsRef.current.scrollBy({
-      left: direction * 320,
-      behavior: "smooth",
-    });
-  };
 
   const saveAccount = async () => {
+    console.log(`Value of form from addAccount.tsx save account: ${form}`);
     if (!form.accountName.trim()) {
-      toastShowError("Account type is required", 3000);
+      toastShowError("Account type is required", Number(3000));
       return;
     }
 
@@ -103,33 +120,31 @@ export default function AddAccountCard({ parentClass }: Props) {
     setSaving(true);
     try {
       const accountPayload = {
-        account_name: form.accountName.trim(),
-        currency_code: form.currency,
-        opening_balance: Number(form.openingBalance) || 0,
-        total_income: Number(form.totalIncome) || 0,
-        total_expense: Number(form.totalExpense) || 0,
+        accountType: form.accountName.trim(),
+        currencyCode: form.currency,
+        openingBalance: Number(form.openingBalance) || 0,
+        totalIncome: Number(form.totalIncome) || 0,
+        totalExpense: Number(form.totalExpense) || 0,
       };
 
       const savedAccount = await createAccount(accountPayload);
 
-      for (const c of cards) {
-        // If card already exists in card list, skip duplicates by number
-        if (c.cardnumber && cards.filter((x) => x.cardnumber === c.cardnumber).length > 1) continue;
+      await Promise.all(
+        cards.map((c) =>
+          createCard(savedAccount.id, {
+            brand: c.brand,
+            cardnumber: c.cardnumber.replace(/\s/g, ""),
+            holder_name: c.holder_name,
+            expiry_month: Number(c.expiry_month),
+            expiry_year: Number(c.expiry_year),
+            is_active: c.is_active,
+            type: c.type,
+          })
+        )
+      );
 
-        await createCard({
-          account_id: String(savedAccount.id),
-          brand: c.brand,
-          cardnumber: c.cardnumber,
-          holder_name: c.holder_name,
-          expiry_month: Number(c.expiry_month),
-          expiry_year: Number(c.expiry_year),
-          cvv: c.cvv,
-          is_active: c.is_active,
-          type: c.type,
-        });
-      }
-
-      toastShowSuccess("Account and cards saved successfully", 3000);
+      
+      toastShowSuccess("Account and cards saved successfully", Number(3000));
 
       setForm({
         accountName: "",
@@ -144,7 +159,7 @@ export default function AddAccountCard({ parentClass }: Props) {
 
     } catch (error) {
       const msg = error instanceof Error ? error.message : "Failed to save account";
-      toastShowError(msg, 4000);
+      toastShowError(msg, Number(4000));
     } finally {
       setSaving(false);
     }
@@ -160,7 +175,7 @@ export default function AddAccountCard({ parentClass }: Props) {
     // duplicate check in local list and existing server cards
     const alreadyExists = cards.some((c) => c.cardnumber.trim() === trimmedCardNumber);
     if (alreadyExists) {
-      toastShowError("Card already registered", 3000);
+      toastShowError("Card already registered", Number(3000));
       return;
     }
 
@@ -176,7 +191,7 @@ export default function AddAccountCard({ parentClass }: Props) {
       type: "credit",
     });
 
-    toastShowSuccess("Card added locally. Save account to persist.", 2200);
+    toastShowSuccess("Card added locally. Save account to persist.", Number(2200));
   };
 
   return (
@@ -367,22 +382,7 @@ export default function AddAccountCard({ parentClass }: Props) {
               <p className="text-xs opacity-60">No cards added yet</p>
             ) : (
               <>
-                <div className="mb-2 flex items-center justify-end gap-2">
-                  <button
-                    onClick={() => scrollSavedCards(-1)}
-                    className="glass hover:bg-gray-200 px-2 py-1 rounded"
-                    aria-label="Scroll left"
-                  >
-                    ◀
-                  </button>
-                  <button
-                    onClick={() => scrollSavedCards(1)}
-                    className="glass hover:bg-gray-200 px-2 py-1 rounded"
-                    aria-label="Scroll right"
-                  >
-                    ▶
-                  </button>
-                </div>
+                
                 <div
                   ref={savedCardsRef}
                   className="flex gap-4 overflow-x-auto no-scrollbar pb-2"
