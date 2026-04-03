@@ -8,7 +8,6 @@ const nextConfig: NextConfig = {
     }
   },
   images: {
-    domains:["expensetrackerappstorage.blob.core.windows.net"],
     remotePatterns: 
     [  
       {
