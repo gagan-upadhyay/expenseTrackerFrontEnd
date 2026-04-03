@@ -1,126 +1,119 @@
-// 'use client';
-
-// import { useProfileForm } from "./hooks/useProfileForm";
-// import Image from "next/image";
-
-// export default function ProfileSettings() {
-//   const { formData, preview, handleChange, handleSubmit, loading } =
-//     useProfileForm();
-
-//   return (
-//     <form
-//       onSubmit={handleSubmit}
-//       className="glass glass-hover w-full rounded-2xl p-5 space-y-6"
-//     >
-//       <h2 className="text-lg font-semibold">Profile</h2>
-
-//       {/* Avatar */}
-//       <div className="flex items-center gap-4">
-//         <div className="relative">
-//           <Image
-//             src={preview || "/profilePicture.jpg"}
-//             alt="profile"
-//             width={80}
-//             height={80}
-//             className="rounded-full object-cover border border-[var(--color-border)]"
-//           />
-//         </div>
-
-//         <div className="text-sm">
-//           <input
-//             type="file"
-//             name="profilePicture"
-//             onChange={handleChange}
-//             className="cursor-pointer"
-//           />
-//           <p className="text-xs opacity-70 mt-1">
-//             JPG/PNG up to 2MB
-//           </p>
-//         </div>
-//       </div>
-
-//       {/* Names */}
-//       <div className="grid md:grid-cols-2 gap-4">
-//         <input
-//           name="firstname"
-//           value={formData.firstname}
-//           onChange={handleChange}
-//           placeholder="First Name"
-//           className="bg-transparent border-b border-[var(--color-border)] focus:outline-none py-2"
-//         />
-
-//         <input
-//           name="lastname"
-//           value={formData.lastname}
-//           onChange={handleChange}
-//           placeholder="Last Name"
-//           className="bg-transparent border-b border-[var(--color-border)] focus:outline-none py-2"
-//         />
-//       </div>
-
-//       <div className="flex justify-end">
-//         <button
-//           className="px-4 py-2 rounded-lg border border-[var(--color-border)] hover:bg-white/10 transition"
-//           disabled={loading}
-//         >
-//           {loading ? "Saving..." : "Save"}
-//         </button>
-//       </div>
-//     </form>
-//   );
-// }
-
 'use client';
 
 import { useProfileForm } from "./hooks/useProfileForm";
 import Image from "next/image";
 import clsx from "clsx";
+import { useState } from "react";
 import { Button } from "../ui/buttons/buttons";
+import { getInitials } from "@/src/utils/getInitials";
 
 export default function ProfileSettings() {
-  const { formData, preview, handleChange, handleSubmit, loading } =
-    useProfileForm();
+  const {
+    formData,
+    preview,
+    handleChange,
+    handleFileChange,
+    handleSubmit,
+    loading,
+  } = useProfileForm();
+
+  const [dragActive, setDragActive] = useState(false);
 
   const inputClass =
-    "w-full bg-transparent border-b border-[var(--color-border)] py-2 text-sm focus:outline-none focus:border-indigo-400 transition";
+    "w-full bg-transparent border-b border-[var(--color-border)] text-sm focus:outline-none focus:border-indigo-400 transition";
+
+  const completion =
+    ((formData.firstname ? 1 : 0) +
+      (formData.lastname ? 1 : 0) +
+      (preview ? 1 : 0)) /
+    3 *
+    100;
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="glass glass-hover w-full rounded-2xl p-4 sm:p-6 space-y-6"
+      className="glass glass-hover w-full rounded-2xl p-4 sm:p-6 space-y-6 relative overflow-hidden"
     >
+      {/* 🔮 Glow */}
+      <div className="glow glow-indigo -top-10 -right-10 pointer-events-none" />
+      <div className="glow glow-purple -bottom-10 -left-10 pointer-events-none" />
+
       {/* TITLE */}
-      <h2 className="text-base sm:text-lg font-semibold">Profile</h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-base sm:text-lg font-semibold">Profile</h2>
 
-      {/* AVATAR SECTION */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        {/* COMPLETION */}
+        <span className="text-xs opacity-70">
+          {Math.round(completion)}% complete
+        </span>
+      </div>
 
-        {/* IMAGE */}
-        <div className="relative group w-fit">
-          <Image
-            src={preview || "/profilePicture.jpg"}
-            alt="profile"
-            width={80}
-            height={80}
-            className="rounded-full object-cover border border-[var(--color-border)]"
-          />
+      {/* PROGRESS BAR */}
+      <div className="w-full h-2 rounded-full glass-light overflow-hidden">
+        <div
+          className="h-full bg-indigo-500 transition-all duration-700"
+          style={{ width: `${completion}%` }}
+        />
+      </div>
 
-          {/* 🔥 HOVER OVERLAY */}
+      {/* AVATAR */}
+      <div
+        className={clsx(
+          "flex flex-col sm:flex-row gap-4 items-center sm:items-start",
+          dragActive && "scale-[1.02]"
+        )}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragActive(true);
+        }}
+        onDragLeave={() => setDragActive(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragActive(false);
+
+          const file = e.dataTransfer.files[0];
+          if (file) {
+            handleFileChange(file);
+          }
+        }}
+      >
+        {/* IMAGE / INITIALS */}
+        <div className="relative group">
+          {preview ? (
+            <Image
+              src={preview}
+              alt="profile"
+              width={90}
+              height={90}
+              className="rounded-full object-cover border border-[var(--color-border)]"
+            />
+          ) : (
+            <div className="w-[90px] h-[90px] rounded-full flex items-center justify-center text-lg font-semibold border border-[var(--color-border)]">
+              {getInitials(formData.firstname, formData.lastname) || "U"}
+            </div>
+          )}
+
+          {/* OVERLAY */}
           <label className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition cursor-pointer text-xs text-white">
-            Change
+            Upload
             <input
               type="file"
               name="profilePicture"
-              onChange={handleChange}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  handleFileChange(file); // ✅ CLEAN
+                }
+              }}
               className="hidden"
             />
           </label>
         </div>
 
-        {/* INFO */}
-        <div className="text-xs sm:text-sm opacity-70">
-          <p>Upload a profile picture</p>
-          <p>JPG or PNG • Max 2MB</p>
+        {/* TEXT */}
+        <div className="text-xs sm:text-sm opacity-70 text-center sm:text-left">
+          <p>Click or drag & drop</p>
+          <p>JPG / PNG • Max 2MB</p>
         </div>
       </div>
 
@@ -143,19 +136,26 @@ export default function ProfileSettings() {
         />
       </div>
 
-      {/* ACTION */}
+      {/* SAVE BUTTON */}
       <div className="flex justify-end">
         <Button
           type="submit"
           disabled={loading}
           className={clsx(
-            "px-4 py-2 text-xs sm:text-sm",
+            "px-4 py-2 text-xs sm:text-sm relative",
             loading && "opacity-60 cursor-not-allowed"
           )}
         >
           {loading ? "Saving..." : "Save Changes"}
         </Button>
       </div>
+
+      {/* SUCCESS FEEDBACK */}
+      {!loading && completion === 100 && (
+        <p className="text-green-400 text-xs text-right">
+          ✅ Profile complete
+        </p>
+      )}
     </form>
   );
 }

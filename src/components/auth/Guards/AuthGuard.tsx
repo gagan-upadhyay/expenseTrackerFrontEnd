@@ -5,7 +5,6 @@ import { useTheme } from "@/src/context/themeContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { BounceLoader } from "react-spinners";
-// import { SyncLoader} from 'react-spinners'
 
 export default function AuthGuard({children}:{children:React.ReactNode}){
     const {isLoggedIn, isReady} = useAuth();
@@ -16,13 +15,8 @@ export default function AuthGuard({children}:{children:React.ReactNode}){
         if(isReady && !isLoggedIn) 
         {
             router.replace('/auth/login');
-            //added below else-if to re-direct user to dashboard if the accessToken is available
         }
-
-        
-
     }, [isLoggedIn, router, isReady]);
-    // console.log("value of isLoggedIn", isLoggedIn);
     if(!isLoggedIn || !isReady) 
         return 
         <div className="text-center text-blue-500 flex flex-col items-center justify-center  mt-50">

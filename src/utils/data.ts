@@ -1,59 +1,40 @@
-//fetch userData from users table
-// import '@dotenvx/dotenvx/config';
 
-// import getLogger from "../services/logger-service";
 import apiFetch from "./apiClient";
-import { AddedUser } from "./definitions";
+import { fetchedUser } from "./definitions";
 
 const USER_SERVICE = process.env.NEXT_PUBLIC_USER_SERVICE;
 const AUTH_SERVICE = process.env.NEXT_PUBLIC_AUTH_SERVICE;
 
+// export const getUserDetails = async () => {
+//     const data:{result:AddedUser} = await apiFetch(`${USER_SERVICE}/api/v1/user/`) as {result:AddedUser};
+//     return data?.result ?? null;
+// };
+
 export const getUserDetails = async () => {
-    const data:{result:AddedUser} = await apiFetch(`${USER_SERVICE}/api/v1/user/`) as {result:AddedUser};
-    // console.log('Value of result from getUserDetails , data.ts', data?.result);
-    return data?.result ?? null;
+  const data: { result: fetchedUser } = await apiFetch(
+    `${USER_SERVICE}/api/v1/user/`
+  ) as { result: fetchedUser };
+
+  const user = data?.result ?? null;
+
+  if (!user) return null;
+  console.log('Value of fetcheduser:', user);
+  // ✅ Normalize profile_picture
+  return {
+    ...user,
+    profile_picture:
+      user.profile_picture && user.profile_picture.startsWith("http")
+        ? user.profile_picture
+        : null, // ❗ fallback if backend sends blobName
+  };
 };
+
+
 console.log(`Value of user_service: ${USER_SERVICE} and AUTH_SERVICE: ${AUTH_SERVICE} from data.ts`);
 
 export const getPasswordType = async () => {
     return apiFetch(`${USER_SERVICE}/api/v1/user/password-type/`);
 }
-
-//passwordUtitlity(oldPassword, "changePassword", newPassword);
-
-//to compare and save password
-// export const passwordUtitlity = async (
-//     password: string | undefined,
-//     action: string,
-//     newPassword?: string | undefined
-// ) => {
-//     if (!password) return "No Password received";
-
-//     const url = action === 'checkPassword' ? 'check-password' : 'change-password';
-//     const body =
-//         action === 'checkPassword'
-//             ? { password }
-//             : { oldPassword: password, newPassword };
-
-//     if (action === 'checkPassword') {
-//         const result:{success:boolean, message:string|null,  error:string|null} = await apiFetch(`${USER_SERVICE}/api/v1/user/${url}/`, {
-//             method: 'POST',
-//             body: JSON.stringify(body),
-//             credentials:'include',
-//         }) as {success:boolean, message:string|null,  error:string|null};
-//         return result;
-//     } else if(action==='changePassword') {
-//         const result:{success:boolean, message:string|null,  error:string|null} = await passwordUtitlity(password, 'checkPassword') as {success:boolean, message:string|null,  error:string|null};
-//         if (result?.success){
-//             return apiFetch(`${USER_SERVICE}/api/v1/user/${url}/`, {
-//             method: 'PUT',
-//             body: JSON.stringify(body),
-//             credentials:'include',
-//         });
-//         }   
-//     }
-// }
-
 export const passwordUtility = async (
     password: string | undefined,
     action: "checkPassword" | "changePassword",

@@ -13,8 +13,9 @@ export default function Accordion({ title, children, isOpen, onToggle }: { title
 
   return (
     <div className={clsx(
-        "w-3/4 px-4 py-2 items-center mb-4 justify-center border rounded-xl transform-all ease-in-out duration-1500",
-        open?'':'hover:scale-102'
+        "w-7/8 glass glass-hover items-center justify-center  rounded-xl transition-all duration-1500",
+        open?'mt-2 px-2 py-2':' px-4 py-2 my-3',
+        
     )}>
       <button
         onClick={toggle}
@@ -29,7 +30,7 @@ export default function Accordion({ title, children, isOpen, onToggle }: { title
             open?'rotate-0 scale 100':'rotate-180 scale-110'
         )}>{upIcon}</span>
       </button>
-      {open && <div className="px-4 flex flex-col py-2">{children}</div>}
+      {open && <div>{children}</div>}
     </div>
   );
 }

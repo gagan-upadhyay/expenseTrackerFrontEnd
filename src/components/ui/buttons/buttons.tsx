@@ -72,7 +72,7 @@ export function Button(props: ButtonProps) {
 
   const variantClass = {
     primary:
-      "glass glass-hover",
+      "glass glass-hover cursor-pointer",
     secondary:
       "glass-light hover:scale-[1.02]",
     ghost:

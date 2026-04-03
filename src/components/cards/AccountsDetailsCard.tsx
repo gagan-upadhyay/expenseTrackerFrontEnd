@@ -6,12 +6,14 @@ import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import AccountDetailsSkeleton from "@/src/components/skeletons/accountDetailsSkeleton";
+import { Button } from "../ui/buttons/buttons";
+// import { useEffect } from "react";
 
 interface Props {
   parentClass: string;
 }
 
-export default function AccountDetailsCard({ parentClass }: Props) {
+export default function AccountsDetailsCard({ parentClass }: Props) {
   const { accounts, loading } = useAccounts();
   const router = useRouter();
 
@@ -38,6 +40,15 @@ export default function AccountDetailsCard({ parentClass }: Props) {
   const totalBalance = accounts.reduce((sum, acc) => sum + Number(acc.remaining_balance), 0);
   const totalIncome = accounts.reduce((sum, acc) => sum + Number(acc.total_income), 0);
   const totalExpense = accounts.reduce((sum, acc) => sum + Number(acc.total_expense), 0);
+  
+  // if(!loading)
+  //   {
+  //      cards?.map((card)=>(
+  //     console.log(`${card.cardnumber}, ${card.}`)
+  //     // console.log()
+  //      ))
+  // }
+
 
   return (
     <div className={clsx(parentClass, "w-full mt-6 relative")}> 
@@ -75,18 +86,25 @@ export default function AccountDetailsCard({ parentClass }: Props) {
 
       {/* Per-account cards */}
       <div className="grid md:grid-cols-2 gap-4">
+        
         {accounts.map((acc) => (
+          
           <div key={acc.id} className="glass p-4 rounded-2xl border border-[var(--color-border)]">
+            {/* <div className="flex justify-between items-center"> */}
+              {/* <div> */}
             <div className="flex items-center justify-between">
-              <h4 className="font-semibold text-sm">{acc.account_name}</h4>
+              <h4 className="font-semibold text-sm">{acc.account_type}</h4>
               <span className="text-xs uppercase opacity-70">{acc.currency_code}</span>
             </div>
             <p className="text-2xl font-bold mt-2">
               {getCurrencySymbol(acc.currency_code)} {acc.remaining_balance}
             </p>
-            <div className="mt-3 flex items-center gap-2 text-xs">
+            <div className="mt-3 flex items-center justify-between text-xs">
+              <div className="flex gap-2">
               <span className="glass px-2 py-1 rounded-md text-green-700">Income: {getCurrencySymbol(acc.currency_code)} {acc.total_income}</span>
               <span className="glass px-2 py-1 rounded-md text-red-700">Expense: {getCurrencySymbol(acc.currency_code)} {acc.total_expense}</span>
+              </div>
+                <Button onClick={()=>router.push(`account/${acc.id}`)} className="w-fit h-fit">Details</Button>
             </div>
             <p className="mt-2 text-xs opacity-70">Opening: {getCurrencySymbol(acc.currency_code)} {acc.opening_balance}</p>
           </div>

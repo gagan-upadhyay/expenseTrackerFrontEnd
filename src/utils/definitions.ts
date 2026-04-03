@@ -11,12 +11,14 @@ export type NewUser = {
 };
 
 export type fetchedUser={
+    id:string;
     firstname:string;
     lastname:string;
     email:string;
     profile_picture:string|null;
     password:string;
     theme:'light'|'dark';
+    updated_at:string;
 }
 
 export type AddedUser = {
@@ -25,7 +27,7 @@ export type AddedUser = {
     lastname:string,
     email:string,
     password:string,
-    profile_picture:string,
+    profile_picture:string |null,
     theme:string
 }
 
@@ -53,7 +55,7 @@ export type AccountType = 'savings'| 'credit' | 'wallet';
 export interface Account{
     id:string;
     user_id:string;
-    account_name:AccountType;
+    account_type:AccountType;
     currency_code:string;
     opening_balance:string;
     total_income:string;
@@ -63,7 +65,6 @@ export interface Account{
 }
 
 export interface CardDetails{
-    // id:string;
     brand:string;
     cardnumber:string;
     holder_name:string;
@@ -72,6 +73,12 @@ export interface CardDetails{
     cvv?:string;
     is_active:boolean;
     type:'debit'|'credit';
+}
+
+export interface fetchedCardsDetails extends CardDetails{
+    id:string;
+    account_id:string;
+    created_at?:string;
 }
 
 export interface Transaction{

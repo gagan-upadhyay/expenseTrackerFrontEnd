@@ -18,7 +18,7 @@ export default function Page() {
 
   return (
     <AuthGuard>
-      <div className="max-w-3xl glass glass-hover flex flex-col h-auto items-center rounded-3xl mx-auto space-y-4 p-4">
+      <div className="w-full items-center   glass glass-hover h-auto flex flex-col h-auto rounded-3xl">
 
         <Accordion title="Profile" isOpen={openAccordion === "Profile"} onToggle={() => toggleAccordion("Profile")}>
           <ProfileSettings />

@@ -39,13 +39,6 @@ export default function WelcomePage(){
                 <h2 className="text-white lg:text-2xl transitions-all ease-in-out duration-400">
                     Take care of your expenses at one place.
                 </h2>
-{/* 
-                <Button
-                    href={isLoggedIn ? '/dashboard' : '/auth/login'}
-                    className="text-xs md:text-sm lg:text-lg text-xs md:text-sm bg-brand active:bg-brand-active px-6 py-3"
-                >
-                    Get Started
-                </Button> */}
                 <Button onClick={handleSubmit} className="mt-10">
                     Get Started
                 </Button>

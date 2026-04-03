@@ -1,4 +1,4 @@
-import { Account, CardDetails } from "../utils/definitions";
+import { Account, CardDetails, fetchedCardsDetails } from "../utils/definitions";
 
 const ACCOUNT_SERVICE=process.env.NEXT_PUBLIC_ACCOUNT_SERVICE;
 console.log(`Value of ACCOUNT_SERVICE: ${ACCOUNT_SERVICE} from accountService.ts file`);
@@ -28,7 +28,7 @@ export async function getAccountById(accountId:string):Promise<Account[]>{
 
 type GetAccountByuserResult = {
     account: { success: boolean; message: string; data: Account[] } | undefined;
-    cards: { success: boolean; result: CardDetails[] } | null;
+    cards: { success: boolean; result: fetchedCardsDetails[] } | null;
     accountErrMsg: string | null;
     cardsErrMsg: string | null;
 }
@@ -69,12 +69,12 @@ export async function getAccountByUser(): Promise<GetAccountByuserResult>{
         // console.log('Value of resAcc and resCards from accountService:\n', resAcc, resCards);
         if(resAcc.ok && resCards.ok){
             const account = await (resAcc.json()??null) as { success: boolean; message: string; data: Account[] } | undefined;
-            const card = await (resCards.json()??null) as { success: boolean; result: CardDetails[] } | null;
+            const card = await (resCards.json()??null) as { success: boolean; result: fetchedCardsDetails[] } | null;
             return {account:account, cards:card, cardsErrMsg:null, accountErrMsg:null};
         }else if(!resAcc.ok && resCards.ok){
             const errAccBody = await safeParseJson<{message?:string}>(resAcc);
             const accountErrMsg = errAccBody?.message ?? `Failed to fetch acoount details (${resAcc.status} ${resAcc.statusText})`;
-            const cards = await (resCards.json() ?? null) as { success: boolean; result: CardDetails[] };
+            const cards = await (resCards.json() ?? null) as { success: boolean; result: fetchedCardsDetails[] };
             return {account: undefined, cards, accountErrMsg, cardsErrMsg: null}
             
         }

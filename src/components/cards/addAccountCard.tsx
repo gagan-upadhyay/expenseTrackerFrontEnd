@@ -2,11 +2,11 @@
 
 import { useRef, useState } from "react";
 import clsx from "clsx";
-
-import AddCardDetails from "./addCard";
 import { useAccounts } from "@/src/context/accountContext";
 import { createAccount, createCard } from "@/src/services/accountServices";
 import { toastShowError, toastShowSuccess } from "@/src/utils/toastUtils";
+import { ToastContainer } from "react-toastify";
+import CardPreview from "./CardPreview";
 
 
 interface Props {
@@ -19,6 +19,14 @@ const CURRENCIES = ["USD", "INR", "GBP", "YEN", "EUR"];
 export default function AddAccountCard({ parentClass }: Props) {
   const { accounts, refreshAccounts } = useAccounts();
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string|null>(null);
+  const [cardError, setCardError]=useState<string|null>(null);
+  // const [cardSaving, setCardSaving]=useState<boolean>(false);
+
+  const resetErrors=()=>{
+    setError(null);
+    setCardError(null);
+  }
 
   const [form, setForm] = useState({
     accountName: "",
@@ -44,9 +52,11 @@ export default function AddAccountCard({ parentClass }: Props) {
 
   const handleAccountChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    resetErrors();
   };
 
 const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  resetErrors();
   const { name, value } = e.target;
 
   if (name === "cardnumber") {
@@ -90,6 +100,12 @@ const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       ...prev,
       expiry_year:Number(val),
     }))
+  }else if(name==='cvv'){
+    const val = value.replace(/\D/g,"").slice(0,3);
+    setCard((prev)=>({
+      ...prev, 
+      cvv:val,
+    }))
   }
   else {
     setCard((prev) => ({
@@ -102,18 +118,20 @@ const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
 
   const saveAccount = async () => {
-    console.log(`Value of form from addAccount.tsx save account: ${form}`);
     if (!form.accountName.trim()) {
       toastShowError("Account type is required", Number(3000));
+      setError("Account type is required");
       return;
     }
+    // if(form.)
 
     const accountExists = accounts?.some(
-      (acc) => acc.account_name.toLowerCase() === form.accountName.trim().toLowerCase()
+      (acc) => acc.account_type.toLowerCase() === form.accountName.trim().toLowerCase()
         && acc.currency_code.toLowerCase() === form.currency.toLowerCase()
     );
     if (accountExists) {
-      toastShowError("Account already registered", 3000);
+      toastShowError("Account already registered", Number(3000));
+      setError("Account already registered");
       return;
     }
 
@@ -126,7 +144,8 @@ const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         totalIncome: Number(form.totalIncome) || 0,
         totalExpense: Number(form.totalExpense) || 0,
       };
-
+      console.log(`Value of accountPayload: ${accountPayload}`);
+      console.log(`Value of cards: ${cards}`);
       const savedAccount = await createAccount(accountPayload);
 
       await Promise.all(
@@ -160,6 +179,7 @@ const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     } catch (error) {
       const msg = error instanceof Error ? error.message : "Failed to save account";
       toastShowError(msg, Number(4000));
+      setError(msg);
     } finally {
       setSaving(false);
     }
@@ -168,7 +188,8 @@ const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   const addCard = () => {
     const trimmedCardNumber = String(card.cardnumber).trim();
     if (!card.brand.trim() || !card.holder_name.trim() || !trimmedCardNumber) {
-      toastShowError("Brand, holder and card number are required", 3000);
+      toastShowError("Brand, holder's name and card number are required", Number(3000));
+      setCardError("Brand, holder's name and card number are required")
       return;
     }
 
@@ -176,6 +197,7 @@ const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const alreadyExists = cards.some((c) => c.cardnumber.trim() === trimmedCardNumber);
     if (alreadyExists) {
       toastShowError("Card already registered", Number(3000));
+      setCardError("Card already registered")
       return;
     }
 
@@ -319,35 +341,30 @@ const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                 <input
                   name="expiry_month"
                   placeholder="MM"
+                  inputMode="numeric"
                   value={card.expiry_month}
-                  min={1}
-                  max={12}
-                  minLength={2}
-                  maxLength={2}
                   onChange={handleCardChange}
                   className="glass px-3 py-2 w-[50%] rounded-xl flex-1"
                 />
                 <input
                   name="expiry_year"
                   placeholder="YY"
+                  inputMode="numeric"
                   value={card.expiry_year}
-                  min={26}
-                  max={45}
-                  minLength={2}
-                  maxLength={2}
                   onChange={handleCardChange}
                   className="glass px-3 py-2 rounded-xl w-[50%] flex-1"
                 />
 
                 
               </div>
-
+              {cardError&&<p className="text-xs text-red-400">{cardError}</p>}
               <button
                 onClick={addCard}
                 className="glass-hover py-2 rounded-xl text-sm"
               >
                 Add Card
               </button>
+              {/* {cardError &&<p className="text-xs text-red-400">{cardError}</p>} */}
             </div>
           </div>
 
@@ -358,6 +375,9 @@ const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
           >
             {saving ? "Saving..." : "Save Account"}
           </button>
+
+          {error&&<p className="text-xs text-red-400">{error}</p>}
+
         </div>
 
         {/* RIGHT: preview pane */}
@@ -373,7 +393,7 @@ const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
           <div className="glass p-4 rounded-2xl">
             <h4 className="text-sm opacity-70 mb-3">Current Card Preview</h4>
-            <AddCardDetails card={card} />
+            <CardPreview card={card} />
           </div>
 
           <div className="glass p-4 rounded-2xl">
@@ -390,15 +410,20 @@ const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                 >
                   {cards.map((c, i) => (
                     <div key={i} className="min-w-[280px] flex-shrink-0 scroll-snap-align-start">
-                      <AddCardDetails card={c} />
+                      <CardPreview card={c} />
                     </div>
                   ))}
                 </div>
+                <ToastContainer/>
               </>
+              
             )}
           </div>
+          <ToastContainer/>
         </div>
+        <ToastContainer/>
       </div>
+      {/* <ToastContainer/> */}
     </div>
   );
 }

@@ -1,12 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins:['192.168.0.126'],
   logging:{
     fetches:{
       fullUrl:true,
     }
   },
   images: {
+    domains:["expensetrackerappstorage.blob.core.windows.net"],
     remotePatterns: 
     [  
       {
@@ -15,6 +17,12 @@ const nextConfig: NextConfig = {
         port: "",
         pathname: "/**",
       },
+      {
+        protocol:"https",
+        hostname:"expensetrackerappstorage.blob.core.windows.net",
+        port:"",
+        pathname:"/profile-images/**",
+      }
     ],
     
   },

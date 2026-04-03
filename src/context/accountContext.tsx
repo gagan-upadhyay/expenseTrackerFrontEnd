@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 
-import { Account, CardDetails } from '../utils/definitions';
+import { Account, fetchedCardsDetails } from '../utils/definitions';
 import { getAccountByUser } from '../services/accountServices';
 // import { useAuth } from './authContext';
 // import { useUser } from './userContext';
@@ -11,7 +11,7 @@ interface AccountContextType {
     accounts: Account[] | undefined;
     loading: boolean;
     error: string | null;
-    cards:CardDetails[] | null;
+    cards:fetchedCardsDetails[] | null;
     refreshAccounts: () => Promise<void>;
 }
 
@@ -19,7 +19,7 @@ const AccountContext = createContext<AccountContextType | undefined>(undefined);
 
 export const AccountProvider=({ children}:{ children:React.ReactNode }) => {
     const [accounts, setAccounts] = useState<Account[] | undefined>(undefined);
-    const [cards, setCard] = useState<CardDetails[] | null>(null);
+    const [cards, setCard] = useState<fetchedCardsDetails[] | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     // const {setIsLoggedIn, logout} = useAuth();
@@ -30,10 +30,8 @@ export const AccountProvider=({ children}:{ children:React.ReactNode }) => {
             setError(null);
             const data = await getAccountByUser();
             if(data?.account){
-                // console.log('value of data from context:', data);
             }
             setCard(data?.cards?.result ?? null);
-            // console.log('value of cards from accountContext:\n', data?.cards?.result);
             setAccounts(data.account?.data ?? undefined);
         } catch (err) {
             // setIsLoggedIn(false);

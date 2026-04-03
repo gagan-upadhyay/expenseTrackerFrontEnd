@@ -73,7 +73,9 @@ export const UserProvider=({children}:{children:React.ReactNode})=>{
             try{
                 const userData = await fetchUserWithRetry(10, 2);
                 if(userData){
-                    setUser(userData);
+                    setUser({...userData,
+                        profile_picture:userData.profile_picture && userData.profile_picture.startsWith("http")?userData.profile_picture:null,
+                    });
                     if(userData?.theme === 'light' || userData?.theme === 'dark'){
                         setUserTheme(userData.theme);
                     }

@@ -4,9 +4,10 @@ import Image from "next/image";
 import Rupay from '../../../public/RuPay.svg';
 import { CardDetails } from "@/src/utils/definitions";
 
-export default function AddCardDetails({ card }: { card: CardDetails }) {
+export default function CardPreview({ card }: { card: CardDetails }) {
     const expiry = `${String(card.expiry_month).padStart(2, '0')}/${card.expiry_year}`;
     const brandLower = (card.brand || "").toLowerCase();
+    console.log('Value of card from addCard:', card);
 
     return (
         <div

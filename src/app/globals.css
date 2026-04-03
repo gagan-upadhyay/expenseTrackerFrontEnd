@@ -2,7 +2,7 @@
 
 /* 🌞 Light Theme (default) */
 :root {
-  --background: #e6edf7;
+  --background: #e6edf7; /*background color of light theme*/
   --foreground: #171717;
 
   --color-primary: #F1F5FB;

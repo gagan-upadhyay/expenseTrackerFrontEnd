@@ -10,7 +10,8 @@ import { ExpenseChart } from "../ui/charts/charts";
 import { SavingsChart } from "../ui/charts/lineChart";
 import AddAccountCard from "./addAccountCard";
 import AddTransactionCard from "./AddTransaction";
-import AccountDetailsCard from "./AccountDetailsCard";
+import AccountsDetailsCard from "./AccountsDetailsCard";
+import SingleAccountDetails from "./SingleAccountDetails";
 
 interface CardProps {
   title: string;
@@ -49,8 +50,10 @@ export default function CardWrapper({ title }: CardProps) {
         <AddAccountCard parentClass={parentClass}/>
       ) : title==='add transaction'?(
         <AddTransactionCard/>
-      ): title === 'account details'?(
-        <AccountDetailsCard parentClass={parentClass}/>
+      ): title === 'accounts details'?(
+        <AccountsDetailsCard parentClass={parentClass}/>
+      ):title==='single account detail'?(
+        <SingleAccountDetails parentClass={parentClass}/>
       ):
       (
         <div className={parentClass}>

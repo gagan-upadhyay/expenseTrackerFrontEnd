@@ -1,8 +1,6 @@
 import AuthGuard from "@/src/components/auth/Guards/AuthGuard";
-import AccountDetailsCard from "@/src/components/cards/AccountDetailsCard";
-// import { Suspense } from "react";
-// import CardWrapper from "@/src/components/cards/cardDetails";
-// import CreditCard from "@/src/components/cards/creditCards";
+import AccountDetailsCard from "@/src/components/cards/AccountsDetailsCard";
+
 
 export default function Page(){
     const pageClass = 'top-5';
