@@ -7,7 +7,7 @@ import { CardDetails } from "@/src/utils/definitions";
 export default function CardPreview({ card }: { card: CardDetails }) {
     const expiry = `${String(card.expiry_month).padStart(2, '0')}/${card.expiry_year}`;
     const brandLower = (card.brand || "").toLowerCase();
-    console.log('Value of card from addCard:', card);
+    // console.log('Value of card from addCard:', card);
 
     return (
         <div

@@ -10,6 +10,7 @@ import { useAccounts } from '@/src/context/accountContext';
 import CreditCardSkeleton from '../skeletons/creditCardSkeleton';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
+import BlurCard from './addCardBlur';
 
 interface CreditCardProps {
   parentClass: string;
@@ -27,7 +28,7 @@ export default function CreditCard({ parentClass }: CreditCardProps) {
   }
 
   if (!cards || cards.length === 0) {
-    return <CreditCardSkeleton parentClass={parentClass} skeleton={false} />;
+    return <BlurCard/>
   }
 
   return (

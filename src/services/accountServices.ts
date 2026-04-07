@@ -1,3 +1,4 @@
+import apiFetch from "../utils/apiClient";
 import { Account, CardDetails, fetchedCardsDetails } from "../utils/definitions";
 
 const ACCOUNT_SERVICE=process.env.NEXT_PUBLIC_ACCOUNT_SERVICE;
@@ -103,7 +104,7 @@ export type NewAccountPayload = {
 
 export async function createAccount(payload: NewAccountPayload): Promise<Account>{
     if(!ACCOUNT_SERVICE) throw new Error('Missing NEXT_PUBLIC_ACCOUNT_SERVICE');
-
+    console.log(`Value of payload: ${payload}`);
     const res = await fetch(`${ACCOUNT_SERVICE}/api/v1/accounts/`, {
         method: 'POST',
         headers: {
@@ -128,7 +129,7 @@ export type NewCardPayload = {
     expiry_year: number;
     cvv?: string;
     is_active: boolean;
-    type: 'credit' | 'debit';
+    type: 'credit' | 'debit'|'loan';
 };
 
 export async function createCard(accountId:string, payload: NewCardPayload): Promise<CardDetails> {
@@ -147,4 +148,15 @@ export async function createCard(accountId:string, payload: NewCardPayload): Pro
     if(!res.ok) throw new Error(data?.message || 'Failed to create card');
 
     return data?.result ?? data;
+}
+
+
+export async function deleteAccountDetails(id:string){
+    if(!id) throw new Error('Missing accountId');
+
+    return await apiFetch(`${ACCOUNT_SERVICE}/api/v1/accounts/${id}`, {
+        method:'DELETE',
+        credentials:'include'
+    }) as {success:boolean, message:string|null, error:string|null};
+
 }

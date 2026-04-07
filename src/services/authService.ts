@@ -17,11 +17,12 @@ export const loginWithGoogle = async (credentialResponse: CredentialResponse) =>
 
 
 export const loginWithEmail = async (email: string, password: string) => {
-  return apiFetch(`${AUTH_SERVICE}/api/v1/auth/login`, {
+  return apiFetch(`${AUTH_SERVICE}/api/v1/auth/login/`, {
     method: 'POST',
     body: JSON.stringify({ email, password }),
   });
 };
+
 
 export const logoutUser = async () => {
   // if you need the raw response, call apiFetch and ignore return value

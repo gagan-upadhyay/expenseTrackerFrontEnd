@@ -4,8 +4,6 @@ import React, { createContext, useContext, useEffect, useState, useCallback, use
 
 import { Account, fetchedCardsDetails } from '../utils/definitions';
 import { getAccountByUser } from '../services/accountServices';
-// import { useAuth } from './authContext';
-// import { useUser } from './userContext';
 
 interface AccountContextType {
     accounts: Account[] | undefined;
@@ -13,6 +11,7 @@ interface AccountContextType {
     error: string | null;
     cards:fetchedCardsDetails[] | null;
     refreshAccounts: () => Promise<void>;
+    setAccounts:React.Dispatch<React.SetStateAction<Account[] | undefined>>;
 }
 
 const AccountContext = createContext<AccountContextType | undefined>(undefined);
@@ -33,6 +32,7 @@ export const AccountProvider=({ children}:{ children:React.ReactNode }) => {
             }
             setCard(data?.cards?.result ?? null);
             setAccounts(data.account?.data ?? undefined);
+            
         } catch (err) {
             // setIsLoggedIn(false);
             // logout();
@@ -45,11 +45,12 @@ export const AccountProvider=({ children}:{ children:React.ReactNode }) => {
 
     useEffect(() => {
         fetchAccounts();
+        // console.log(`value of accounts and card: ${accounts}, ${cards}`);
     }, [fetchAccounts]);
 
     const contextValue = useMemo(()=>({
-        accounts, cards, loading, error, refreshAccounts:fetchAccounts
-    }),[accounts, cards, loading, error, fetchAccounts])
+        accounts, setAccounts, cards, loading, error, refreshAccounts:fetchAccounts
+    }),[accounts, setAccounts, cards, loading, error, fetchAccounts])
 
     return (
         <AccountContext.Provider value={contextValue}>

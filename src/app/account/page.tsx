@@ -8,13 +8,13 @@ export default function Page(){
 
     return(
        
-        //  <div className="flex bg-red-500 w-full relative items-center justify-center">
+         
            <AuthGuard>
-            {/* <Suspense fallback={}> */}
+            {/* <div className="flex w-full overflow-y-auto relative items-center justify-center"> */}
                 <AccountDetailsCard parentClass={pageClass}/>
-                {/* </Suspense> */}
+            {/* </div> */}
            </AuthGuard> 
-        // {/* </div> */}
+        
        
         
     )

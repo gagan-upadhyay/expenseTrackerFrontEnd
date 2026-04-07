@@ -17,17 +17,19 @@ export default function DashBoardLayout({children}: {children:React.ReactNode}){
                     <ThemeSync/>
                     <SidebarProvider>
                         
-                        {/* <div className="flex h-screen flex-col sm:flex-row sm:overflow-hidden"> */}
                             
-                            {/* <div className="flex-grow p-6 sm:p-12 sm:overflow-y-auto"> */}
                                 <SideBar/>
-                                
                                 <MainContent>
+
                                     <Breadcrumbs/>
-                                {children}
-                                </MainContent>
+                                {/* <div className="flex h-screen flex-col sm:flex-row sm:overflow-hidden overflow-y-auto overflow-x-hidden"> */}
+                                    {/* <div className="flex-grow p-6 sm:p-12 sm:overflow-y-auto"> */}
+                                    {children}
+                                {/* </div> */}
                             {/* </div> */}
-                        {/* </div> */}
+                                </MainContent>
+                            
+                        
                     </SidebarProvider>
                 {/* </TransactionProvider> */}
             </AccountProvider>

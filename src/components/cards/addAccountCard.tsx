@@ -47,8 +47,12 @@ export default function AddAccountCard({ parentClass }: Props) {
     is_active:true,
     type:"" as "credit"|"debit",
   });
-
+  
   // id, holder_name, expiry_month, expiry_year, is_active
+  const yearRef = useRef<HTMLInputElement>(null);
+  const monthRef = useRef<HTMLInputElement>(null);
+  const brandRef = useRef<HTMLInputElement>(null);
+  const holderRef = useRef<HTMLInputElement>(null);
 
   const handleAccountChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -58,49 +62,62 @@ export default function AddAccountCard({ parentClass }: Props) {
 const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   resetErrors();
   const { name, value } = e.target;
-
+  const digitsOnly = value.replace(/\D/g,"");
   if (name === "cardnumber") {
-    // Remove non-digits
-    const rawValue = value.replace(/\D/g, "");
-
     // Limit to 16 digits
-    const limitedValue = rawValue.slice(0, 16);
+    const limitedValue = digitsOnly.slice(0, 16);
 
     // Format with spaces
     const formattedValue = limitedValue.replace(/(\d{4})(?=\d)/g, "$1 ");
-
+    if(limitedValue.length===16) brandRef.current?.focus();
     setCard((prev) => ({
       ...prev,
       [name]: formattedValue,
     }));
   } 
+  // else if(name==='brand'){
+  //   if(value.toLowerCase()==='visa'||'mastercard'||'rupay'){
+  //     holderRef.current?.focus();
+  //   }
+  // }
 
   else if(name==='expiry_month'){
-    let val = value.replace(/\D/g, "").slice(0,2);
+    let val = digitsOnly.slice(0,2);
     let num = parseInt(val);
-    if(!isNaN(num)){
+    if(val.length===2){
       if(num<1) num=1;
       if(num>12) num=12;
+      yearRef.current?.focus();
       val=num.toString().padStart(2, '0');
+      
     }
+    
     setCard((prev)=>({
       ...prev, 
       expiry_month:Number(val),
     }));
-  }else if(name==='expiry_year'){
-    let val = value.replace(/\D/g,"").slice(0,2);
+    
+  }
+  else if(name==='expiry_year'){
+    const val = digitsOnly.slice(0,2);
 
+    if(val===""){
+      setCard(prev=>({...prev, expiry_year:0}));
+      return;
+    }
     let num = parseInt(val);
-    if (!isNaN(num)){
+    if (val.length===2){
       if(num<26) num=26;
       if(num>45) num=45;
-      val=num.toString();
+      addCardRef.current?.focus();
     }
     setCard((prev)=>({
       ...prev,
-      expiry_year:Number(val),
+      expiry_year:num,
     }))
-  }else if(name==='cvv'){
+  }
+
+  else if(name==='cvv'){
     const val = value.replace(/\D/g,"").slice(0,3);
     setCard((prev)=>({
       ...prev, 
@@ -115,6 +132,7 @@ const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   }
 };
   const savedCardsRef = useRef<HTMLDivElement>(null);
+  const addCardRef = useRef<HTMLButtonElement>(null);
 
 
   const saveAccount = async () => {
@@ -138,8 +156,8 @@ const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSaving(true);
     try {
       const accountPayload = {
-        accountType: form.accountName.trim(),
-        currencyCode: form.currency,
+        accountType: form.accountName.trim().toLowerCase(),
+        currencyCode: form.currency.toLowerCase(),
         openingBalance: Number(form.openingBalance) || 0,
         totalIncome: Number(form.totalIncome) || 0,
         totalExpense: Number(form.totalExpense) || 0,
@@ -147,21 +165,23 @@ const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       console.log(`Value of accountPayload: ${accountPayload}`);
       console.log(`Value of cards: ${cards}`);
       const savedAccount = await createAccount(accountPayload);
-
-      await Promise.all(
-        cards.map((c) =>
-          createCard(savedAccount.id, {
-            brand: c.brand,
-            cardnumber: c.cardnumber.replace(/\s/g, ""),
-            holder_name: c.holder_name,
-            expiry_month: Number(c.expiry_month),
-            expiry_year: Number(c.expiry_year),
-            is_active: c.is_active,
-            type: c.type,
-          })
-        )
-      );
-
+      
+      if(savedAccount?.id){
+        console.log(`value of savedAccount: ${saveAccount}`)
+        await Promise.all(
+          cards.map((c) =>
+            createCard(savedAccount.id, {
+              brand: c.brand,
+              cardnumber: c.cardnumber.replace(/\s/g, ""),
+              holder_name: c.holder_name,
+              expiry_month: Number(c.expiry_month),
+              expiry_year: Number(c.expiry_year),
+              is_active: c.is_active,
+              type: c.type,
+            })
+          )
+        );
+      }
       
       toastShowSuccess("Account and cards saved successfully", Number(3000));
 
@@ -310,6 +330,7 @@ const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                   name="brand"
                   placeholder="Card Brand"
                   value={card.brand}
+                  ref={brandRef}
                   onChange={handleCardChange}
                   className="glass px-3 py-2 w-[60%] rounded-xl"
                 />
@@ -334,6 +355,7 @@ const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                 placeholder="Card holder_name"
                 value={card.holder_name}
                 onChange={handleCardChange}
+                ref={holderRef}
                 className="glass px-3 py-2 rounded-xl"
               />
 
@@ -341,16 +363,18 @@ const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                 <input
                   name="expiry_month"
                   placeholder="MM"
-                  inputMode="numeric"
-                  value={card.expiry_month}
+                  ref={monthRef}
+                  // inputMode="numeric"
+                  value={card.expiry_month===0?"":card.expiry_month}
                   onChange={handleCardChange}
                   className="glass px-3 py-2 w-[50%] rounded-xl flex-1"
                 />
                 <input
                   name="expiry_year"
                   placeholder="YY"
-                  inputMode="numeric"
-                  value={card.expiry_year}
+                  ref={yearRef}
+                  // inputMode="numeric"
+                  value={card.expiry_year===0?"":card.expiry_year}
                   onChange={handleCardChange}
                   className="glass px-3 py-2 rounded-xl w-[50%] flex-1"
                 />
@@ -360,6 +384,7 @@ const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
               {cardError&&<p className="text-xs text-red-400">{cardError}</p>}
               <button
                 onClick={addCard}
+                ref={addCardRef}
                 className="glass-hover py-2 rounded-xl text-sm"
               >
                 Add Card
@@ -414,16 +439,16 @@ const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                     </div>
                   ))}
                 </div>
-                <ToastContainer/>
+                {/* <ToastContainer/> */}
               </>
               
             )}
           </div>
-          <ToastContainer/>
+          {/* <ToastContainer/> */}
         </div>
-        <ToastContainer/>
+        {/* <ToastContainer/> */}
       </div>
-      {/* <ToastContainer/> */}
+      <ToastContainer/>
     </div>
   );
 }
