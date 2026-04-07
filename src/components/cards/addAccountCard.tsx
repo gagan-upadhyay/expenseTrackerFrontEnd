@@ -325,7 +325,7 @@ const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                 />
 
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between gap-2">
                 <input
                   name="brand"
                   placeholder="Card Brand"
@@ -340,7 +340,7 @@ const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                         key={t}
                         onClick={() => setCard({ ...card, type: t as "credit" | "debit" })}
                         className={clsx(
-                          "px-4 py-2 text-sm",
+                          "px-3 py-2 text-sm",
                           card.type === t ? "bg-green-500/20" : "glass"
                         )}
                       >

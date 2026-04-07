@@ -84,7 +84,7 @@ export default function AccountsDetailsCard({ parentClass }: Props) {
             </div>
             <button 
             onClick={() => router.push("/account/add")}
-            className="md:hidden p-2 glass rounded-xl border border-white/10 active:scale-90 transition-transform"
+            className="md:hidden p-2 glass rounded-xl border z-50 border-white/10 active:scale-90 transition-transform"
             >
              <PlusIcon className="w-5 h-5 text-indigo-400" />
             </button>
@@ -165,6 +165,7 @@ export default function AccountsDetailsCard({ parentClass }: Props) {
         ))}
       </div>
       </div>
+      
 
       {/* CTA: Add Transaction */}
       <Button
