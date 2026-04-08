@@ -108,15 +108,17 @@ export default function WalletCard({ parentClass }: WalletCardProps) {
   <button
     onClick={toggleVisibility}
     className={clsx(
-      "absolute bottom-4 right-4 p-2 rounded-full",
+      "absolute p-2 rounded-full",
       "glass", // ✅ reuse glass here too
-      "hover:scale-110 active:scale-95 transition-all duration-300"
+      "hover:scale-110 active:scale-95 transition-all duration-300",
+      "bottom-4 right-4",
+      
     )}
   >
         {showSensitive ? (
-          <EyeIcon className="w-4 h-4 lg:w-5 lg:h-5" />
+          <EyeIcon className="w-4 h-4" />
         ) : (
-          <EyeSlashIcon className="w-4 h-4 lg:w-5 lg:h-5" />
+          <EyeSlashIcon className="w-4 h-4" />
         )}
       </button>
     </div>

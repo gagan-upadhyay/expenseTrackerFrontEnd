@@ -160,3 +160,28 @@ export async function deleteAccountDetails(id:string){
     }) as {success:boolean, message:string|null, error:string|null};
 
 }
+
+export async function CreateAccountWithCards(
+    accountPayload:NewAccountPayload,
+    cardsPayload:NewCardPayload[]
+):Promise<{account:Account, cards:CardDetails[]}>{
+    
+    // 1. create account
+    const account = await createAccount(accountPayload);
+    console.log('Value of account:', account);
+    const accountId = account.id;
+    console.log(`value of accountId: ${accountId}`);
+    
+    if(!accountId){
+        throw new Error("Account created but no ID was returned to save and link cards");
+    }
+
+    // 2. Create card and link them
+    
+    const cardPromises=cardsPayload.map(card=>createCard(accountId, card));
+    const cards = await Promise.all(cardPromises);
+    return {
+        account, cards
+    };
+
+}

@@ -3,17 +3,18 @@
 import { useRef, useState } from "react";
 import clsx from "clsx";
 import { useAccounts } from "@/src/context/accountContext";
-import { createAccount, createCard } from "@/src/services/accountServices";
+import {  CreateAccountWithCards, NewAccountPayload, NewCardPayload } from "@/src/services/accountServices";
 import { toastShowError, toastShowSuccess } from "@/src/utils/toastUtils";
 import { ToastContainer } from "react-toastify";
 import CardPreview from "./CardPreview";
+import { useRouter } from "next/navigation";
 
 
 interface Props {
   parentClass: string;
 }
 
-const ACCOUNT_TYPES = ["SAVINGS", "LOAN", "CREDIT"];
+const ACCOUNT_TYPES = ["SAVINGS", "LOAN", "CREDITS"];
 const CURRENCIES = ["USD", "INR", "GBP", "YEN", "EUR"];
 
 export default function AddAccountCard({ parentClass }: Props) {
@@ -22,6 +23,7 @@ export default function AddAccountCard({ parentClass }: Props) {
   const [error, setError] = useState<string|null>(null);
   const [cardError, setCardError]=useState<string|null>(null);
   // const [cardSaving, setCardSaving]=useState<boolean>(false);
+  const router = useRouter();
 
   const resetErrors=()=>{
     setError(null);
@@ -38,7 +40,7 @@ export default function AddAccountCard({ parentClass }: Props) {
 
   const [cards, setCards] = useState<typeof card[]>([]);
   const [card, setCard] = useState({
-    brand: "" as "visa"|"rupay"|"mastercard",
+    brand: "" as "Visa"|"Rupay"|"Mastercard",
     holder_name: "",
     expiry_month: 0 as number,
     expiry_year: 0 as number,
@@ -75,11 +77,6 @@ const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       [name]: formattedValue,
     }));
   } 
-  // else if(name==='brand'){
-  //   if(value.toLowerCase()==='visa'||'mastercard'||'rupay'){
-  //     holderRef.current?.focus();
-  //   }
-  // }
 
   else if(name==='expiry_month'){
     let val = digitsOnly.slice(0,2);
@@ -155,35 +152,50 @@ const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
     setSaving(true);
     try {
-      const accountPayload = {
+      const accountPayload:NewAccountPayload = {
         accountType: form.accountName.trim().toLowerCase(),
         currencyCode: form.currency.toLowerCase(),
         openingBalance: Number(form.openingBalance) || 0,
         totalIncome: Number(form.totalIncome) || 0,
         totalExpense: Number(form.totalExpense) || 0,
       };
-      console.log(`Value of accountPayload: ${accountPayload}`);
-      console.log(`Value of cards: ${cards}`);
-      const savedAccount = await createAccount(accountPayload);
+
+        const cardsPayload: NewCardPayload[] = cards.map((c) => ({
+          brand: c.brand,
+          cardnumber: c.cardnumber.replace(/\s/g, ""),
+          holder_name: c.holder_name,
+          expiry_month: Number(c.expiry_month),
+          expiry_year: Number(c.expiry_year),
+          is_active: c.is_active,
+          type: c.type as 'credit' | 'debit' | 'loan',
+        }));
+
+        const result = await CreateAccountWithCards(accountPayload, cardsPayload);
+        console.log("Success! Created Account and Cards:", result);
+
+      // console.log(`Value of accountPayload: ${accountPayload}`);
+      // console.log(`Value of cards: ${cards}`);
+      // const savedAccount = await createAccount(accountPayload);
       
-      if(savedAccount?.id){
-        console.log(`value of savedAccount: ${saveAccount}`)
-        await Promise.all(
-          cards.map((c) =>
-            createCard(savedAccount.id, {
-              brand: c.brand,
-              cardnumber: c.cardnumber.replace(/\s/g, ""),
-              holder_name: c.holder_name,
-              expiry_month: Number(c.expiry_month),
-              expiry_year: Number(c.expiry_year),
-              is_active: c.is_active,
-              type: c.type,
-            })
-          )
-        );
-      }
+      // if(savedAccount?.id){
+      //   console.log(`value of savedAccount: ${saveAccount}`)
+      //   await Promise.all(
+      //     cards.map((c) =>
+      //       createCard(savedAccount.id, {
+      //         brand: c.brand,
+      //         cardnumber: c.cardnumber.replace(/\s/g, ""),
+      //         holder_name: c.holder_name,
+      //         expiry_month: Number(c.expiry_month),
+      //         expiry_year: Number(c.expiry_year),
+      //         is_active: c.is_active,
+      //         type: c.type,
+      //       })
+      //     )
+      //   );
+      // }
       
-      toastShowSuccess("Account and cards saved successfully", Number(3000));
+      toastShowSuccess("Account and cards saved successfully", Number(1500));
+      router.replace('/account');
 
       setForm({
         accountName: "",
@@ -223,7 +235,7 @@ const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
     setCards([...cards, { ...card, cardnumber: trimmedCardNumber }]);
     setCard({
-      brand: "visa",
+      brand: "Visa",
       holder_name: "",
       expiry_month: 0,
       expiry_year: 0,

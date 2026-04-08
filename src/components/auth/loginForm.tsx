@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
-import { ToastContainer} from "react-toastify";
+// import { ToastContainer} from "react-toastify";
 // import { Button } from "../ui/buttons/buttons";
 import {AtSymbolIcon, EyeIcon, EyeSlashIcon, KeyIcon} from '@heroicons/react/24/outline'
 import { GoogleLogin } from "@react-oauth/google";
@@ -275,7 +275,7 @@ export default function LoginForm(){
                     </div>
                 </div>
             </form>
-            <ToastContainer />
+            {/* <ToastContainer /> */}
         </>
     )
 }
