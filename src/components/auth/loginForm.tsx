@@ -98,6 +98,10 @@ export default function LoginForm(){
             }else if(typeof e==='string'){
                 errorMessage=e;
             }
+            const htmlMatch = errorMessage.match(/502\s+(Bad Gateway)/i);
+            if (htmlMatch) {
+                errorMessage = htmlMatch[1]; // Sets errorMessage to exactly "Bad Gateway"
+            }
             setErrors(errorMessage);
             console.warn("value of error from loginForm:", errorMessage);
             toastShowError(errorMessage, Number(1500));
