@@ -11,6 +11,7 @@ import { ThemeProvider } from "../context/themeContext";
 import ThemeSync from "../components/dashboard/ThemeSync";
 import { getInitialAuth } from "../utils/authFunctions";
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from "@vercel/analytics/next"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,6 +43,7 @@ export default async function RootLayout({
       <body
         className={`flex flex-col min-h-screen ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <Analytics/>
         <SpeedInsights/>
         <ThemeProvider>
           <AuthProvider initialToken={initialToken}>
