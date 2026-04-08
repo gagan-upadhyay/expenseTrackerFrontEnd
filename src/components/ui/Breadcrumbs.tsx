@@ -34,7 +34,7 @@ export default function Breadcrumbs() {
   });
 
   return (
-    <div className="w-full mt-10 mb-4">
+    <div className="relative w-[70%] left-15 ">
       <div className="glass glass-light px-4 py-2 rounded-xl flex items-center gap-2 text-sm overflow-x-auto">
 
         {breadcrumbs.map((crumb, index) => {

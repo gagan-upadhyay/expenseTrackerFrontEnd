@@ -10,11 +10,7 @@ import FooterWrapper from "../components/layout/footerWrapper";
 import { ThemeProvider } from "../context/themeContext";
 import ThemeSync from "../components/dashboard/ThemeSync";
 import { getInitialAuth } from "../utils/authFunctions";
-// import { SidebarProvider } from "../context/sidebarContext";
-// import { AuthModalProvider } from "../context/authModalContext";
-// import AuthModal from "../components/auth/authModal";
-
-// import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -46,6 +42,7 @@ export default async function RootLayout({
       <body
         className={`flex flex-col min-h-screen ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <SpeedInsights/>
         <ThemeProvider>
           <AuthProvider initialToken={initialToken}>
             <GoogleOAuthProvider clientId={process.env.GOOGLE_CLIENT_ID ?? ""}>
