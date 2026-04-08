@@ -6,12 +6,17 @@ import { lusitana } from "@/src/assets/fonts/fonts";
 import clsx from "clsx";
 import WalletCard from "./walletCard";
 import TransactionCard from "./transactionCard";
-import { ExpenseChart } from "../ui/charts/charts";
-import { SavingsChart } from "../ui/charts/lineChart";
+// import { ExpenseChart } from "../ui/charts/charts";
+// import { SavingsChart } from "../ui/charts/lineChart";
 import AddAccountCard from "./addAccountCard";
 import AddTransactionCard from "./AddTransaction";
 import AccountsDetailsCard from "./AccountsDetailsCard";
 import SingleAccountDetails from "./SingleAccountDetails";
+// import dynamic from "next/dynamic";
+// import ExpenseChartSkeleton from "../skeletons/chartSkeleton";
+// import LineChartSkeleton from "../skeletons/lineChartSkeleton";
+import { ExpenseChart } from "../ui/charts/charts";
+import { SavingsChart } from "../ui/charts/lineChart";
 
 interface CardProps {
   title: string;
@@ -33,6 +38,16 @@ export default function CardWrapper({ title }: CardProps) {
     "glass glass-hover  smooth-theme relative flex flex-col rounded-2xl p-6 overflow-hidden",
     fontClass
   );
+
+  // const ExpenseChart = dynamic(()=>import('../ui/charts/charts').then(mod=>mod.ExpenseChart),{
+  //   ssr:false,
+  //   loading:()=><ExpenseChartSkeleton/>
+  // });
+
+  // const SavingsChart = dynamic(()=>import('../ui/charts/lineChart').then(mod=>mod.SavingsChart),{
+  //   ssr:false,
+  //   loading:()=><LineChartSkeleton/>
+  // })
 
   return (
     <>

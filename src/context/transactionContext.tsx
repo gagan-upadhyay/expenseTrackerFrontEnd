@@ -10,6 +10,7 @@ interface TransactionContextType{
     transactions: Transaction[]|null;
     loading:boolean;
     errorMsg:TransacationError|null;
+    fetchTransactions:()=> Promise<void>;
 }
 
 const TransactionContext = createContext<TransactionContextType | undefined>(undefined);
@@ -56,8 +57,8 @@ export const TransactionProvider = ({children}:{children:React.ReactNode})=>{
     }, [fetchTransactions, isLoggedIn]);
 
     const contextValue = useMemo(()=>({
-        transactions, loading, errorMsg, setTransactions
-    }), [transactions, loading, errorMsg, setTransactions]);
+        transactions, loading, errorMsg, setTransactions, fetchTransactions
+    }), [transactions, loading, errorMsg, setTransactions, fetchAllTransactions]);
 
     return (
         <TransactionContext.Provider value={contextValue}>

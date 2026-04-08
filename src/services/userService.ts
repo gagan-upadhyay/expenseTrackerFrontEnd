@@ -1,33 +1,3 @@
-// export async function updateUserProfile(data:{
-//     firstName:string|null,
-//     lastName:string|null,
-//     email:string|null,
-//     password?:string|null,
-//     profilePicture?:File|null;
-// }){
-//     const USER_SERVICE= process.env.NEXT_PUBLIC_USER_SERVICE;
-//     console.log(`VALUE OF USER_SERVICE: ${USER_SERVICE} from userService.ts`);
-//     try{    
-//         const formData = new FormData();
-//         Object.entries(data).forEach(([key, value])=>{
-//             if(value) formData.append(key, value);
-//         });
-//         const res = await fetch(`${USER_SERVICE}/api/v1/user/update-user/`, {
-//             method:'PUT',
-//             body:formData,
-//             credentials:'include'
-//         });
-//         const json = await res.json();
-//         console.log('UserService, response from submit:', json);
-//         return {success:true};
-//     }catch(err){
-//         if(err instanceof(Error))
-//         {console.error("Error while fetching userDetails", err);
-//         return {success:false, error:err};}
-//     }
-// }
-
-
 import apiFetch from "../utils/apiClient";
 import imageCompression from 'browser-image-compression';
 
@@ -98,8 +68,6 @@ export async function uploadProfilePicture(file:File){
     if(!res.success){
       throw new Error(res.error || "Failed to get upload URL");
     }
-    
-
   // ✅ 4. Upload to Azure Blob
     await fetch(res.uploadUrl, {
       method:"PUT",
@@ -109,15 +77,6 @@ export async function uploadProfilePicture(file:File){
       },
       body:compressedFile
     });
-
-    // ✅ 5. Save URL in DB
-    
-    // await updateUserProfile({profile_picture:res.blobUrl});
-    // return {
-    //   success:true, url:res.blobUrl
-    // };
-    // return await updateUserProfile({profile_picture:res.blobName}) 
-    // return updateRes;
     return {success:true, blobName:res.blobName}
     }catch(err){
     return {success:false, error:err}

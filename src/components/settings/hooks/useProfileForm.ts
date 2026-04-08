@@ -75,59 +75,6 @@ export function useProfileForm() {
       [name]: value
     }));
   };
-
-  // ✅ Submit handler (fixed flow)
-  // const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   setLoading(true);
-
-
-  //   try {
-  //     let profileImageUrl: string | undefined;
-  //         const payload:any={};
-  //     if (formData.firstname?.trim()) payload.firstName = formData.firstname;
-  //     if (formData.lastname?.trim()) payload.lastName = formData.lastname;
-  //     if (formData.email?.trim()) payload.email = formData.email;
-  //     if (profileImageUrl) payload.profile_picture = profileImageUrl;
-      
-  //     if (Object.keys(payload).length === 0) {
-  //       throw new Error("Nothing to update");
-  //     }
-  //     console.log('payload:', payload);
-      
-  //     // ✅ 1. Upload image if changed
-  //     if (formData.profile_picture_file) {
-        
-  //       const uploadRes = await uploadProfilePicture(formData.profile_picture_file)
-
-  //       if (!uploadRes?.success) {
-  //         throw new Error("Image upload failed");
-  //       }
-
-  //       // assuming upload returns updated user or URL
-  //       profileImageUrl = uploadRes.blobName;
-  //     }
-
-  //     // ✅ 2. Update profile
-  //     const res = await updateUserProfile(payload) as {success:boolean,error:null|string, user:fetchedUser};
-
-  //     if(res.success && res.user){
-  //       console.log(`User updated from useProfileForm hook`);
-  //       setUser(res.user)
-  //     }
-  //     if (!res.success) {
-  //       throw new Error(
-  //         typeof res.error ==='string'?res.error:"Profile Update failed"
-  //       );
-  //     }
-
-  //   } catch (err) {
-  //     console.error("Profile update error:", err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
