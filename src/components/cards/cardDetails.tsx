@@ -12,11 +12,10 @@ import AddAccountCard from "./addAccountCard";
 import AddTransactionCard from "./AddTransaction";
 import AccountsDetailsCard from "./AccountsDetailsCard";
 import SingleAccountDetails from "./SingleAccountDetails";
-// import dynamic from "next/dynamic";
-// import ExpenseChartSkeleton from "../skeletons/chartSkeleton";
-// import LineChartSkeleton from "../skeletons/lineChartSkeleton";
+
 import { ExpenseChart } from "../ui/charts/charts";
 import { SavingsChart } from "../ui/charts/lineChart";
+import PayablesReceiptsCard from "./PayableAndReceipts";
 
 interface CardProps {
   title: string;
@@ -39,15 +38,6 @@ export default function CardWrapper({ title }: CardProps) {
     fontClass
   );
 
-  // const ExpenseChart = dynamic(()=>import('../ui/charts/charts').then(mod=>mod.ExpenseChart),{
-  //   ssr:false,
-  //   loading:()=><ExpenseChartSkeleton/>
-  // });
-
-  // const SavingsChart = dynamic(()=>import('../ui/charts/lineChart').then(mod=>mod.SavingsChart),{
-  //   ssr:false,
-  //   loading:()=><LineChartSkeleton/>
-  // })
 
   return (
     <>
@@ -56,7 +46,7 @@ export default function CardWrapper({ title }: CardProps) {
       ) : title === 'Wallet' ? (
         <WalletCard parentClass={parentClass} />
       ) : title === 'Transactions' ? (
-        <TransactionCard pageClass={parentClass} />
+        <TransactionCard pageClass="h-full max-h-[500px] overflow-y-auto scrollbar-hide" />
       ) : title === 'Monthly Spent' ? (
         <ExpenseChart />
       ) : title === 'Savings' ? (
@@ -69,13 +59,10 @@ export default function CardWrapper({ title }: CardProps) {
         <AccountsDetailsCard parentClass={parentClass}/>
       ):title==='single account detail'?(
         <SingleAccountDetails parentClass={parentClass}/>
-      ):
-      (
-        <div className={parentClass}>
-          <h3 className="text-lg text-center font-semibold">{title}</h3>
-          <FaCcVisa size={60} />
-        </div>
-      )}
+      ):title==='Payable Accounts, Receipts'?(
+        <PayablesReceiptsCard/>
+      ):null
+    }
     </>
   );
 }

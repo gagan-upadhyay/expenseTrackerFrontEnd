@@ -2,12 +2,9 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { fetchedUser } from "../utils/definitions";
-// import { useSession } from "../Hooks/userHooks/userHook";
 import { getUserDetails } from "../utils/data";
 import { useAuth } from "./authContext";
 import { toastShowError } from "../utils/toastUtils";
-
-// import {} from 'use-debounce'
 
 const UserContext = createContext<{
     user: fetchedUser | null;
@@ -30,12 +27,7 @@ export const UserProvider=({children}:{children:React.ReactNode})=>{
     // const clearUser = ()=> setUser(null);
     const [loading, setLoading] = useState(true);
     const [userTheme, setUserTheme] = useState<'light'|'dark'>('light');
-
     const {accessToken, logout, isTokenValid} = useAuth();
-    
-
-    // console.log('Value of userTheme from userCOntext:\n', userTheme);
-    
     
     const fetchUserWithRetry = useCallback(async (maxRetries:number,delay:number ): Promise<fetchedUser | null> => {
         for (let attempt = 0; attempt < maxRetries; attempt++) {
@@ -52,10 +44,6 @@ export const UserProvider=({children}:{children:React.ReactNode})=>{
         }
         return null;
     },[]);
-
-    // const debouncedLogout = debounce(()=>{
-
-    // })
 
     useEffect(()=>{
         const initUser = async()=>{
@@ -76,10 +64,10 @@ export const UserProvider=({children}:{children:React.ReactNode})=>{
                     setUser({...userData,
                         profile_picture:userData.profile_picture && userData.profile_picture.startsWith("http")?userData.profile_picture:null,
                     });
+                    console.log('Value of user data:', userData);
                     if(userData?.theme === 'light' || userData?.theme === 'dark'){
                         setUserTheme(userData.theme);
                     }
-                // console.log('Value of userTheme from userContext:\n', userTheme);
                 }
             }catch(err){
                 console.error('error fetching user details:', err)

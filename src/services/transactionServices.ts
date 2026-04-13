@@ -1,7 +1,7 @@
 import apiFetch from "../utils/apiClient";
-import { Transaction, TransacationError } from "../utils/definitions";
+import { Transaction, TransacationError, deletePayload } from "../utils/definitions";
 import {safeParseJson, safeParseJsonResult} from '../utils/safeParseJSON';
-import {TransactionSchema, TransactionsSchema} from '../utils/schemas/transaction';
+import {TransactionSchema, TransactionsSchema} from '../utils/schemas/transactionSchema';
 import imageCompression from "browser-image-compression";
 
 const TRANSACTION_SERVICE = process.env.NEXT_PUBLIC_TRANSACTION_SERVICE;
@@ -31,33 +31,46 @@ export async function fetchSingleTransaction(id:string):Promise<Transaction|null
     }
 }
 
-
-
-export async function fetchAllTransactions():Promise<Transaction[]|TransacationError>{
+export async function fetchAllTransactions(queryString: string = ""): Promise<Transaction[] | TransacationError> {
     const controller = new AbortController();
-    const timeout = setTimeout(()=>controller.abort(), 20_000);
-    if(!TRANSACTION_SERVICE) throw new Error('Missing transaction_service URL');
+    const timeout = setTimeout(() => controller.abort(), 20_000);
+    
+    if (!TRANSACTION_SERVICE) throw new Error('Missing transaction_service URL');
 
-    try{
-        const res = await fetch(`${TRANSACTION_SERVICE}/api/v1/transactions/`, {
-            credentials:'include',
-            signal:controller.signal,
+    try {
+        // Construct URL with the query string
+        const url = `${TRANSACTION_SERVICE}/api/v1/transactions${queryString}`;
+
+        const res = await fetch(url, {
+            credentials: 'include',
+            signal: controller.signal,
         });
 
-        // console.log('Value of res from fetchAlltransacctions transacService:\n', await res.json());
-        const result =  await safeParseJsonResult(res, TransactionsSchema);
-        // console.log('Value of result from fetchTransacts function:\n', result);
-        if(result.ok){
+        const result = await safeParseJsonResult(res, TransactionsSchema);
+        console.log('value of result:', result);
+
+        if (result.ok) {
             return result?.data;
         }
-        if(!result.ok){
-            return {err:result?.error, zodError:result.zodError ? JSON.stringify(result.zodError) : undefined}
+        
+        return {
+            err: result?.error || "Failed to parse transactions",
+            zodError: result.zodError ? JSON.stringify(result.zodError) : undefined
+        };
+
+    } catch (err: any) {
+        // Fix: Explicitly add zodError: undefined to satisfy the type requirement
+        if (err.name === 'AbortError') {
+            return { 
+                err: 'Request timed out', 
+                zodError: undefined 
+            };
         }
-        return result;
-    }catch(err){
-        console.warn('Error while fetching transactions', err);
-        throw new Error('Error while fetching transactions');
-    }finally{
+        return { 
+            err: 'Error while fetching transactions', 
+            zodError: undefined 
+        };
+    } finally {
         clearTimeout(timeout);
     }
 }
@@ -95,7 +108,7 @@ export async function uploadTransactionReceipt(file:File){
 
     // ✅ 2. Compress Image
     const compressedFile = await imageCompression(file, {
-      maxSizeMB:1,
+      maxSizeMB:2,
       maxWidthOrHeight:512,
       useWebWorker:true
     });
@@ -106,7 +119,8 @@ export async function uploadTransactionReceipt(file:File){
     headers:{
       "Content-Type":"application/json",
     },
-    body:JSON.stringify({fileType:compressedFile.type})
+    body:JSON.stringify({fileType:compressedFile.type}),
+    credentials:'include',
     }) as {success:boolean, uploadUrl:string, blobName:string|undefined, error:string|null};
 
     if(!res.success){
@@ -117,7 +131,7 @@ export async function uploadTransactionReceipt(file:File){
       method:"PUT",
       headers:{
         "x-ms-blob-type":"BlockBlob",
-        "Content-Type":compressedFile.type
+        "Content-Type":file.type
       },
       body:compressedFile
     });
@@ -129,4 +143,46 @@ export async function uploadTransactionReceipt(file:File){
             error: err instanceof Error ? err.message : "Upload failed" 
         }
     }
+}
+
+
+
+export const deleteTransaction=async (deletePayload:deletePayload)=>{
+    const {transactionId} = deletePayload;
+    try{
+        const res:{success:boolean, message:string|null, error:string|null} = await apiFetch(`${TRANSACTION_SERVICE}/api/v1/transactions/${transactionId}`, {
+        method:'DELETE',
+        headers:{
+            'Content-Type':'application/json',
+        },
+        body:JSON.stringify(deletePayload)
+        });
+        if(res.success){
+            return res.message;
+        }
+    }catch(err){
+        return {
+            success:false,
+            error:err instanceof Error ? err.message: "Delete transaction failure"
+        }
+    }
+}
+
+export const updateTransaction = async (transactionId: string, payload: any) => {
+    const res = await apiFetch(`${TRANSACTION_SERVICE}/api/v1/transactions/${transactionId}`, {
+        method: 'PATCH',
+        credentials:'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+    return res;
+};
+
+
+export const fetchStatsService = async(args:string)=>{
+    const res = await apiFetch(`${TRANSACTION_SERVICE}/api/v1/transactions/stats/breakdown${args}`,{
+        method:'GET',
+        credentials:'include'
+    });
+    return res;
 }

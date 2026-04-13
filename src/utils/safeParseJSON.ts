@@ -29,20 +29,31 @@ export const safeParseJsonResult=async<T>(
 ):Promise<Result<T>>=>{
     try{
         const json = await res.json();
+        console.log('value of json:', json);
         const result = schema.safeParse(json);
 
         if(result.success){
             return {ok:true, data:result.data};
         }
-        getLogger('safeParseJSON').debug('parsed result', result);
-        getLogger('safeParseJSON').debug('json input', json);
-        // this is returning an pbject with ok error status and zodError 
-        return {
-            ok:false,
-            error:'Schema validation failed',
-            status:res.status,
-            zodError:result.error
-        }
+        // if(!result.success){
+            console.error("Zod Validation Path:", result.error.issues.map(i => `${i.path.join('.')}: ${i.message}`));
+            getLogger('safeParseJSON').debug('Full Zod Error Object', result.error.format());
+            return {
+                ok: false,
+                error: 'Schema validation failed',
+                status: res.status,
+                zodError: result.error
+            }
+        // }
+        // getLogger('safeParseJSON').debug('parsed result', result);
+        // getLogger('safeParseJSON').debug('json input', json);
+        // // this is returning an pbject with ok error status and zodError 
+        // return {
+        //     ok:false,
+        //     error:'Schema validation failed',
+        //     status:res.status,
+        //     zodError:result.error
+        // }
     }catch(e){
         return{
             ok:false, 

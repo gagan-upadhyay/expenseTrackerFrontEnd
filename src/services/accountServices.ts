@@ -1,5 +1,5 @@
 import apiFetch from "../utils/apiClient";
-import { Account, CardDetails, fetchedCardsDetails } from "../utils/definitions";
+import { Account, AccountTotals, CardDetails, fetchedCardsDetails } from "../utils/definitions";
 
 const ACCOUNT_SERVICE=process.env.NEXT_PUBLIC_ACCOUNT_SERVICE;
 console.log(`Value of ACCOUNT_SERVICE: ${ACCOUNT_SERVICE} from accountService.ts file`);
@@ -11,6 +11,7 @@ export async function getAccounts(): Promise<Account[]>{
         credentials:'include',
     });
     const data = await res.json();
+    console.log('value of data that should be accounts:', data);
     if(!res.ok) throw new Error(data?.message|| 'Failed to fetch accounts');
     // console.log("Value of data fetched:\n",data);
     return Array.isArray(data?.result)?data.result:data;
@@ -28,10 +29,12 @@ export async function getAccountById(accountId:string):Promise<Account[]>{
 // ----------------------------------------------------------------
 
 type GetAccountByuserResult = {
-    account: { success: boolean; message: string; data: Account[] } | undefined;
+    account:  Account[] | undefined;
+    totals:AccountTotals | undefined;
     cards: { success: boolean; result: fetchedCardsDetails[] } | null;
     accountErrMsg: string | null;
     cardsErrMsg: string | null;
+    
 }
 
 const safeParseJson = async <T=unknown>(res:Response): Promise<T | null> =>{
@@ -43,56 +46,102 @@ const safeParseJson = async <T=unknown>(res:Response): Promise<T | null> =>{
 }
 
 
-export async function getAccountByUser(): Promise<GetAccountByuserResult>{
-    const controller = new AbortController();
-    const timeout = setTimeout(()=> controller.abort(), 12_000);
-    const accountUrl = `${ACCOUNT_SERVICE}/api/v1/accounts/`;
-    const cardsUrl = `${ACCOUNT_SERVICE}/api/v1/accounts/cards/`;
-    //will fetch an array of accounts and cards
+// export async function getAccountByUser(args:string): Promise<GetAccountByuserResult>{
+//     const controller = new AbortController();
+//     const timeout = setTimeout(()=> controller.abort(), 12_000);
+//     const accountUrl = `${ACCOUNT_SERVICE}/api/v1/accounts${args}`;
+//     const cardsUrl = `${ACCOUNT_SERVICE}/api/v1/accounts/cards/`;
+//     //will fetch an array of accounts and cards
 
-    try{
-        const [resAcc, resCards] = await Promise.all([
-            fetch(accountUrl,{
-                headers:{   
-                    'Content-Type':'application/json'
-                },
-                credentials:'include',
-                signal:controller.signal,
-            }),
-            fetch(cardsUrl, {
-                headers:{'Content-Type':'application/json',
-                    // 'Access-Control-Allow-Origin'
-                },
-                credentials:'include',
-                signal:controller.signal,
-            }),
-        ]);
-        // console.log('Value of resAcc and resCards from accountService:\n', resAcc, resCards);
-        if(resAcc.ok && resCards.ok){
-            const account = await (resAcc.json()??null) as { success: boolean; message: string; data: Account[] } | undefined;
-            const card = await (resCards.json()??null) as { success: boolean; result: fetchedCardsDetails[] } | null;
-            return {account:account, cards:card, cardsErrMsg:null, accountErrMsg:null};
-        }else if(!resAcc.ok && resCards.ok){
-            const errAccBody = await safeParseJson<{message?:string}>(resAcc);
-            const accountErrMsg = errAccBody?.message ?? `Failed to fetch acoount details (${resAcc.status} ${resAcc.statusText})`;
-            const cards = await (resCards.json() ?? null) as { success: boolean; result: fetchedCardsDetails[] };
-            return {account: undefined, cards, accountErrMsg, cardsErrMsg: null}
+//     try{
+//         const [resAcc, resCards] = await Promise.all([
+//             fetch(accountUrl,{
+//                 headers:{   
+//                     'Content-Type':'application/json'
+//                 },
+//                 credentials:'include',
+//                 signal:controller.signal,
+//             }),
+//             fetch(cardsUrl, {
+//                 headers:{'Content-Type':'application/json',
+//                     // 'Access-Control-Allow-Origin'
+//                 },
+//                 credentials:'include',
+//                 signal:controller.signal,
+//             }),
+//         ]);
+//         // console.log('Value of resAcc and resCards from accountService:\n', resAcc, resCards);
+//         if(resAcc.ok && resCards.ok){
+//             const account = await (resAcc.json()??null) as { success: boolean; message: string; data: Account[] } | undefined;
+//             const card = await (resCards.json()??null) as { success: boolean; result: fetchedCardsDetails[] } | null;
+//             return {account:account, cards:card, cardsErrMsg:null, accountErrMsg:null};
+//         }else if(!resAcc.ok && resCards.ok){
+//             const errAccBody = await safeParseJson<{message?:string}>(resAcc);
+//             const accountErrMsg = errAccBody?.message ?? `Failed to fetch acoount details (${resAcc.status} ${resAcc.statusText})`;
+//             const cards = await (resCards.json() ?? null) as { success: boolean; result: fetchedCardsDetails[] };
+//             return {account: undefined, cards, accountErrMsg, cardsErrMsg: null}
             
+//         }
+//         else if(!resCards.ok && resAcc.ok){
+//             const errCardBody = await safeParseJson<{message?:string}>(resCards);
+//             const cardsErrMsg = errCardBody?.message ?? `Failed to fetch cards details (${resCards.status} ${resCards.statusText})`;
+//             const account = await (resAcc.json() ?? undefined) as { success: boolean; message: string; data: Account[] } | undefined;
+//             console.log('value of account from accountService:\n', account);
+//             return {account:account, cards:null, accountErrMsg:null, cardsErrMsg:cardsErrMsg}
+//         }
+//         else{
+//             throw new Error('Failed to fetch account details');
+//         }
+//     }finally{
+//         clearTimeout(timeout)
+//     }
+// }
+
+export async function getAccountByUser(args: string): Promise<GetAccountByuserResult> {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12_000);
+    
+    // Fix: Ensure URL construction doesn't double-slash before query params
+    const accountUrl = `${ACCOUNT_SERVICE}/api/v1/accounts${args}`; 
+    const cardsUrl = `${ACCOUNT_SERVICE}/api/v1/accounts/cards/`;
+
+    try {
+        const [resAcc, resCards] = await Promise.all([
+            fetch(accountUrl, { credentials: 'include', signal: controller.signal }),
+            fetch(cardsUrl, { credentials: 'include', signal: controller.signal }),
+        ]);
+
+        // Parse bodies immediately to avoid "body already used" errors
+        const accountData = resAcc.ok ? await resAcc.json() : null;
+        const cardData = resCards.ok ? await resCards.json() : null;
+        console.log('Value of accoutnData:', accountData);
+        let accountErrMsg = null;
+        let cardsErrMsg = null;
+
+        if (!resAcc.ok) {
+            const err = await safeParseJson<{message?: string}>(resAcc);
+            accountErrMsg = err?.message ?? `Account Error: ${resAcc.status}`;
         }
-        else if(!resCards.ok && resAcc.ok){
-            const errCardBody = await safeParseJson<{message?:string}>(resCards);
-            const cardsErrMsg = errCardBody?.message ?? `Failed to fetch cards details (${resCards.status} ${resCards.statusText})`;
-            const account = await (resAcc.json() ?? undefined) as { success: boolean; message: string; data: Account[] } | undefined;
-            console.log('value of account from accountService:\n', account);
-            return {account:account, cards:null, accountErrMsg:null, cardsErrMsg:cardsErrMsg}
+
+        if (!resCards.ok) {
+            const err = await safeParseJson<{message?: string}>(resCards);
+            cardsErrMsg = err?.message ?? `Cards Error: ${resCards.status}`;
         }
-        else{
-            throw new Error('Failed to fetch account details');
-        }
-    }finally{
-        clearTimeout(timeout)
+
+        return {
+            account: accountData?.accounts,
+            totals:accountData?.totals,
+            cards: cardData,
+            accountErrMsg,
+            cardsErrMsg
+        };
+    } catch (err) {
+        throw err;
+    } finally {
+        clearTimeout(timeout);
     }
 }
+
 
 export type NewAccountPayload = {
     accountType: string;

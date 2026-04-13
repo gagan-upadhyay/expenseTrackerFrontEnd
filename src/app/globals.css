@@ -154,6 +154,14 @@ body {
   background: rgba(255, 255, 255, 0.03);
 }
 
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 
 /*Skeleton effectL*/
 
@@ -190,7 +198,7 @@ body {
     transparent
   );
 }
-
+/* Animations */
 @keyframes shimmer {
   100% {
     transform: translateX(100%);
@@ -198,4 +206,26 @@ body {
 }
 .skeleton-no-shimmer::after{
   display: none;
+}
+
+@layer utilities {
+  .animate-shake {
+    animation: shake 0.2s ease-in-out 2;
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* Removes up/down arrows (spinners) */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
 }

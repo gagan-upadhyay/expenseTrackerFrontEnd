@@ -21,7 +21,14 @@ const nextConfig: NextConfig = {
         hostname:"expensetrackerappstorage.blob.core.windows.net",
         port:"",
         pathname:"/profile-images/**",
+      },
+      {
+        protocol:"https",
+        hostname:"expensetrackerappstorage.blob.core.windows.net",
+        port:"",
+        pathname:"/transaction-receipts/**", 
       }
+
     ],
     
   },

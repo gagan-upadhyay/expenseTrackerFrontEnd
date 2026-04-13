@@ -33,6 +33,7 @@ export function useProfileForm() {
   // ✅ Populate form
   useEffect(() => {
     if (user) {
+      console.log("valueof user from useProfileFOrm:", user);
       setFormData({
         firstname: user.firstname,
         lastname: user.lastname,

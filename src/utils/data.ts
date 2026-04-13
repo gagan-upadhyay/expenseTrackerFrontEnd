@@ -12,7 +12,13 @@ const AUTH_SERVICE = process.env.NEXT_PUBLIC_AUTH_SERVICE;
 
 export const getUserDetails = async () => {
   const data: { result: fetchedUser } = await apiFetch(
-    `${USER_SERVICE}/api/v1/user/`
+    `${USER_SERVICE}/api/v1/user/`,{
+        method:'GET',
+        credentials:'include',
+        headers:{
+            'Content-Type':'application/json',
+        },
+    }
   ) as { result: fetchedUser };
 
   const user = data?.result ?? null;

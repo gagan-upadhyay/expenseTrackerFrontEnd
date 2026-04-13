@@ -14,13 +14,13 @@ export default function TransactionLayout({children}: {children:React.ReactNode}
             <AccountProvider>
                 <TransactionProvider>
                     <ThemeSync/>
-                    <div className="flex h-screen flex-col sm:flex-row sm:overflow-hidden">
+                    <div className="flex h-screen w-full flex-col sm:flex-row sm:overflow-hidden">
                         {/* <div className="w-full flex-none sm:w-64"> */}
                         <SidebarProvider>
                             <SideBar/>
                             <MainContent>
                                 <Breadcrumbs/>
-                                <div className="flex-grow p-6 sm:p-12 sm:overflow-y-auto">
+                                <div className="flex-grow sm:overflow-y-auto">
                                     {children}
                                 </div>
                             </MainContent>

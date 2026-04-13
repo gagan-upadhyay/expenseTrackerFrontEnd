@@ -19,6 +19,7 @@ export type fetchedUser={
     password:string;
     theme:'light'|'dark';
     updated_at:string;
+    base_currency:string
 }
 
 export type AddedUser = {
@@ -51,6 +52,15 @@ export interface AuthContextType {
 export type NavbarProps={
     theme:string;
 }
+
+
+export interface AccountTotals {
+    netWorth: string;
+    income: string;
+    expense: string;
+    currency: string;
+}
+
 export type AccountType = 'savings'| 'credit' | 'wallet';
 export interface Account{
     id:string;
@@ -62,6 +72,16 @@ export interface Account{
     total_expense:string;
     remaining_balance:string;
     created_at:Timestamp;
+    is_liability:boolean
+}
+export interface AccountContextType {
+    accounts: Account[] | undefined;
+    totals:AccountTotals|null;
+    loading: boolean;
+    error: string | null;
+    cards:fetchedCardsDetails[] | null;
+    refreshAccounts: () => Promise<void>;
+    setAccounts:React.Dispatch<React.SetStateAction<Account[] | undefined>>;
 }
 
 export interface CardDetails{
@@ -89,16 +109,31 @@ export interface Transaction{
     amount: string;
     type: "credit"| "debit";
     description: string;
-    reference: string;
+    reference: string|null;
     occurred_at: string;
     created_at: string;
     is_active: boolean,
     deleted_at: string | null;
     display_name:string;
     currency_code:string;
+    category_code:string;
 }
 
 export type TransacationError={
     err:string;
     zodError:string|undefined;
 }
+
+export interface deletePayload{
+    accountId:string;
+    userId:string, 
+    transactionId:string
+}
+
+export interface SwipeableProps {
+   onDone?: () => void;
+   onDelete: () => void;
+   id?:string;
+   swipeFor:string;
+   children: React.ReactNode;
+ }

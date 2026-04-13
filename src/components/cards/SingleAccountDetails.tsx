@@ -50,56 +50,56 @@ export default function SingleAccountDetails({parentClass}:Props){
         );
       }
     return(
-        <div>
-        <div key={account?.id} className="glass p-4 rounded-2xl border border-[var(--color-border)]">
-        {/* <div className="flex justify-between items-center"> */}
-            {/* <div> */}
-            <div className="flex items-center justify-between">
-                <h4 className="font-semibold text-sm">{account?.account_type}</h4>
-                <span className="text-xs uppercase opacity-70">{account?.currency_code}</span>
-            </div>
-            <p className="text-2xl font-bold mt-2">
-                {getCurrencySymbol(account?.currency_code)} {account?.remaining_balance}
-            </p>
-            <div className="mt-3 flex items-center gap-2 justify-between text-xs">
-                <div className="flex gap-2">
-                    <span className="glass px-2 py-1 rounded-md text-green-700">Income: {getCurrencySymbol(account?.currency_code)} {account?.total_income}</span>
-                    <span className="glass px-2 py-1 rounded-md text-red-700">Expense: {getCurrencySymbol(account?.currency_code)} {account?.total_expense}</span>
+        <div className="h-screen mt-5">
+            <div key={account?.id} className="glass p-4 rounded-2xl border border-[var(--color-border)]">
+            {/* <div className="flex justify-between items-center"> */}
+                {/* <div> */}
+                <div className="flex items-center justify-between">
+                    <h4 className="font-semibold text-sm">{account?.account_type}</h4>
+                    <span className="text-xs uppercase opacity-70">{account?.currency_code}</span>
                 </div>
-                <Button onClick={() => router.push('/transactions/add')} className="w-fit h-fit flex items-center gap-2"> 
-                <GrTransaction />
-                <span className="hidden sm:inline">Transactions</span>
-                </Button>
+                <p className="text-2xl font-bold mt-2">
+                    {getCurrencySymbol(account?.currency_code)} {account?.remaining_balance}
+                </p>
+                <div className="mt-3 flex items-center gap-2 justify-between text-xs">
+                    <div className="flex gap-2">
+                        <span className="glass px-2 py-1 rounded-md text-green-700">Income: {getCurrencySymbol(account?.currency_code)} {account?.total_income}</span>
+                        <span className="glass px-2 py-1 rounded-md text-red-700">Expense: {getCurrencySymbol(account?.currency_code)} {account?.total_expense}</span>
+                    </div>
+                    <Button onClick={() => router.push(`/transactions/add?accountId=${account?.id}`)} className="w-fit h-fit flex items-center gap-2"> 
+                    <GrTransaction />
+                    <span className="hidden sm:inline">Transactions</span>
+                    </Button>
+                </div>
+                <p className="mt-2 text-xs opacity-70">Opening: {getCurrencySymbol(account?.currency_code)} {account?.opening_balance}</p>
             </div>
-            <p className="mt-2 text-xs opacity-70">Opening: {getCurrencySymbol(account?.currency_code)} {account?.opening_balance}</p>
-        </div>
 
-    {/* <CardWrapper title="Transactions"/> */}
+            {/* <CardWrapper title="Transactions"/> */}
 
-        <div className="glass p-4 mt-2 rounded-2xl">
-            <div className="flex justify-between mb-10 text-xs items-center">
-                <h4 className="text-sm opacity-70 mb-3">Saved Cards</h4>
-                <Button onClick={toggleCard} className="w-fit h-fit">Show Cards</Button>
+            <div className="glass p-4 mt-2 rounded-2xl">
+                <div className="flex justify-between mb-10 text-xs items-center">
+                    <h4 className="text-sm opacity-70 mb-3">Saved Cards</h4>
+                    <Button onClick={toggleCard} className="w-fit h-fit">Show Cards</Button>
+                </div>
+                {!savedCards && (
+                <p className="text-xs opacity-60">No cards added yet</p>
+                )}
+                {(savedCards && openCards && (
+                        <>
+                            <div className={clsx("flex gap-4 overflow-x-auto overflow-y-hidden  whitespace-nowrap no-scrollbar pb-2",
+
+                            )} style={{ scrollSnapType: "x mandatory" }}>
+                                <BlurCard/>
+                                {savedCards.map((c:fetchedCardsDetails) => (
+                                    <div key={c.id} className="min-w-[280px] flex-shrink-0 scroll-snap-align-start">
+                                        <CardPreview card={c} />
+                                    </div>
+                                ))}
+                            </div>
+                        </>
+                    )
+                )}
             </div>
-            {!savedCards && (
-              <p className="text-xs opacity-60">No cards added yet</p>
-            )}
-            {(savedCards && openCards && (
-                    <>
-                        <div className={clsx("flex gap-4 overflow-x-auto overflow-y-hidden  whitespace-nowrap no-scrollbar pb-2",
-
-                        )} style={{ scrollSnapType: "x mandatory" }}>
-                            <BlurCard/>
-                            {savedCards.map((c:fetchedCardsDetails) => (
-                                <div key={c.id} className="min-w-[280px] flex-shrink-0 scroll-snap-align-start">
-                                    <CardPreview card={c} />
-                                </div>
-                            ))}
-                        </div>
-                    </>
-                )
-            )}
-          </div>
         </div>
 
     )

@@ -42,6 +42,7 @@ export default async function RootLayout({
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <body
         className={`flex flex-col min-h-screen ${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
         <Analytics/>
         <SpeedInsights/>

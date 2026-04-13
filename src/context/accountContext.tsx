@@ -2,17 +2,11 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 
-import { Account, fetchedCardsDetails } from '../utils/definitions';
+import { Account, AccountContextType, AccountTotals, fetchedCardsDetails } from '../utils/definitions';
 import { getAccountByUser } from '../services/accountServices';
+import { useUser } from './userContext';
 
-interface AccountContextType {
-    accounts: Account[] | undefined;
-    loading: boolean;
-    error: string | null;
-    cards:fetchedCardsDetails[] | null;
-    refreshAccounts: () => Promise<void>;
-    setAccounts:React.Dispatch<React.SetStateAction<Account[] | undefined>>;
-}
+
 
 const AccountContext = createContext<AccountContextType | undefined>(undefined);
 
@@ -21,17 +15,25 @@ export const AccountProvider=({ children}:{ children:React.ReactNode }) => {
     const [cards, setCard] = useState<fetchedCardsDetails[] | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const {user} = useUser();
+    const [totals, setTotals] = useState<AccountTotals|null>(null);
     // const {setIsLoggedIn, logout} = useAuth();
 
     const fetchAccounts = useCallback(async () => {
         try {
             setLoading(true);
             setError(null);
-            const data = await getAccountByUser();
+            const baseCurrency = user?.base_currency || 'INR';
+            const data = await getAccountByUser(`?base_currency=${baseCurrency}`);
+            
             if(data?.account){
+                console.log("value of data.account", data);
+            setTotals(data?.totals ?? null);
+            setAccounts(data?.account ?? undefined);
             }
+            // console.log('Value of data?.account', data);
             setCard(data?.cards?.result ?? null);
-            setAccounts(data.account?.data ?? undefined);
+
             
         } catch (err) {
             // setIsLoggedIn(false);
@@ -41,7 +43,7 @@ export const AccountProvider=({ children}:{ children:React.ReactNode }) => {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [user?.base_currency]);
 
     useEffect(() => {
         fetchAccounts();
@@ -49,8 +51,8 @@ export const AccountProvider=({ children}:{ children:React.ReactNode }) => {
     }, [fetchAccounts]);
 
     const contextValue = useMemo(()=>({
-        accounts, setAccounts, cards, loading, error, refreshAccounts:fetchAccounts
-    }),[accounts, setAccounts, cards, loading, error, fetchAccounts])
+        accounts, setAccounts, cards, totals, loading, error, refreshAccounts:fetchAccounts
+    }),[accounts, setAccounts, cards, totals, loading, error, fetchAccounts])
 
     return (
         <AccountContext.Provider value={contextValue}>

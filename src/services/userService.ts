@@ -62,7 +62,8 @@ export async function uploadProfilePicture(file:File){
     headers:{
       "Content-Type":"application/json",
     },
-    body:JSON.stringify({fileType:compressedFile.type})
+    body:JSON.stringify({fileType:compressedFile.type}),
+    credentials:'include',
     }) as {success:boolean, uploadUrl:string, blobName:string, error:string|null};
 
     if(!res.success){
