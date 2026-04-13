@@ -122,7 +122,7 @@ export default function PayablesReceiptsCard() {
             {recentReceipts.map((receipt) => (
               <div key={receipt.id} className="group relative aspect-square glass rounded-xl overflow-hidden border border-white/10">
                 <Image 
-                  src={receipt.reference} 
+                  src={receipt.reference!} 
                   alt="Receipt"
                   fill 
                   className="object-cover opacity-40 group-hover:opacity-100 transition-all duration-500 cursor-pointer"
