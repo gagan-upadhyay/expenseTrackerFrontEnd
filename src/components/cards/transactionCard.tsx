@@ -23,6 +23,7 @@ import ImagePreviewModal from "../ui/ImagePreviewModal";
 import { useState } from "react";
 import { SwipeableTransaction } from "../ui/Swipable";
 import RefreshButton from "../ui/buttons/RefreshButton";
+import { Transaction } from "@/src/utils/definitions";
 
 
 interface TransactionCardProps {
@@ -30,12 +31,17 @@ interface TransactionCardProps {
 }
 
 export default function TransactionCard({ pageClass }: TransactionCardProps) {
-  const { transactions, errorMsg, loading, fetchTransactions, deleteTransaction } = useTransactions();
+  const { transactions, errorMsg, loading, fetchTransactions, deleteTransaction, removeReceiptOnly } = useTransactions();
   const path = usePathname();
   const isDashboard = path.includes('dashboard');
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  // const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction|null>(null);
   console.log("value of transactions:", transactions);
 
+  const redirectingToEdit =()=>{
+    console.log("taking to edit page...");
+    
+  }
   if (errorMsg?.err === 'Request timed out') {
     return (
       <div className={clsx("glass backdrop-blur-xl p-8 rounded-[2rem] text-center space-y-4 border border-white/10", pageClass)}>
@@ -74,7 +80,7 @@ export default function TransactionCard({ pageClass }: TransactionCardProps) {
         {!isDashboard && (
           <Button 
             href="/transactions/add" 
-            className="glass-hover !rounded-xl md:!rounded-xl !p-2 md:!py-1.5 md:!px-4 !text-xs font-bold uppercase tracking-wider flex items-center justify-center"
+            className="glass-hover  z-40 !rounded-xl md:!rounded-xl !p-2 md:!py-1.5 md:!px-4 !text-xs font-bold uppercase tracking-wider flex items-center justify-center"
           >
             {/* Shown only on Mobile */}
             <PlusIcon className="w-5 h-5 md:hidden" />
@@ -103,7 +109,7 @@ export default function TransactionCard({ pageClass }: TransactionCardProps) {
         ) : (
           <ul className={clsx("flex flex-col", isDashboard ? "gap-1" : "gap-3")}>
             {transactions.map((transaction, index) => (
-              <SwipeableTransaction swipeFor="transactions" id={transaction.id} onDelete={()=>deleteTransaction(transaction.id)} onDone={undefined} key={transaction.id||index}>
+              <SwipeableTransaction swipeFor="transactions" id={transaction.id} onDelete={()=>deleteTransaction(transaction.id)} onDone={()=>redirectingToEdit} key={transaction.id||index}>
                 <li 
                   key={transaction.id || index} 
                   className={clsx(
@@ -124,7 +130,7 @@ export default function TransactionCard({ pageClass }: TransactionCardProps) {
 
                   {/* NAME & INFO BLOCK */}
                   <div className="flex-1 min-w-0 flex flex-col justify-center relative group/name">
-                    <div className="absolute -top-10 left-0 z-50 hidden group-hover/name:block animate-in fade-in zoom-in duration-200">
+                    <div className="absolute -top-10 left-0 z-50 hidden animate-in fade-in zoom-in duration-200">
                       <div className="glass backdrop-blur-md bg-white/20 px-3 py-1.5 rounded-lg border border-white/30 shadow-xl whitespace-nowrap text-xs font-medium text-white pointer-events-none">
                         {transaction.display_name}
                         <div className="absolute -bottom-1 left-4 w-2 h-2 bg-white/20 border-r border-b border-white/30 rotate-45" />
@@ -188,7 +194,7 @@ export default function TransactionCard({ pageClass }: TransactionCardProps) {
                     {!isDashboard && (
                       <div className="flex items-center justify-center w-10">
                         {transaction.reference ? (
-                          <button onClick={() => setPreviewUrl(transaction.reference)} className="glass-hover p-2.5 rounded-xl text-indigo-400 hover:text-white transition-all shadow-lg active:scale-90">
+                          <button onClick={() => setSelectedTransaction(transaction)} className="glass-hover p-2.5 rounded-xl text-indigo-400 hover:text-white transition-all shadow-lg active:scale-90">
                             <PhotoIcon className="w-5 h-5" />
                           </button>
                         ) : (
@@ -205,7 +211,7 @@ export default function TransactionCard({ pageClass }: TransactionCardProps) {
         )}
       </div>
 
-      <ImagePreviewModal  isOpen={!!previewUrl} onClose={() => setPreviewUrl(null)} imageUrl={previewUrl|| ''} title="Transaction Reference" />
+      <ImagePreviewModal onEdit={null} onDelete={selectedTransaction ? () => removeReceiptOnly(selectedTransaction.id, selectedTransaction.account_id) : undefined} isOpen={!!selectedTransaction} onClose={() => setSelectedTransaction(null)} imageUrl={selectedTransaction?.reference|| ''} title={selectedTransaction?.display_name || "Transaction Reference"} />
 
 
     </div>

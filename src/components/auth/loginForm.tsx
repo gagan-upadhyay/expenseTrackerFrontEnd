@@ -173,9 +173,9 @@ export default function LoginForm(){
                         className="absolute right-3 top-2.5"
                         >
                         {eyeOpen ? (
-                            <EyeIcon className="w-4 h-4 opacity-60" />
+                            <EyeIcon className="w-4 h-4 user-events-none opacity-60" />
                         ) : (
-                            <EyeSlashIcon className="w-4 h-4 opacity-60" />
+                            <EyeSlashIcon className="w-4 h-4 user-events-none opacity-60" />
                         )}
                         </button>
                     )}

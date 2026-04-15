@@ -187,17 +187,18 @@ import { BounceLoader } from 'react-spinners';
 import { useTheme } from './themeContext';
 import { JwtPayload, AuthContextType } from '../utils/definitions';
 import { jwtDecode } from 'jwt-decode';
+import apiFetch from '../utils/apiClient';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Define the refresh API inside or import it
 const AUTH_SERVICE = process.env.NEXT_PUBLIC_AUTH_SERVICE_URL;
 
-export const apiFetch = async (url: string, options: any) => {
-    const res = await fetch(url, options);
-    if (!res.ok) throw new Error('Fetch failed');
-    return res.json();
-};
+// export const apiFetch = async (url: string, options: any) => {
+//     const res = await fetch(url, options);
+//     if (!res.ok) throw new Error('Fetch failed');
+//     return res.json();
+// };
 
 export const refreshTokenApi = async () => {
     return apiFetch(`${AUTH_SERVICE}/api/v1/auth/refresh/`, {

@@ -16,6 +16,7 @@ export const TransactionSchema = z.object({
     display_name:z.string(),
     currency_code:z.string(),
     category_code:z.string(),
+    is_payable:z.boolean(),
 });
 
 export const TransactionsSchema = z.array(TransactionSchema)

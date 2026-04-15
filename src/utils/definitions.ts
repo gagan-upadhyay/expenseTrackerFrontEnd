@@ -117,6 +117,7 @@ export interface Transaction{
     display_name:string;
     currency_code:string;
     category_code:string;
+    is_payable:boolean;
 }
 
 export type TransacationError={

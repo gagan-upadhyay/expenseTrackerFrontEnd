@@ -10,6 +10,7 @@ export function useProfileForm() {
   const { user, setUser } = useUser();
 
   console.log('Value of user from userProfile');
+  const [isDirty, setIsDirty] = useState(false);
 
   const [formData, setFormData] = useState({
     firstname: "",
@@ -135,5 +136,7 @@ export function useProfileForm() {
     handleFileChange,
     handleSubmit,
     loading,
+    isDirty, 
+    setIsDirty,
   };
 }

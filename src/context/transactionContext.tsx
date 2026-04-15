@@ -1,90 +1,3 @@
-// 'use client';
-
-// import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-// import { TransacationError, Transaction } from "../utils/definitions";
-// import { fetchAllTransactions } from "../services/transactionServices";
-// import { useAuth } from "./authContext";
-// import getLogger from "../services/logger-service";
-
-// interface TransactionContextType {
-//     transactions: Transaction[] | null;
-//     loading: boolean;
-//     errorMsg: TransacationError | null;
-//     fetchTransactions: (filters?: Record<string, string>) => Promise<void>; 
-//      deleteTransaction: (transactionId: string) => Promise<void>;
-// }
-
-// const TransactionContext = createContext<TransactionContextType | undefined>(undefined);
-
-// export const TransactionProvider = ({ children }: { children: React.ReactNode }) => {
-//     const [transactions, setTransactions] = useState<Transaction[] | null>(null);
-//     const [loading, setLoading] = useState<boolean>(true);
-//     const [errorMsg, setErrorMsg] = useState<TransacationError | null>(null);
-//     const { isLoggedIn } = useAuth();
-
-//     const fetchTransactions = useCallback(async (filters?: Record<string, string>) => {
-//         try {
-//             setLoading(true);
-//             setErrorMsg(null);
-
-//             // ✅ 1. Construct query string for dynamic filtering
-//             const queryString = filters 
-//                 ? '?' + new URLSearchParams(filters).toString() 
-//                 : '';
-
-//             const data = await fetchAllTransactions(queryString);
-//             console.log("Value of data:", data);
-
-//             if (data && !('error' in data)) {
-//                 setTransactions(data as Transaction[]);
-//             } else if (data && 'error' in data) {
-//                 console.log('Value of error from transaction:',errorMsg );
-//                 setErrorMsg(data as TransacationError);
-//             }
-//         } catch (err) {
-//             const errorObj: TransacationError = {
-//                 err: err instanceof Error ? err.message : 'An error occurred',
-//                 zodError: undefined
-//             };
-//             setErrorMsg(errorObj);
-//             getLogger(`error while fetching transactions: ${errorObj.err}`);
-//         } finally {
-//             setLoading(false);
-//         }
-//     }, []);
-
-
-
-    
-
-//     useEffect(() => {
-//         if (isLoggedIn) {
-//             fetchTransactions();
-//         }
-//     }, [fetchTransactions, isLoggedIn]);
-
-//     const contextValue = useMemo(() => ({
-//         transactions, 
-//         loading, 
-//         errorMsg, 
-//         fetchTransactions // ✅ 2. Exposed for manual refresh and filter updates
-//     }), [transactions, loading, errorMsg, fetchTransactions]);
-
-//     return (
-//         <TransactionContext.Provider value={contextValue}>
-//             {children}
-//         </TransactionContext.Provider>
-//     );
-// };
-
-// export const useTransactions = () => {
-//     const context = useContext(TransactionContext);
-//     if (!context) {
-//         throw new Error('useTransaction must be used within Transaction Provider');
-//     }
-//     return context;
-// };
-
 'use client';
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
@@ -92,7 +5,7 @@ import { deletePayload, TransacationError, Transaction } from "../utils/definiti
 import { 
     deleteTransaction as deleteTransactionService, 
     fetchAllTransactions, 
-    fetchStatsService,
+    // fetchStatsService,
     updateTransaction as updateTransactionApiService 
 } from "../services/transactionServices";
 import { useAuth } from "./authContext";
@@ -105,7 +18,7 @@ interface TransactionContextType {
     errorMsg: TransacationError | null;
     fetchTransactions: (filters?: Record<string, string>) => Promise<void>;
     deleteTransaction: (transactionId: string) => Promise<void>;
-    updateTransaction: (transactionId: string, accountId:string, updates: Partial<Transaction>) => Promise<void>;
+    updateTransaction: (transactionId: string, accountId:string,  updates: Partial<Transaction>) => Promise<void>;
     removeReceiptOnly: (transactionId: string, accountId:string) => Promise<void>;
 }
 
@@ -115,12 +28,12 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
     const [transactions, setTransactions] = useState<Transaction[] | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [errorMsg, setErrorMsg] = useState<TransacationError | null>(null);
-    const [stats, setStats] = useState(null);
+    // const [stats, setStats] = useState(null);
     // const []
     
     const { isLoggedIn } = useAuth();
     const { user } = useUser();
-    const baseCurrency = user?.base_currency;
+    // const baseCurrency = user?.base_currency;
 
     const fetchTransactions = useCallback(async (filters?: Record<string, string>) => {
         try {
@@ -146,21 +59,22 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
         }
     }, []);
 
-    const fetchStats = useCallback(async()=>{
-        try{
-            const data = await fetchStatsService(`?base_currency=${baseCurrency}`);
-            if(data){
-                console.log('value of data', data);
-            }
+    // const fetchStats = useCallback(async()=>{
+    //     try{
+    //         const data = await fetchStatsService(`?base_currency=${baseCurrency}`);
+    //         if(data){
+    //             console.log('value of data', data);
+    //             setStats(data);
+    //         }
             
-        }catch(err){
-            const errorObj:TransacationError={
-                err:err instanceof Error? err.message:'An error occurred', 
-                zodError:undefined
-            }
-            getLogger(errorObj);
-        }
-    },[]);
+    //     }catch(err){
+    //         const errorObj:TransacationError={
+    //             err:err instanceof Error? err.message:'An error occurred', 
+    //             zodError:undefined
+    //         }
+    //         getLogger(errorObj);
+    //     }
+    // },[]);
 
     const deleteTransactionHandler = useCallback(async (transactionId: string) => {
         const target = transactions?.find(t => t.id === transactionId);
@@ -183,10 +97,10 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
     }, [transactions, user]);
 
     const updateTransactionHandler = useCallback(async (transactionId: string, accountId:string, updates: Partial<Transaction>) => {
-        if (!user?.id) return console.error("No user ID found");
+        // if (!user?.id) return console.error("No user ID found");
         const payload = {
             ...updates,
-            userId: user.id,
+            
             accountId: accountId
         };
 
@@ -203,7 +117,7 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
         }
     }, [user?.id]);
 
-    const removeReceiptOnly = useCallback(async (transactionId: string, accountId:string) => {
+    const removeReceiptOnlyHandler = useCallback(async (transactionId: string, accountId:string) => {
         await updateTransactionHandler(transactionId, accountId,{ reference: null });
     }, [updateTransactionHandler]);
 
@@ -218,9 +132,11 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
         fetchTransactions,
         deleteTransaction: deleteTransactionHandler,
         updateTransaction: updateTransactionHandler,
-        removeReceiptOnly,
-        fetchStats,
-    }), [transactions, loading, errorMsg, fetchStats,fetchTransactions, deleteTransactionHandler, updateTransactionHandler, removeReceiptOnly]);
+        removeReceiptOnly: removeReceiptOnlyHandler,
+        // fetchStats,
+    }), [transactions, loading, errorMsg, 
+        // fetchStats,
+        fetchTransactions, deleteTransactionHandler, updateTransactionHandler, removeReceiptOnlyHandler]);
 
     return (
         <TransactionContext.Provider value={contextValue}>

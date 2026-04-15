@@ -11,6 +11,7 @@ import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import ShakingDeleteButton from "../ui/buttons/DeleteButton";
 import { Button } from "../ui/buttons/buttons";
+import { useFileUpload } from "../settings/hooks/useFileUploads";
 
 export default function AddTransactionCard() {
   const { transactions } = useTransactions();
@@ -18,7 +19,16 @@ export default function AddTransactionCard() {
   const { 
     form, setForm, preview, setPreview, loading, error, handleFileChange, handleSubmit, success, setSuccess, isPayablemode, setIsPayablemode,
   } = useTransactionForm();
- 
+
+  const { isDragging, handleDrag, handleDrop } = useFileUpload((file) => {
+    // Reuse your existing logic from useTransactionForm
+    setPreview(URL.createObjectURL(file));
+    setForm((prev) => ({ ...prev, reference: file }));
+  });
+
+  
+
+
   //---------------categories setup-------------------
   ;
   const defaultCategories = ["TRANSPORT", "SALARY", "FOOD", "FEES"];
@@ -30,11 +40,16 @@ export default function AddTransactionCard() {
     return [...new Set([...defaultCategories, ...filteredArray])];
   }, [transactions]);
 
-  console.log('Value if initialCategories:', initialCategories);
+
+
+  // console.log('Value if initialCategories:', initialCategories);
   const [categories, setCategories] = useState(initialCategories);
   // const [category, setCategory] = useState('');
+  useEffect(() => {
+    setCategories(initialCategories);
+  }, [initialCategories]);
   
-  console.log('Value of categories:',  categories);
+  // console.log('Value of categories:',  categories);
   const [newCategory, setNewCategory] = useState("");
   const [categoryError, setCategoryError] = useState(false);
 
@@ -56,10 +71,10 @@ export default function AddTransactionCard() {
   const remainingBalance = selectedAccount?Number(selectedAccount.remaining_balance):Number(0);
 
   const handleAmountChange=(e:React.ChangeEvent<HTMLInputElement>)=>{
-    const val =e.target.value;
+    const val = e.target.value;
     setForm({...form, amount:val});
     if(val && Number(val)>remainingBalance){
-      setAmountError(true)
+      if(form.type==='debit') setAmountError(true)
     }else{
       setAmountError(false);
     }
@@ -74,14 +89,31 @@ export default function AddTransactionCard() {
 
   //-------------payable setup---------------------
   const searchParams = useSearchParams();
-  setIsPayablemode(searchParams.get('mode') === 'payable');
-  
   const isAccountId = searchParams.get('accountId');
-  if(isAccountId) form.accountId=isAccountId;
+  // setIsPayablemode(searchParams.get('mode') === 'payable');
+  useEffect(() => {
+  const mode = searchParams.get('mode') === 'payable';
+  const accountId = searchParams.get('accountId');
+
+  // Set the boolean mode
+  setIsPayablemode(mode);
+  console.log('Value of isPayable:',isPayablemode);
+
+  // Safely update the form state based on URL params
+  setForm(prev => ({
+    ...prev,
+    // Only overwrite accountId if one is provided in URL
+    accountId: accountId || prev.accountId,
+    // If it's payable mode, force it to 'debit'
+    type: mode ? "debit" : prev.type,
+  }));
+}, [searchParams, setIsPayablemode, setForm]);
+  
+  // if(isAccountId) form.accountId=isAccountId;
 
   useEffect(() => {
     if (isPayablemode) {
-      setForm(prev => ({ ...prev, type: "debit" }));
+      setForm(prev => ({ ...prev, type: "debit", isPayable:true }));
     }
   }, [isPayablemode, setForm]);
 
@@ -170,7 +202,7 @@ export default function AddTransactionCard() {
               
               <div className="flex gap-2">
                 <input
-                  placeholder="New custom..."
+                  placeholder="New Category"
                   className={clsx(
                     "glass flex-1 px-4 py-3 text-sm rounded-2xl outline-none transition-all border border-transparent",
                     categoryError ? "border-red-500/50 animate-shake bg-red-500/5" : "focus:border-white/40"
@@ -234,7 +266,7 @@ export default function AddTransactionCard() {
                   <button
                     key={t}
                     type="button"
-                    onClick={() => setForm({ ...form, type: t as any })}
+                    onClick={() => setForm({ ...form, type: t as "debit"|"credit" })}
                     className={clsx(
                       "px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-tighter transition-all", 
                       form.type === t ? "bg-white text-black shadow-lg" : "hover:bg-white/5 text-white/60"
@@ -276,20 +308,38 @@ export default function AddTransactionCard() {
           </div>
 
              {/* Receipt Upload */}
+          
            <div className="space-y-3">
              <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/40 ml-1">
                <PhotoIcon className="w-4 h-4" /> Receipt (Optional)
              </label>
-
+            
              
             {!preview ? (
-              <label className="flex flex-col items-center justify-center py-6 rounded-2xl border-2 border-dashed border-white/10 cursor-pointer hover:bg-white/5 transition-all">
-                <PhotoIcon className="w-6 h-6 opacity-20" />
-                <span className="text-[9px] font-bold text-white/30 uppercase mt-1">Add Image</span>
+              <label 
+              onDragOver={handleDrag}
+              onDragLeave={handleDrag}
+              onDrop={handleDrop}
+              className={clsx(
+                "flex flex-col items-center justify-center py-6 rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-300",
+                isDragging 
+                  ? "border-indigo-500 bg-indigo-500/10 scale-[1.02]" 
+                  : "border-white/10 hover:bg-white/5"
+              )}
+              >
+              <div className={clsx("transition-transform duration-300", isDragging && "scale-110")}>
+                <PhotoIcon className={clsx("w-6 h-6", isDragging ? "text-indigo-400" : "opacity-20")} />
+              </div>
+                <span className={clsx(
+                  "text-[9px] font-bold uppercase mt-1",
+                    isDragging ? "text-indigo-400" : "text-white/30"
+                  )}>
+                     {isDragging ? "Drop to Upload" : "Add Image or Drag & Drop"}
+                </span>
                 <input type="file" className="hidden" onChange={handleFileChange} accept="image/*" />
               </label>
             ) : (
-              <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-white/20">
+              <div className="relative z-60 w-full aspect-video rounded-2xl overflow-hidden border border-white/20 animate-in fade-in zoom-in duration-300">
                 <Image src={preview} alt="Preview" fill className="object-cover" />
                 <div className="absolute top-2 right-2">
                   <ShakingDeleteButton
@@ -300,7 +350,7 @@ export default function AddTransactionCard() {
                 </div>
               </div>
             )}
-
+          
           </div>
 
           {/* {error && <p className="text-red-400 text-[10px] font-bold text-center">{error}</p>} */}

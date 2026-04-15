@@ -75,7 +75,7 @@ export async function fetchAllTransactions(queryString: string = ""): Promise<Tr
     }
 }
 
-export async function saveOneTransaction(amount:number, type:'debit'|'credit', displayname:string, description:string, reference:string, occurredat:Date, categorycode:string, accountId:string):Promise<string|TransacationError>{
+export async function saveOneTransaction(amount:number, type:'debit'|'credit', displayname:string, description:string, reference:string, occurredat:Date, categorycode:string, accountId:string, isPayable:boolean):Promise<string|TransacationError>{
     const controller = new AbortController();
     const timeout = setTimeout(()=>controller.abort, 20_000);
     if(!TRANSACTION_SERVICE) throw new Error('Missing Transaction_Service URL');
@@ -84,7 +84,7 @@ export async function saveOneTransaction(amount:number, type:'debit'|'credit', d
         const res:{success:boolean, message:string} = await apiFetch(`${TRANSACTION_SERVICE}/api/v1/transactions/`,{
             method:'POST',
             credentials:'include',
-            body:JSON.stringify({amount, type, displayname, description, reference, occurredat, categorycode, accountId})
+            body:JSON.stringify({amount, type, displayname, description, reference, occurredat, categorycode, accountId, isPayable})
 
         })as {success:boolean, message:string};
         return res?.message

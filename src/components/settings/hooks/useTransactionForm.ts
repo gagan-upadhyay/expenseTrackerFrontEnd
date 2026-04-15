@@ -114,6 +114,7 @@ export function useTransactionForm() {
     reference: null as File | null,
     occurred_at: today, // MATCH: Aligned with AddTransaction UI
     accountId: "",
+    isPayable:false,
   });
 
   const [preview, setPreview] = useState<string | null>(null);
@@ -164,6 +165,7 @@ export function useTransactionForm() {
         occurredAtDate,
         form.category,
         form.accountId,
+        form.isPayable,
       );
 
       if (typeof data === 'string') {
@@ -180,6 +182,7 @@ export function useTransactionForm() {
           reference: null,
           occurred_at: today,
           accountId: "",
+          isPayable:true,
         });
         setPreview(null);
       } else {

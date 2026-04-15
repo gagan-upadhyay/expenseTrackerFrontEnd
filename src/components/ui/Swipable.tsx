@@ -26,14 +26,18 @@
       e.stopPropagation();
       setActionType(type);
       if(type==='edit'){
-        router.push(`'transactions/${id}/edit`)
+        router.push(`transactions/edit/${id}`)
+        return;
       }
       setSwipeState('confirmed');
       
       // Wait for animation to finish before calling parent handlers
       setTimeout(() => {
         if (type === 'done') onDone?.();
-        else onDelete();
+        else if(type==='delete')
+        {
+          onDelete?.();
+        }
       }, 800); // Duration matches the "exit" animation
     };
 
