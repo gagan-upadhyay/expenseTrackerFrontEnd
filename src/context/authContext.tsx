@@ -253,32 +253,26 @@ export const AuthProvider = ({ children, initialToken }: { children: ReactNode; 
   }, [clearTheme]);
 
   // 1. Initial Authentication Logic (Fixes the iPhone Loop)
-  useEffect(() => {
-    const initAuth = async () => {
-      const token = getCookie('accessToken');
-      
-      if (token && isTokenValid(token)) {
-        setAccessToken(token);
+  // Replace the initAuth useEffect with this:
+useEffect(() => {
+  const initAuth = async () => {
+    // ✅ Never try getCookie('accessToken') — it's httpOnly, unreliable on iOS
+    // Always go straight to the refresh endpoint which uses the httpOnly
+    // refreshToken cookie automatically via credentials: 'include'
+    try {
+      const data = await refreshTokenApi() as { accessToken: string };
+      if (data?.accessToken) {
+        setAccessToken(data.accessToken);
         setIsLoggedIn(true);
-      } else {
-        // iPhone Fix: Don't check for 'refreshToken' cookie in JS. 
-        // It's httpOnly, so getCookie will return null. Just try the API.
-        try {
-          const data = await refreshTokenApi() as { accessToken: string };
-          if (data?.accessToken) {
-            setAccessToken(data.accessToken);
-            setIsLoggedIn(true);
-          }
-        } catch (err) {
-          // If refresh fails, we do nothing. We stay logged out.
-          // Do NOT call logout() here; it triggers the dependency loop.
-          console.log("No valid session found.");
-        }
       }
-      setIsReady(true);
-    };
-    initAuth();
-  }, [isTokenValid]); // Removed logout from dependencies
+    } catch (err) {
+      // No valid session — stay logged out, don't call logout()
+      console.log('No valid session found.');
+    }
+    setIsReady(true);
+  };
+  initAuth();
+}, []); // ✅ Empty deps — run once on mount only
 
   // 2. Token Expiry & Silent Refresh Logic
   useEffect(() => {
