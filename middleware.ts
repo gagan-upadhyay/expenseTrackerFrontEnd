@@ -3,6 +3,19 @@ import type { NextRequest } from 'next/server';
 import { jwtDecode } from 'jwt-decode';
 
 export function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+  
+  // Bypass auth for PWA assets and public resources
+  if (
+    pathname === '/manifest.webmanifest' ||
+    pathname === '/sw.js' ||
+    pathname.startsWith('/workbox-') ||
+    pathname.startsWith('/_next/') ||
+    pathname === '/favicon.ico'
+  ) {
+    return NextResponse.next();
+  }
+
   const accessToken = request.cookies.get('accessToken')?.value;
 
   if (!accessToken) {
