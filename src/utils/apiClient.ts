@@ -1,62 +1,68 @@
-import { getCookie } from './getCookie';
 import { refreshToken as fetchRefreshToken } from './data';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 
-console.log(`Value fof BASE_URL:${BASE_URL} from apiclient`);
+let isRefreshing = false;
+let refreshPromise: Promise<{ accessToken: string | null }> | null = null;
 
-// Generic fetch wrapper that automatically includes credentials and handles
-// token refreshing when a 401 Unauthorized is returned.
 export async function apiFetch<T = unknown>(
   path: string,
   options: RequestInit = {}
 ): Promise<T> {
   const url = path.startsWith('http') ? path : `${BASE_URL}${path}`;
-  const init: RequestInit = {
-    credentials: 'include',
+
+  const buildInit = (): RequestInit => ({
+    credentials: 'include',      // ✅ Always send cookies
     headers: {
       'Content-Type': 'application/json',
       ...(options.headers || {}),
     },
     ...options,
-  };
+  });
 
-  let res= await fetch(url, init);
-//   console.log('Value of res from apiclient:', res);
+  let res = await fetch(url, buildInit());
 
-  // if unauthorized try silent refresh
+  // ✅ On 401: always attempt silent refresh — never gate on httpOnly cookie check
   if (res.status === 401) {
-    const refreshCookie = getCookie('refreshToken');
-    if (refreshCookie) {
-      try {
-        const data:{accessToken:string|null} = await fetchRefreshToken() as {accessToken:string|null};
-        // console.log("Value of data from apiCLient.ts", data)
-        if (data && data?.accessToken) {
-          // update cookie and retry original request
-          document.cookie = `accessToken=${data?.accessToken}; path=/;`;
-          res = await fetch(url, init);
-        }
-      } catch (err) {
-        // ignore refresh errors; original response will be returned below
-        console.warn('refresh token failed', err);
+    try {
+      // ✅ Deduplicate: if multiple requests fail simultaneously, only refresh once
+      if (!isRefreshing) {
+        isRefreshing = true;
+        refreshPromise = fetchRefreshToken() as Promise<{ accessToken: string | null }>;
       }
+
+      const data = await refreshPromise;
+      isRefreshing = false;
+      refreshPromise = null;
+
+      if (data?.accessToken) {
+        // ✅ Retry the original request — browser will send the new cookie automatically
+        res = await fetch(url, buildInit());
+      } else {
+        // Refresh returned no token — session is truly dead
+        throw new Error('Session expired. Please log in again.');
+      }
+    } catch (err) {
+      isRefreshing = false;
+      refreshPromise = null;
+      console.warn('Silent refresh failed:', err);
+      // Let the error propagate so UI can handle logout
+      throw new Error('Session expired. Please log in again.');
     }
   }
-  
+
   if (!res.ok) {
     const errorText = await res.text();
     let errorMessage = res.statusText;
-    try{
+    try {
       const parsed = JSON.parse(errorText);
       errorMessage = parsed.error || errorMessage;
-    }catch{
-      errorMessage = errorText||errorMessage;
+    } catch {
+      errorMessage = errorText || errorMessage;
     }
     throw new Error(errorMessage);
-
   }
 
-  // attempt parse json; if no body return empty
   const contentType = res.headers.get('content-type') || '';
   if (contentType.includes('application/json')) {
     return res.json();
