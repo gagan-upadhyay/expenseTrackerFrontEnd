@@ -73,7 +73,7 @@ export default function Sidebar() {
                 </div>
               </div>
 
-              <UserProfile expanded={expanded} />
+              <UserProfile />
 
               {SIDEBAR_SECTIONS.map((section, idx) => (
                 <SidebarSection

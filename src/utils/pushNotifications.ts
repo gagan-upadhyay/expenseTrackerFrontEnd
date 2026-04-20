@@ -1,8 +1,17 @@
 /**
  * Push Notifications Utility for PWA
  * Handles subscribing to push notifications and managing permissions
+ *
+ * Required backend information:
+ * - NEXT_PUBLIC_VAPID_PUBLIC_KEY: VAPID public key for push subscriptions
+ * - NEXT_PUBLIC_PUSH_SUBSCRIBE_ENDPOINT: optional custom subscribe endpoint
+ * - NEXT_PUBLIC_PUSH_UNSUBSCRIBE_ENDPOINT: optional custom unsubscribe endpoint
+ *
+ * Backend implementation must:
+ * - persist push subscriptions per authenticated user
+ * - verify/refresh auth tokens on the server
+ * - use the VAPID secret key to send push notifications later
  */
-
 export interface NotificationSubscription {
   endpoint: string;
   auth: string;
@@ -10,13 +19,22 @@ export interface NotificationSubscription {
 }
 
 const SUBSCRIPTION_STORE_KEY = "pwa_notification_subscription";
-const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || "";
+const VAPID_PUBLIC_KEY =
+  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ||
+  "<PASTE_YOUR_VAPID_PUBLIC_KEY_HERE>";
+const NOTIFICATION_SUBSCRIBE_ENDPOINT =
+  process.env.NEXT_PUBLIC_PUSH_SUBSCRIBE_ENDPOINT ||
+  "/api/notifications/subscribe";
+const NOTIFICATION_UNSUBSCRIBE_ENDPOINT =
+  process.env.NEXT_PUBLIC_PUSH_UNSUBSCRIBE_ENDPOINT ||
+  "/api/notifications/unsubscribe";
 
 /**
  * Check if push notifications are supported
  */
 export function isPushNotificationSupported(): boolean {
   return (
+    typeof window !== "undefined" &&
     "serviceWorker" in navigator &&
     "PushManager" in window &&
     "Notification" in window
@@ -27,7 +45,7 @@ export function isPushNotificationSupported(): boolean {
  * Get current notification permission status
  */
 export function getNotificationPermission(): NotificationPermission {
-  if ("Notification" in window) {
+  if (typeof window !== "undefined" && "Notification" in window) {
     return Notification.permission;
   }
   return "denied";
@@ -66,6 +84,13 @@ export async function subscribeToPushNotifications(): Promise<boolean> {
     return false;
   }
 
+  if (!VAPID_PUBLIC_KEY || VAPID_PUBLIC_KEY.includes("<PASTE_")) {
+    console.warn(
+      "[Notifications] VAPID public key is missing. Set NEXT_PUBLIC_VAPID_PUBLIC_KEY in environment variables."
+    );
+    return false;
+  }
+
   try {
     const registration = await navigator.serviceWorker.ready;
 
@@ -74,7 +99,6 @@ export async function subscribeToPushNotifications(): Promise<boolean> {
       return false;
     }
 
-    // Create subscription
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
@@ -82,10 +106,7 @@ export async function subscribeToPushNotifications(): Promise<boolean> {
 
     console.log("[Notifications] Subscribed to push notifications");
 
-    // Save subscription details
     saveSubscription(subscription);
-
-    // Send subscription to backend
     await sendSubscriptionToBackend(subscription);
 
     return true;
@@ -112,16 +133,13 @@ export async function unsubscribeFromPushNotifications(): Promise<boolean> {
       return true;
     }
 
-    await subscription.unsubscribe();
-    console.log("[Notifications] Unsubscribed from push notifications");
+    const success = await subscription.unsubscribe();
+    console.log("[Notifications] Subscription unsubscribe result:", success);
 
-    // Remove from backend
     await removeSubscriptionFromBackend(subscription);
-
-    // Clear local storage
     clearSubscription();
 
-    return true;
+    return success;
   } catch (error) {
     console.error("[Notifications] Error unsubscribing:", error);
     return false;
@@ -196,10 +214,11 @@ async function sendSubscriptionToBackend(
   subscription: PushSubscription
 ): Promise<void> {
   try {
-    const response = await fetch("/api/notifications/subscribe", {
+    const response = await fetch(NOTIFICATION_SUBSCRIBE_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(subscription.toJSON()),
+      credentials: "include",
     });
 
     if (!response.ok) {
@@ -220,10 +239,11 @@ async function removeSubscriptionFromBackend(
   subscription: PushSubscription
 ): Promise<void> {
   try {
-    const response = await fetch("/api/notifications/unsubscribe", {
+    const response = await fetch(NOTIFICATION_UNSUBSCRIBE_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ endpoint: subscription.endpoint }),
+      credentials: "include",
     });
 
     if (!response.ok) {
@@ -295,19 +315,14 @@ export function initPushNotificationListeners(): void {
     return;
   }
 
-  // Listen for notification permission changes
-  if (document.hidden !== undefined) {
-    document.addEventListener("visibilitychange", () => {
-      if (!document.hidden) {
-        // App came to foreground, check subscription status
-        getPushSubscriptionStatus().then((isSubscribed) => {
-          console.log("[Notifications] App foreground - subscription status:", isSubscribed);
-        });
-      }
-    });
-  }
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) {
+      getPushSubscriptionStatus().then((isSubscribed) => {
+        console.log("[Notifications] App foreground - subscription status:", isSubscribed);
+      });
+    }
+  });
 
-  // Listen for service worker messages about push notifications
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.addEventListener("message", (event) => {
       if (event.data && event.data.type === "PUSH_NOTIFICATION") {

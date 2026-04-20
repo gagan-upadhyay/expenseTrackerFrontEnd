@@ -1,83 +1,112 @@
 import { NextRequest, NextResponse } from "next/server";
+import { jwtDecode } from "jwt-decode";
 
 /**
- * POST /api/notifications/subscribe
- * Subscribe a user to push notifications
- *
- * Request body:
- * {
- *   endpoint: string,
- *   expirationTime: number | null,
- *   keys: {
- *     p256dh: string,
- *     auth: string
- *   }
- * }
+ * Required backend configuration:
+ * - Ensure `accessToken` cookie is set securely from your auth service
+ * - Persist push subscriptions tied to authenticated users
+ * - Use the stored subscriptions to send pushes from a server-side worker
  */
+
+interface PushSubscriptionPayload {
+  endpoint: string;
+  expirationTime?: number | null;
+  keys: {
+    p256dh: string;
+    auth: string;
+  };
+}
+
+interface TokenPayload {
+  sub?: string;
+  userId?: string;
+  exp?: number;
+}
+
+async function getUserIdFromRequest(request: NextRequest): Promise<string | null> {
+  const accessToken = request.cookies.get("accessToken")?.value;
+  if (!accessToken) return null;
+
+  try {
+    const decoded = jwtDecode<TokenPayload>(accessToken);
+    return decoded.sub || decoded.userId || null;
+  } catch (error) {
+    console.warn("[API] Unable to decode access token:", error);
+    return null;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const subscription = await request.json();
+    const subscription: PushSubscriptionPayload = await request.json();
 
-    // Validate required fields
-    if (!subscription.endpoint || !subscription.keys) {
+    if (!subscription?.endpoint || !subscription?.keys?.p256dh || !subscription?.keys?.auth) {
       return NextResponse.json(
-        { error: "Invalid subscription data" },
+        { error: "Invalid push subscription payload" },
         { status: 400 }
       );
     }
 
-    console.log("[API] Push notification subscription received:", {
+    const userId = await getUserIdFromRequest(request);
+    if (!userId) {
+      return NextResponse.json(
+        { error: "Authentication required for push subscription" },
+        { status: 401 }
+      );
+    }
+
+    console.log("[API] Push notification subscription received for user:", {
+      userId,
       endpoint: subscription.endpoint,
       timestamp: new Date().toISOString(),
     });
 
-    // TODO: Save subscription to database
-    // This is where you would:
-    // 1. Get the authenticated user's ID from the request
-    // 2. Save the subscription to your database
-    // 3. You can later use this to send push notifications to the user
-
-    // Example of what you might do:
-    // const userId = await getUserIdFromToken(request);
-    // await db.push_subscriptions.create({
-    //   user_id: userId,
+    // TODO: Persist this subscription using your preferred storage solution.
+    // Example:
+    // await pushSubscriptionStore.save({
+    //   userId,
     //   endpoint: subscription.endpoint,
     //   p256dh: subscription.keys.p256dh,
     //   auth: subscription.keys.auth,
-    //   created_at: new Date(),
+    //   createdAt: new Date(),
     // });
 
     return NextResponse.json(
       {
         success: true,
-        message: "Subscription saved successfully",
-        endpoint: subscription.endpoint.substring(0, 50) + "...",
+        message: "Push subscription recorded successfully",
+        userId,
       },
       { status: 201 }
     );
   } catch (error) {
-    console.error("[API] Error handling subscription:", error);
+    console.error("[API] Error handling push subscription:", error);
     return NextResponse.json(
-      { error: "Failed to save subscription" },
+      { error: "Failed to save push subscription" },
       { status: 500 }
     );
   }
 }
 
-/**
- * GET /api/notifications/subscribe
- * Get subscription status for current user
- */
 export async function GET(request: NextRequest) {
   try {
-    // TODO: Get authenticated user's subscription status
-    // const userId = await getUserIdFromToken(request);
-    // const subscription = await db.push_subscriptions.findOne({ user_id: userId });
+    const userId = await getUserIdFromRequest(request);
+    if (!userId) {
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 }
+      );
+    }
+
+    // TODO: Query the user's subscription status from your storage.
+    // Example:
+    // const subscription = await pushSubscriptionStore.findOne({ userId });
 
     return NextResponse.json(
       {
-        subscribed: false, // Replace with actual check
-        message: "Subscription status check not implemented yet",
+        subscribed: false,
+        message: "Push subscription status endpoint configured but not implemented",
+        userId,
       },
       { status: 200 }
     );

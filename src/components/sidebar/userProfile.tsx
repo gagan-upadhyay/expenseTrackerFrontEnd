@@ -2,15 +2,15 @@
 import { useUser } from "@/src/context/userContext";
 import Image from "next/image";
 
-interface UserProfileInterface{
-    expanded:boolean;
-}
+// interface UserProfileInterface{
+//     expanded:boolean;
+// }
 
-export default function UserProfile({ expanded }: UserProfileInterface) {
+export default function UserProfile() {
         const {loading, user}=useUser();
-        console.log('Value of expanded:', expanded);
-        console.log(`value of user:${user}`);
-        console.log(' typeof user from UserProfile:', typeof(user?.updated_at));
+        // console.log('Value of expanded:', expanded);
+        // console.log(`value of user:${user}`);
+        // console.log(' typeof user from UserProfile:', typeof(user?.updated_at));
   return (
     <div className="flex flex-col items-center mb-6">
       {loading ? (

@@ -9,8 +9,9 @@ export function middleware(request: NextRequest) {
   
   // Bypass auth for PWA assets and public resources
   if (
-    pathname.includes('/manifest.webmanifest') ||
+    pathname === '/manifest.webmanifest' ||
     pathname === '/sw.js' ||
+    pathname === '/offline.html' ||
     pathname.startsWith('/workbox-') ||
     pathname.startsWith('/_next/') ||
     pathname === '/favicon.ico'

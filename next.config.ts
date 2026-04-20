@@ -54,6 +54,7 @@ const pwaConfig = withPWA({
   register: true,
   skipWaiting: false,
   disable: process.env.NODE_ENV === "development",
+  swSrc: "src/service-worker.js",
   runtimeCaching: [
     {
       urlPattern: /^https:\/\/.*\.(png|jpg|jpeg|svg|gif|webp)$/,
@@ -89,6 +90,6 @@ const pwaConfig = withPWA({
       },
     },
   ],
-});
+} as any);
 
 export default pwaConfig(nextConfig);
