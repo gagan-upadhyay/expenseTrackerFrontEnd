@@ -24,10 +24,10 @@ const VAPID_PUBLIC_KEY =
   "<PASTE_YOUR_VAPID_PUBLIC_KEY_HERE>";
 const NOTIFICATION_SUBSCRIBE_ENDPOINT =
   process.env.NEXT_PUBLIC_PUSH_SUBSCRIBE_ENDPOINT ||
-  "/api/notifications/subscribe";
+  "/api/v1/auth/notifications/subscribe";
 const NOTIFICATION_UNSUBSCRIBE_ENDPOINT =
   process.env.NEXT_PUBLIC_PUSH_UNSUBSCRIBE_ENDPOINT ||
-  "/api/notifications/unsubscribe";
+  "/api/v1/auth/notifications/unsubscribe";
 
 /**
  * Check if push notifications are supported

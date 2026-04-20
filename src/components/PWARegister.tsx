@@ -1,60 +1,61 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { registerServiceWorker, promptSkipWaiting } from "../utils/registerServiceWorker";
 
 export function PWARegister() {
+  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null);
+
   useEffect(() => {
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker
-        .register("/sw.js", { scope: "/" })
-        .then((registration) => {
-          console.log("[PWA] Service worker registered:", registration);
+    let mounted = true;
+    registerServiceWorker({
+      onUpdate: (reg) => {
+        if (!mounted) return;
+        setRegistration(reg);
+        setUpdateAvailable(true);
+      },
+      onSuccess: (reg) => {
+        if (!mounted) return;
+        setRegistration(reg);
+      },
+    }).catch(() => {
+      /* ignore */
+    });
 
-          // Listen for updates
-          registration.onupdatefound = () => {
-            const newWorker = registration.installing;
-            if (newWorker) {
-              newWorker.onstatechange = () => {
-                if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
-                  console.log("[PWA] New service worker available - app can be updated");
-                  // Dispatch custom event for UI to show update prompt
-                  window.dispatchEvent(new CustomEvent("sw-update-available"));
-                }
-              };
-            }
-          };
-
-          // Check for updates periodically
-          setInterval(() => {
-            registration.update().catch((err) => {
-              console.log("[PWA] Error checking for updates:", err);
-            });
-          }, 60000); // Check every minute
-        })
-        .catch((error) => {
-          console.error("[PWA] Service worker registration failed:", error);
-        });
-
-      // Listen for online/offline events
-      const handleOnline = () => {
-        console.log("[PWA] App is online");
-        window.dispatchEvent(new CustomEvent("app-online"));
-      };
-
-      const handleOffline = () => {
-        console.log("[PWA] App is offline");
-        window.dispatchEvent(new CustomEvent("app-offline"));
-      };
-
-      window.addEventListener("online", handleOnline);
-      window.addEventListener("offline", handleOffline);
-
-      return () => {
-        window.removeEventListener("online", handleOnline);
-        window.removeEventListener("offline", handleOffline);
-      };
-    }
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  return null;
+  const applyUpdate = async () => {
+    if (!registration) return;
+    try {
+      promptSkipWaiting(registration);
+      setTimeout(() => window.location.reload(), 700);
+    } catch (e) {
+      console.error('[PWA] Failed to apply update', e);
+      window.location.reload();
+    }
+  };
+
+  if (!updateAvailable) return null;
+
+  return (
+    <div style={{ position: 'fixed', right: 12, bottom: 12, zIndex: 9999 }}>
+      <button
+        onClick={applyUpdate}
+        style={{
+          background: '#111827',
+          color: 'white',
+          padding: '8px 12px',
+          borderRadius: 8,
+          border: 'none',
+          cursor: 'pointer',
+        }}
+      >
+        New update available — click to refresh
+      </button>
+    </div>
+  );
 }

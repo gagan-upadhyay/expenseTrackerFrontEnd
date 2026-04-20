@@ -64,7 +64,7 @@ export const passwordUtility = async (
             credentials: "include",
         }
         );
-    
+
     }
 
     // 🔹 STEP 2: Change password

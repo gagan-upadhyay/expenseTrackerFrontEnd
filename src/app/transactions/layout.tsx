@@ -6,7 +6,7 @@ import { AccountProvider } from "@/src/context/accountContext";
 import { TransactionProvider } from "@/src/context/transactionContext";
 import { SidebarProvider } from "@/src/context/sidebarContext";
 import MainContent from "@/src/components/layout/MainContent";
-import Breadcrumbs from "@/src/components/ui/Breadcrumbs";
+// import Breadcrumbs from "@/src/components/ui/Breadcrumbs";
 
 export default function TransactionLayout({children}: {children:React.ReactNode}){
     return (
@@ -19,7 +19,7 @@ export default function TransactionLayout({children}: {children:React.ReactNode}
                         <SidebarProvider>
                             <SideBar/>
                             <MainContent>
-                                <Breadcrumbs/>
+                                {/* <Breadcrumbs/> */}
                                 <div className="flex-grow sm:overflow-y-auto">
                                     {children}
                                 </div>
