@@ -5,6 +5,8 @@ import { jwtDecode } from 'jwt-decode';
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   
+  console.log('[MIDDLEWARE] pathname:', pathname);
+  
   // Bypass auth for PWA assets and public resources
   if (
     pathname === '/manifest.webmanifest' ||
@@ -13,6 +15,7 @@ export function middleware(request: NextRequest) {
     pathname.startsWith('/_next/') ||
     pathname === '/favicon.ico'
   ) {
+    console.log('[MIDDLEWARE] bypassing auth for:', pathname);
     return NextResponse.next();
   }
 
