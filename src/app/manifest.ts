@@ -1,0 +1,72 @@
+import type { MetadataRoute } from "next";
+
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: 'Expense Tracker - Smart Finance Management',
+    short_name: 'ExpenseTracker',
+    description: 'PWA for expense tracking and financial management. Track transactions, manage accounts, and analyze spending patterns.',
+    start_url: '/',
+    scope: '/',
+    display: 'standalone',
+    orientation: 'portrait-primary',
+    background_color: '#ffffff',
+    theme_color: '#000000',
+    categories: ['finance', 'productivity'],
+    screenshots: [
+      {
+        src: '/logo_512.png',
+        sizes: '512x512',
+        type: 'image/png',
+        form_factor: 'wide',
+      },
+      {
+        src: '/logo_192.png',
+        sizes: '192x192',
+        type: 'image/png',
+        form_factor: 'narrow',
+      },
+    ],
+    icons: [
+      {
+        src: '/logo_192.png',
+        sizes: '192x192',
+        type: 'image/png',
+        purpose: 'any',
+      },
+      {
+        src: '/logo_512.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'any',
+      },
+      {
+        src: '/logo_192.png',
+        sizes: '192x192',
+        type: 'image/png',
+        purpose: 'maskable',
+      },
+      {
+        src: '/logo_512.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'maskable',
+      },
+    ],
+    prefer_related_applications: false,
+    shortcuts: [
+      {
+        name: 'Dashboard',
+        short_name: 'Dashboard',
+        description: 'View your expense dashboard',
+        url: '/dashboard',
+        icons: [
+          {
+            src: '/logo_192.png',
+            sizes: '192x192',
+            type: 'image/png',
+          },
+        ],
+      },
+    ],
+  };
+}
