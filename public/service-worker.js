@@ -71,14 +71,21 @@ if (workbox) {
   self.addEventListener('push', (event) => {
     console.log('Push received:', event);
     let data = {};
+    
     if (event.data) {
       try {
         data = event.data.json();
       } catch (e) {
-        console.error('Failed to parse push data:', e);
+        console.log('Push data is not JSON, treating as plain text:', e);
+        // If JSON parsing fails, treat the data as plain text
+        data = {
+          title: 'Expense Tracker',
+          body: event.data.text(),
+        };
       }
     }
 
+    const title = data.title || 'Expense Tracker';
     const options = {
       body: data.body || 'New notification',
       icon: '/icon-192x192.png',
@@ -91,11 +98,20 @@ if (workbox) {
       },
     };
 
+    // Only show notification if permission is granted
     event.waitUntil(
-      self.registration.showNotification(
-        data.title || 'Expense Tracker',
-        options
-      )
+      (async () => {
+        try {
+          // Check if notification permission is granted
+          if (Notification.permission === 'granted') {
+            await self.registration.showNotification(title, options);
+          } else if (Notification.permission !== 'denied') {
+            console.warn('Notification permission not granted. User has not been asked.');
+          }
+        } catch (err) {
+          console.error('Failed to show notification:', err);
+        }
+      })()
     );
   });
 
