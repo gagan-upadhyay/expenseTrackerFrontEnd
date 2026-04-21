@@ -338,14 +338,14 @@ useEffect(() => {
     isTokenValid,
   }), [accessToken, isLoggedIn, isReady, logout, isTokenValid]);
 
-  if (!isReady) {
-    return (
-      <div className="text-center text-blue-500 flex flex-col items-center justify-center mt-50">
-        Checking Authentication...
-        <BounceLoader className='relative top-10' size={70} color={theme === 'dark' ? '#0F172B' : '#779dffff'} speedMultiplier={2} />
-      </div>
-    );
-  }
+  // if (!isReady) {
+  //   return (
+  //     <div className="text-center text-blue-500 flex flex-col items-center justify-center mt-50">
+  //       Checking Authentication...
+  //       <BounceLoader className='relative top-10' size={70} color={theme === 'dark' ? '#0F172B' : '#779dffff'} speedMultiplier={2} />
+  //     </div>
+  //   );
+  // }
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 };
