@@ -183,11 +183,11 @@ import {
   useState,
 } from 'react';
 import { toastShowWarning } from '../utils/toastUtils';
-import { BounceLoader } from 'react-spinners';
+// import { BounceLoader } from 'react-spinners';
 import { useTheme } from './themeContext';
 import { JwtPayload, AuthContextType } from '../utils/definitions';
 import { jwtDecode } from 'jwt-decode';
-import apiFetch from '../utils/apiClient';
+// import apiFetch from '../utils/apiClient';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 

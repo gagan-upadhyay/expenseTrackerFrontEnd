@@ -97,76 +97,166 @@ export default function RegisterForm(){
         }
     }
 
-    return(
-        <form
-            onSubmit={handleRegister}
-            className="glass glass-hover relative w-full px-6 py-8 rounded-2xl"
-            >
-            {/* Glow */}
-            <div className="glow glow-indigo -top-10 -right-10"></div>
-            <div className="glow glow-purple -bottom-10 -left-10"></div>
+    // return(
+    //     <form
+    //         onSubmit={handleRegister}
+    //         className="glass glass-hover relative w-full px-6 py-8 rounded-2xl"
+    //         >
+    //         {/* Glow */}
+    //         <div className="glow glow-indigo -top-10 -right-10"></div>
+    //         <div className="glow glow-purple -bottom-10 -left-10"></div>
 
-            <h1 className="text-xl md:text-2xl font-bold text-center opacity-80 mb-6">
-                Register
-            </h1>
+    //         <h1 className="text-xl md:text-2xl font-bold text-center opacity-80 mb-6">
+    //             Register
+    //         </h1>
 
-            <div className="flex flex-col gap-4">
+    //         <div className="flex flex-col gap-4">
 
-                <input
-                placeholder="First Name"
-                onChange={(e) => setFirstName(e.target.value)}
-                className="glass px-3 py-2 rounded-xl text-sm"
-                />
+    //             <input
+    //             placeholder="First Name"
+    //             onChange={(e) => setFirstName(e.target.value)}
+    //             className="glass px-3 py-2 rounded-xl text-sm"
+    //             />
 
-                <input
-                placeholder="Last Name"
-                onChange={(e) => setLastName(e.target.value)}
-                className="glass px-3 py-2 rounded-xl text-sm"
-                />
+    //             <input
+    //             placeholder="Last Name"
+    //             onChange={(e) => setLastName(e.target.value)}
+    //             className="glass px-3 py-2 rounded-xl text-sm"
+    //             />
 
-                <input
-                type="email"
-                placeholder="Email"
-                onChange={(e) => setEmail(e.target.value)}
-                className="glass px-3 py-2 rounded-xl text-sm"
-                />
+    //             <input
+    //             type="email"
+    //             placeholder="Email"
+    //             onChange={(e) => setEmail(e.target.value)}
+    //             className="glass px-3 py-2 rounded-xl text-sm"
+    //             />
 
-                <input
-                type="password"
-                placeholder="Password"
-                onChange={(e) => setPassword(e.target.value)}
-                className="glass px-3 py-2 rounded-xl text-sm"
-                />
-                {password && (
-                    <div className="mt-1">
+    //             <input
+    //             type="password"
+    //             placeholder="Password"
+    //             onChange={(e) => setPassword(e.target.value)}
+    //             className="glass px-3 py-2 rounded-xl text-sm"
+    //             />
+    //             {password && (
+    //                 <div className="mt-1">
                         
-                        {/* Bar */}
-                        <div className="w-full h-2 rounded-full glass-light overflow-hidden">
-                        <div
-                            className={clsx(
-                            "h-full transition-all duration-500",
-                            strength.color
-                            )}
-                            style={{ width: strength.width }}
-                        />
-                        </div>
+    //                     {/* Bar */}
+    //                     <div className="w-full h-2 rounded-full glass-light overflow-hidden">
+    //                     <div
+    //                         className={clsx(
+    //                         "h-full transition-all duration-500",
+    //                         strength.color
+    //                         )}
+    //                         style={{ width: strength.width }}
+    //                     />
+    //                     </div>
 
-                        {/* Label */}
-                        <p className="text-xs mt-1 opacity-70">
-                        Strength: {strength.label}
-                        </p>
-                    </div>
-                    )}
-                {error?<p className="text-xs text-red-400">{error}</p>:success?<p className="text-xs text-green-400">Successfully registered!</p>:''}
-                <button className="glass-hover py-2 rounded-xl text-sm font-medium">
-                Register
-                </button>
+    //                     {/* Label */}
+    //                     <p className="text-xs mt-1 opacity-70">
+    //                     Strength: {strength.label}
+    //                     </p>
+    //                 </div>
+    //                 )}
+    //             {error?<p className="text-xs text-red-400">{error}</p>:success?<p className="text-xs text-green-400">Successfully registered!</p>:''}
+    //             <button className="glass-hover py-2 rounded-xl text-sm font-medium">
+    //             Register
+    //             </button>
 
-                <p className="text-xs text-center opacity-70">
-                Already registered?{" "}
-                <Link href="/auth/login">Login</Link>
-                </p>
+    //             <p className="text-xs text-center opacity-70">
+    //             Already registered?{" "}
+    //             <Link href="/auth/login">Login</Link>
+    //             </p>
+    //         </div>
+    //         </form>
+    // )
+
+  return (
+    <div className="relative group">
+      {/* Outer Border Glow */}
+      <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+      
+      <form
+        onSubmit={handleRegister}
+        className="glass relative w-full px-8 py-10 rounded-2xl border border-white/10 shadow-2xl flex flex-col gap-6"
+      >
+        <div className="text-center">
+          <h1 className="text-2xl font-black uppercase tracking-[0.2em] text-white opacity-90">
+            Create Account
+          </h1>
+          <p className="text-[10px] text-indigo-400 font-bold uppercase mt-2 tracking-widest">
+            Join the Financial Hub
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          {/* Name Row */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-[10px] font-black uppercase text-white/30 ml-1">First Name</label>
+              <input
+                required
+                placeholder="John"
+                onChange={(e) => setFirstName(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-indigo-500/50 transition-all"
+              />
             </div>
-            </form>
-    )
+            <div className="space-y-1">
+              <label className="text-[10px] font-black uppercase text-white/30 ml-1">Last Name</label>
+              <input
+                required
+                placeholder="Doe"
+                onChange={(e) => setLastName(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-indigo-500/50 transition-all"
+              />
+            </div>
+          </div>
+
+          {/* Email */}
+          <div className="space-y-1">
+            <label className="text-[10px] font-black uppercase text-white/30 ml-1">Email Address</label>
+            <input
+              type="email"
+              required
+              placeholder="john@example.com"
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-white/5 border border-white/10 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-indigo-500/50 transition-all"
+            />
+          </div>
+
+          {/* Password */}
+          <div className="space-y-1">
+            <label className="text-[10px] font-black uppercase text-white/30 ml-1">Secure Password</label>
+            <input
+              type="password"
+              required
+              placeholder="••••••••"
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-white/5 border border-white/10 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-indigo-500/50 transition-all"
+            />
+            {password && (
+              <div className="px-1 pt-2">
+                <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+                  <div className={clsx("h-full transition-all duration-500", strength.color)} style={{ width: strength.width }} />
+                </div>
+                <p className="text-[9px] mt-1 font-bold uppercase text-white/40">Security: {strength.label}</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <button className="w-full bg-white text-black py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-indigo-500 hover:text-white transition-all duration-300 shadow-xl active:scale-95">
+          Get Started
+        </button>
+
+        <p className="text-[10px] text-center font-bold uppercase tracking-widest text-white/30">
+          Member already?{" "}
+          <Link href="/auth/login" className="text-indigo-400 hover:text-indigo-300 ml-1 transition-colors">
+            Sign In
+          </Link>
+        </p>
+      </form>
+    </div>
+  );
+// }
+
 }

@@ -1,6 +1,4 @@
 'use client';
-
-import { FaCcVisa } from "react-icons/fa";
 import CreditCard from "./creditCards";
 import { lusitana } from "@/src/assets/fonts/fonts";
 import clsx from "clsx";
