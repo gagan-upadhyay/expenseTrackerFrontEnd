@@ -25,7 +25,6 @@ export default function WelcomePage(){
         }
     }
 
-
     return (
         <div className={`flex justify-center h-screen transition-opacity ease-in-out ${loaded ? 'opacity-90':'opacity-0'}`}>
             <div className="w-full absolute min-h-screen">

@@ -22,7 +22,7 @@ export async function registerServiceWorker(options: RegistrationOptions = {}) {
   const swUrl = '/service-worker.js';
 
   try {
-    const registration = await navigator.serviceWorker.register(swUrl, {type:'module'});
+    const registration = await navigator.serviceWorker.register(swUrl);
     console.log('[SW] Registered service worker at', swUrl);
 
     // Listen for updates
