@@ -89,42 +89,9 @@ const pwaConfig = withPWA({
   register: true,
   skipWaiting: false,
   disable: process.env.NODE_ENV === "development",
+  mode: 'InjectManifest',
   swSrc: "src/service-worker.js",
-  runtimeCaching: [
-    {
-      urlPattern: /^https:\/\/.*\.(png|jpg|jpeg|svg|gif|webp)$/,
-      handler: "CacheFirst",
-      options: {
-        cacheName: "images-cache",
-        expiration: {
-          maxEntries: 50,
-          maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
-        },
-      },
-    },
-    {
-      urlPattern: /^https:\/\/api\..*$/,
-      handler: "NetworkFirst",
-      options: {
-        cacheName: "api-cache",
-        expiration: {
-          maxEntries: 32,
-          maxAgeSeconds: 5 * 60, // 5 minutes
-        },
-      },
-    },
-    {
-      urlPattern: /\/_next\/static\//,
-      handler: "CacheFirst",
-      options: {
-        cacheName: "next-static",
-        expiration: {
-          maxEntries: 60,
-          maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
-        },
-      },
-    },
-  ],
 } as any);
 
 export default pwaConfig(nextConfig);
+
