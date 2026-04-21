@@ -192,7 +192,7 @@ import apiFetch from '../utils/apiClient';
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Define the refresh API inside or import it
-const AUTH_SERVICE = process.env.NEXT_PUBLIC_AUTH_SERVICE_URL;
+const AUTH_SERVICE = process.env.NEXT_PUBLIC_AUTH_SERVICE;
 
 // export const apiFetch = async (url: string, options: any) => {
 //     const res = await fetch(url, options);
