@@ -1,5 +1,4 @@
 import type { NextConfig } from "next";
-import withPWA from "next-pwa";
 
 const nextConfig: NextConfig = {
   turbopack: {},
@@ -84,14 +83,5 @@ const nextConfig: NextConfig = {
   },
 };
 
-const pwaConfig = withPWA({
-  dest: "public",
-  register: true,
-  skipWaiting: false,
-  disable: process.env.NODE_ENV === "development",
-  mode: 'InjectManifest',
-  swSrc: "src/service-worker.js",
-} as any);
-
-export default pwaConfig(nextConfig);
+export default nextConfig;
 

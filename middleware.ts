@@ -10,6 +10,7 @@ export function middleware(request: NextRequest) {
   // Bypass auth for PWA assets and public resources
   if (
     pathname === '/manifest.webmanifest' ||
+    pathname === '/service-worker.js' ||
     pathname === '/sw.js' ||
     pathname === '/offline.html' ||
     pathname.startsWith('/workbox-') ||
