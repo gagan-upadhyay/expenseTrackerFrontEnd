@@ -73,7 +73,7 @@ export default async function RootLayout({
         <link rel="apple-touch-icon" href="/logo_192.png" />
         <link rel="icon" type="image/png" sizes="192x192" href="/logo_192.png" />
         <link rel="icon" type="image/png" sizes="512x512" href="/logo_512.png" />
-        <link rel="manifest" href="/manifest.webmanifest" />
+        <link rel="manifest" href="/manifest.webmanifest" crossOrigin="use-credentials"/>
       </head>
       <body
         className={`flex flex-col min-h-screen ${geistSans.variable} ${geistMono.variable} antialiased`}
