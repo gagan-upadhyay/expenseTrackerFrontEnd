@@ -13,7 +13,7 @@ export default function AuthGuard({children}:{children:React.ReactNode}){
     // console.log('Value of isLoggedIn and isReady from authGurad:\n', isLoggedIn, isReady);
     const router = useRouter();
     useEffect(()=>{
-        if(isReady && !isLoggedIn  && pathname !== '/auth/login') 
+        if(isReady && !isLoggedIn) 
         {
             router.push('/auth/login');
         }
