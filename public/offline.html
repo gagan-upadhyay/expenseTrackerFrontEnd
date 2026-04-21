@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - Expense Tracker</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .offline-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+        }
+        h1 { font-size: 28px; color: #1f2937; margin-bottom: 10px; }
+        p { font-size: 16px; color: #6b7280; line-height: 1.6; margin-bottom: 20px; }
+        .status {
+            padding: 15px;
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            border-radius: 6px;
+            margin: 20px 0;
+            color: #92400e;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover { background: #2563eb; }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <h1>You're Offline</h1>
+        <p>It looks like you've lost your internet connection. Some features may be unavailable.</p>
+        <div class="status">
+            <strong>Cached data available:</strong> You can view previously loaded pages and transactions.
+        </div>
+        <button onclick="location.reload()">Try Again</button>
+    </div>
+</body>
+</html>

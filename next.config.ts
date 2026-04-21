@@ -1,14 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins:['192.168.0.126'],
+  turbopack: {},
+  allowedDevOrigins:['192.168.0.126','192.168.0.185', '172.31.144.1'],
   logging:{
     fetches:{
       fullUrl:true,
     }
   },
   images: {
-    remotePatterns: 
+    remotePatterns:
     [  
       {
         protocol: "https",
@@ -26,7 +27,7 @@ const nextConfig: NextConfig = {
         protocol:"https",
         hostname:"expensetrackerappstorage.blob.core.windows.net",
         port:"",
-        pathname:"/transaction-receipts/**", 
+        pathname:"/transaction-receipts/**",
       }
 
     ],
@@ -34,6 +35,41 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
+      {
+        source: '/manifest.webmanifest',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/manifest+json',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=3600, must-revalidate',
+          },
+        ],
+      },
+      {
+        source: '/sw.js',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=0, must-revalidate',
+          },
+          {
+            key: 'Service-Worker-Allowed',
+            value: '/',
+          },
+        ],
+      },
+      {
+        source: '/offline.html',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400',
+          },
+        ],
+      },
       {
         source: '/(.*)',
         headers: [
@@ -48,3 +84,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+

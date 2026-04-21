@@ -2,8 +2,12 @@
 import apiFetch from "./apiClient";
 import { fetchedUser } from "./definitions";
 
-const USER_SERVICE = process.env.NEXT_PUBLIC_USER_SERVICE;
-const AUTH_SERVICE = process.env.NEXT_PUBLIC_AUTH_SERVICE;
+const USER_SERVICE =
+  process.env.NEXT_PUBLIC_USER_SERVICE ||
+  "https://expensetrackerapi.duckdns.org";
+const AUTH_SERVICE =
+  process.env.NEXT_PUBLIC_AUTH_SERVICE ||
+  "https://expensetrackerapi.duckdns.org";
 
 // export const getUserDetails = async () => {
 //     const data:{result:AddedUser} = await apiFetch(`${USER_SERVICE}/api/v1/user/`) as {result:AddedUser};
@@ -24,7 +28,7 @@ export const getUserDetails = async () => {
   const user = data?.result ?? null;
 
   if (!user) return null;
-  console.log('Value of fetcheduser:', user);
+//   console.log('Value of fetcheduser:', user);
   // ✅ Normalize profile_picture
   return {
     ...user,
@@ -36,7 +40,7 @@ export const getUserDetails = async () => {
 };
 
 
-console.log(`Value of user_service: ${USER_SERVICE} and AUTH_SERVICE: ${AUTH_SERVICE} from data.ts`);
+// console.log(`Value of user_service: ${USER_SERVICE} and AUTH_SERVICE: ${AUTH_SERVICE} from data.ts`);
 
 export const getPasswordType = async () => {
     return apiFetch(`${USER_SERVICE}/api/v1/user/password-type/`);
@@ -49,7 +53,7 @@ export const passwordUtility = async (
     if (!password) {
     return { success: false, error: "No password received" };
     }
-    console.log(`Value of password, action and newPassword:${password}, ${action}, ${newPassword}`);
+    // console.log(`Value of password, action and newPassword:${password}, ${action}, ${newPassword}`);
 // 🔹 STEP 1: Check password
     if (action === "checkPassword") {
         return await apiFetch(
@@ -60,12 +64,12 @@ export const passwordUtility = async (
             credentials: "include",
         }
         );
-    
+
     }
 
     // 🔹 STEP 2: Change password
     if (action === "changePassword") {
-        console.log(`Inside changePassword `);
+        // console.log(`Inside changePassword `);
         // First verify old password
         return await apiFetch(
         `${USER_SERVICE}/api/v1/user/change-password`,
@@ -78,7 +82,7 @@ export const passwordUtility = async (
             credentials: "include",
         }
         ) as {success:boolean, message:string|null, error:string|null};
-        console.log(`After calling chaangePassowrd`);
+        // console.log(`After calling chaangePassowrd`);
     }
 };
 
@@ -116,7 +120,7 @@ export const sendOTP = async (name: string, email: string, type: string) => {
 
 export const verifyOTPStatus = async (otp: string, email: string) => {
     try{
-        console.log(`value of otp from dfata.ts: ${otp}`);
+        // console.log(`value of otp from dfata.ts: ${otp}`);
         const useForLogin = false;
         return apiFetch(`${AUTH_SERVICE}/api/v1/auth/otp/verify/`, {
         method: 'POST',

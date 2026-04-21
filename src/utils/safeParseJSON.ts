@@ -29,7 +29,7 @@ export const safeParseJsonResult=async<T>(
 ):Promise<Result<T>>=>{
     try{
         const json = await res.json();
-        console.log('value of json:', json);
+        // console.log('value of json:', json);
         const result = schema.safeParse(json);
 
         if(result.success){

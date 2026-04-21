@@ -192,19 +192,29 @@ import apiFetch from '../utils/apiClient';
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Define the refresh API inside or import it
-const AUTH_SERVICE = process.env.NEXT_PUBLIC_AUTH_SERVICE_URL;
+const AUTH_SERVICE = process.env.NEXT_PUBLIC_AUTH_SERVICE;
 
-// export const apiFetch = async (url: string, options: any) => {
-//     const res = await fetch(url, options);
-//     if (!res.ok) throw new Error('Fetch failed');
-//     return res.json();
-// };
-
+// ✅ Use raw fetch to avoid circular 401 handling in apiFetch
 export const refreshTokenApi = async () => {
-    return apiFetch(`${AUTH_SERVICE}/api/v1/auth/refresh/`, {
+    const url = `${AUTH_SERVICE}/api/v1/auth/refresh/`;
+    const res = await fetch(url, {
         method: 'POST',
         credentials: 'include', // CRITICAL: This sends the httpOnly refreshToken
+        headers: {
+            'Content-Type': 'application/json',
+        },
     });
+    
+    if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Token refresh failed: ${res.status} ${errorText}`);
+    }
+    
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+        return res.json();
+    }
+    throw new Error('Invalid response from refresh endpoint');
 };
 
 export const getCookie = (name: string): string | null => {
@@ -338,14 +348,14 @@ useEffect(() => {
     isTokenValid,
   }), [accessToken, isLoggedIn, isReady, logout, isTokenValid]);
 
-  if (!isReady) {
-    return (
-      <div className="text-center text-blue-500 flex flex-col items-center justify-center mt-50">
-        Checking Authentication...
-        <BounceLoader className='relative top-10' size={70} color={theme === 'dark' ? '#0F172B' : '#779dffff'} speedMultiplier={2} />
-      </div>
-    );
-  }
+  // if (!isReady) {
+  //   return (
+  //     <div className="text-center text-blue-500 flex flex-col items-center justify-center mt-50">
+  //       Checking Authentication...
+  //       <BounceLoader className='relative top-10' size={70} color={theme === 'dark' ? '#0F172B' : '#779dffff'} speedMultiplier={2} />
+  //     </div>
+  //   );
+  // }
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 };

@@ -36,7 +36,7 @@ export default function TransactionCard({ pageClass }: TransactionCardProps) {
   const isDashboard = path.includes('dashboard');
   // const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction|null>(null);
-  console.log("value of transactions:", transactions);
+  // console.log("value of transactions:", transactions);
 
   const redirectingToEdit =()=>{
     console.log("taking to edit page...");

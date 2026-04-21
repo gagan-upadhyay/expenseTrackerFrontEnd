@@ -43,7 +43,7 @@ export default function PayablesReceiptsCard() {
     ) ?? [];
   }, [transactions]);
 
-  console.log(`Value of Payable:${payables}`);
+  // console.log(`Value of Payable:${payables}`);
 
   const recentReceipts = useMemo(() => 
     transactions?.filter(t => t.reference !== null) ?? [], 

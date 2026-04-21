@@ -2,7 +2,7 @@ import apiFetch from "../utils/apiClient";
 import { Account, AccountTotals, CardDetails, fetchedCardsDetails } from "../utils/definitions";
 
 const ACCOUNT_SERVICE=process.env.NEXT_PUBLIC_ACCOUNT_SERVICE;
-console.log(`Value of ACCOUNT_SERVICE: ${ACCOUNT_SERVICE} from accountService.ts file`);
+// console.log(`Value of ACCOUNT_SERVICE: ${ACCOUNT_SERVICE} from accountService.ts file`);
 
 export async function getAccounts(): Promise<Account[]>{
     if(!ACCOUNT_SERVICE) throw new Error('Missing NEXT_PUBLIC_ACCOUNT_SERVICE');
@@ -11,7 +11,7 @@ export async function getAccounts(): Promise<Account[]>{
         credentials:'include',
     });
     const data = await res.json();
-    console.log('value of data that should be accounts:', data);
+    // console.log('value of data that should be accounts:', data);
     if(!res.ok) throw new Error(data?.message|| 'Failed to fetch accounts');
     // console.log("Value of data fetched:\n",data);
     return Array.isArray(data?.result)?data.result:data;
@@ -114,7 +114,7 @@ export async function getAccountByUser(args: string): Promise<GetAccountByuserRe
         // Parse bodies immediately to avoid "body already used" errors
         const accountData = resAcc.ok ? await resAcc.json() : null;
         const cardData = resCards.ok ? await resCards.json() : null;
-        console.log('Value of accoutnData:', accountData);
+        // console.log('Value of accoutnData:', accountData);
         let accountErrMsg = null;
         let cardsErrMsg = null;
 
@@ -217,9 +217,9 @@ export async function CreateAccountWithCards(
     
     // 1. create account
     const account = await createAccount(accountPayload);
-    console.log('Value of account:', account);
+    // console.log('Value of account:', account);
     const accountId = account.id;
-    console.log(`value of accountId: ${accountId}`);
+    // console.log(`value of accountId: ${accountId}`);
     
     if(!accountId){
         throw new Error("Account created but no ID was returned to save and link cards");
