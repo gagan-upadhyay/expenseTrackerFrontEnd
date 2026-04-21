@@ -149,6 +149,7 @@
 importScripts('https://googleapis.com');
 
 if (workbox) {
+  console.log('Workbox is loaded! 🎉');
   const { precaching, routing, strategies, expiration } = workbox;
 
   const OFFLINE_URL = '/offline.html';
@@ -220,6 +221,8 @@ if (workbox) {
       ],
     })
   );
+}else{
+  console.log('Workbox failed to load.');
 }
 
 // --- Standard Event Listeners (Keep these as they are) ---
