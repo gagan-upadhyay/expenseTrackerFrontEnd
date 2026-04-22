@@ -10,13 +10,24 @@ import { MdOutlineAccountBalance } from "react-icons/md";
 
 export const SIDEBAR_SECTIONS = [
   {
+    label: "Main",
     items: [
       { name: "Dashboard", href: "/dashboard", icon: Squares2X2Icon },
       { name: "Wallet", href: "/wallet", icon: WalletIcon },
       { name: "Account", href: "/account", icon: MdOutlineAccountBalance },
+    ],
+  },
+  {
+    label: "Transactions",
+    items: [
       { name: "Transactions", href: "/transactions", icon: Square3Stack3DIcon },
-      { name: "Revenue Analytics", href: "/revenue-analytics", icon: ChartPieIcon },
+      { name: "Analytics", href: "/revenue-analytics", icon: ChartPieIcon },
       { name: "Search", href: "/search", icon: MagnifyingGlassCircleIcon },
+    ],
+  },
+  {
+    label: "Settings",
+    items: [
       { name: "Settings", href: "/dashboard/user/settings", icon: Cog6ToothIcon },
     ],
   },

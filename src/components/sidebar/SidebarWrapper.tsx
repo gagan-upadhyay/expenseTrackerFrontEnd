@@ -8,6 +8,7 @@ import UserProfile from "./userProfile";
 import { useSidebar } from "@/src/context/sidebarContext";
 import { useIsMobile } from "@/src/Hooks/useIsMobile";
 import SideBarActions from "./sideBarActions";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 
 export default function Sidebar() {
   const { collapsed } = useSidebar();
@@ -19,77 +20,109 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile Toggle */}
+      {/* Mobile Toggle Button */}
       {isMobile && !open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed top-4 glass left-4 z-50 rounded-md bg-black text-white px-3 py-2"
+          className={clsx(
+            "fixed top-4 left-4 z-50 rounded-lg p-2",
+            "bg-slate-100 dark:bg-slate-800",
+            "text-slate-900 dark:text-white",
+            "hover:bg-slate-200 dark:hover:bg-slate-700",
+            "transition-all duration-200",
+            "focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          )}
+          aria-label="Open sidebar"
         >
-          ☰
+          <Bars3Icon className="w-6 h-6" />
         </button>
       )}
 
-      {/* Overlay */}
+      {/* Mobile Overlay */}
       {isMobile && open && (
-        <div
+        <button
           onClick={() => setOpen(false)}
-          className="fixed inset-0 bg-black/40 z-40"
+          className="fixed inset-0 bg-black/30 dark:bg-black/50 z-40 transition-colors duration-200"
+          aria-label="Close sidebar"
         />
       )}
 
+      {/* Sidebar */}
       <aside
         className={clsx(
-          "fixed top-0 left-0  z-50 h-screen flex flex-col border-r",
+          "fixed top-0 left-0 z-50 h-screen flex flex-col",
+          "border-r border-slate-200 dark:border-slate-700",
           "transition-all duration-300 ease-in-out",
           "bg-white dark:bg-slate-900",
-          expanded ? "w-64" : "w-20 overflow-x-hidden",
+          expanded ? "w-64" : "w-20",
           isMobile
             ? open
-              ? "translate-x-0"
+              ? "translate-x-0 shadow-xl"
               : "-translate-x-full"
             : "translate-x-0"
         )}
       >
-  
+        {/* Close Button - Mobile Only */}
+        {isMobile && open && (
+          <button
+            onClick={() => setOpen(false)}
+            className={clsx(
+              "absolute top-4 right-4 z-60 rounded-lg p-2",
+              "text-slate-900 dark:text-white",
+              "hover:bg-slate-100 dark:hover:bg-slate-800",
+              "transition-all duration-200",
+              "focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            )}
+            aria-label="Close sidebar"
+          >
+            <XMarkIcon className="w-6 h-6" />
+          </button>
+        )}
 
-          <div className="flex flex-col  glass overflow-y-auto h-full">
-  
-            {/* TOP */}
-            <div className="flex flex-col">
-              {/* HEADER */}
-              <div className="flex md:flex-col transition-all duration-500 items-center gap-2 p-4">
-                <div className="h-10 transition-all duration-500 w-10 bg-indigo-500 text-white flex items-center justify-center rounded-lg font-bold">
-                  ET
-                </div>
-                
-
-                <div
-                  className={clsx(
-                    "text-center transition-all duration-300",
-                    expanded ? "opacity-100" : "opacity-0 h-0 overflow-hidden"
-                  )}
-                >
-                  <p className="font-bold text-white text-sm">Expense Tracker</p>
-                </div>
-              </div>
-
-              <UserProfile />
-
-              {SIDEBAR_SECTIONS.map((section, idx) => (
-                <SidebarSection
-                  key={idx}
-                  section={section}
-                  expanded={expanded}
-                />
-              ))}
+        {/* Sidebar Content */}
+        <div className="flex flex-col overflow-y-auto h-full">
+          {/* Header */}
+          <div className="flex md:flex-col transition-all duration-500 items-center gap-2 p-4 border-b border-slate-200 dark:border-slate-700">
+            <div className={clsx(
+              "h-10 w-10 rounded-lg",
+              "bg-gradient-to-br from-indigo-500 to-indigo-600",
+              "text-white flex items-center justify-center",
+              "font-bold text-sm",
+              "flex-shrink-0"
+            )}>
+              ET
             </div>
 
-            {/* 🔥 BOTTOM (IMPORTANT FIX) */}
-            <div className="p-2 border-t dark:border-white/10">
-              <SideBarActions expanded={expanded} />
+            <div
+              className={clsx(
+                "text-center transition-all duration-300",
+                expanded ? "opacity-100" : "opacity-0 h-0 overflow-hidden"
+              )}
+            >
+              <p className="font-bold text-slate-900 dark:text-white text-sm">Expense Tracker</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Smart Finance</p>
             </div>
           </div>
-        
+
+          {/* User Profile */}
+          <UserProfile expanded={expanded} />
+
+          {/* Navigation Sections */}
+          <div className="flex-1 flex flex-col gap-2 py-4 overflow-y-auto">
+            {SIDEBAR_SECTIONS.map((section, idx) => (
+              <SidebarSection
+                key={idx}
+                section={section}
+                expanded={expanded}
+              />
+            ))}
+          </div>
+
+          {/* Actions - Bottom */}
+          <div className="border-t border-slate-200 dark:border-slate-700 p-3">
+            <SideBarActions expanded={expanded} />
+          </div>
+        </div>
       </aside>
     </>
   );
