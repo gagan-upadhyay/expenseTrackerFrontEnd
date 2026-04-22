@@ -2,10 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0F172B">
     <title>Offline - Expense Tracker</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        html, body {
+            height: 100%;
+            width: 100%;
+        }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #f3f4f6;
@@ -14,25 +26,77 @@
             justify-content: center;
             min-height: 100vh;
             padding: 20px;
+            /* iPhone safe area */
+            padding-top: max(20px, env(safe-area-inset-top));
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
+            padding-left: max(20px, env(safe-area-inset-left));
+            padding-right: max(20px, env(safe-area-inset-right));
         }
+        
         .offline-container {
             background: white;
-            border-radius: 8px;
+            border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             padding: 40px;
             text-align: center;
             max-width: 500px;
+            width: 100%;
         }
-        h1 { font-size: 28px; color: #1f2937; margin-bottom: 10px; }
-        p { font-size: 16px; color: #6b7280; line-height: 1.6; margin-bottom: 20px; }
+        
+        .offline-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        h1 { 
+            font-size: 28px; 
+            color: #1f2937; 
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        p { 
+            font-size: 16px; 
+            color: #6b7280; 
+            line-height: 1.6; 
+            margin-bottom: 20px;
+        }
+        
         .status {
             padding: 15px;
             background: #fef3c7;
             border: 1px solid #fcd34d;
-            border-radius: 6px;
+            border-radius: 8px;
             margin: 20px 0;
             color: #92400e;
+            font-size: 14px;
         }
+        
+        .status strong {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .cached-info {
+            padding: 12px;
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            border-radius: 4px;
+            margin: 15px 0;
+            color: #1e40af;
+            font-size: 14px;
+            text-align: left;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
         button {
             background: #3b82f6;
             color: white;
@@ -41,18 +105,172 @@
             border-radius: 6px;
             font-size: 16px;
             cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s ease;
         }
-        button:hover { background: #2563eb; }
+        
+        button:hover { 
+            background: #2563eb; 
+        }
+        
+        button:active {
+            background: #1d4ed8;
+        }
+        
+        .button-secondary {
+            background: #e5e7eb;
+            color: #1f2937;
+        }
+        
+        .button-secondary:hover {
+            background: #d1d5db;
+        }
+        
+        .offline-tips {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 8px;
+            text-align: left;
+        }
+        
+        .offline-tips h3 {
+            font-size: 14px;
+            color: #1f2937;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        
+        .offline-tips ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .offline-tips li {
+            font-size: 13px;
+            color: #6b7280;
+            padding: 6px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .offline-tips li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: #1f2937;
+            }
+            
+            .offline-container {
+                background: #111827;
+            }
+            
+            h1 {
+                color: #f3f4f6;
+            }
+            
+            p {
+                color: #9ca3af;
+            }
+            
+            .status {
+                background: #78350f;
+                border-color: #b45309;
+                color: #fef3c7;
+            }
+            
+            .cached-info {
+                background: #1e3a8a;
+                border-left-color: #60a5fa;
+                color: #bfdbfe;
+            }
+            
+            .button-secondary {
+                background: #374151;
+                color: #f3f4f6;
+            }
+            
+            .button-secondary:hover {
+                background: #4b5563;
+            }
+            
+            .offline-tips {
+                background: #1f2937;
+            }
+            
+            .offline-tips h3 {
+                color: #f3f4f6;
+            }
+            
+            .offline-tips li {
+                color: #d1d5db;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="offline-container">
+        <div class="offline-icon">📡</div>
         <h1>You're Offline</h1>
-        <p>It looks like you've lost your internet connection. Some features may be unavailable.</p>
+        <p>It looks like you've lost your internet connection. However, you can still view cached data.</p>
+        
         <div class="status">
-            <strong>Cached data available:</strong> You can view previously loaded pages and transactions.
+            <strong>Connected: <span id="online-status">No</span></strong>
+            <span id="status-message">Your device is offline. Reconnecting...</span>
         </div>
-        <button onclick="location.reload()">Try Again</button>
+        
+        <div class="cached-info">
+            <strong>💾 Cached Data Available:</strong>
+            <p>You can view previously loaded pages, transactions, and accounts while offline.</p>
+        </div>
+        
+        <div class="offline-tips">
+            <h3>What you can do offline:</h3>
+            <ul>
+                <li>View your dashboard and transaction history</li>
+                <li>Check your accounts and balances</li>
+                <li>View saved receipts and transaction details</li>
+                <li>Review your spending analytics</li>
+            </ul>
+        </div>
+        
+        <div class="button-group">
+            <button onclick="location.reload()">Try Again</button>
+            <button class="button-secondary" onclick="goToDashboard()">View Cached Data</button>
+        </div>
     </div>
+    
+    <script>
+        // Check online status
+        const updateStatus = () => {
+            const isOnline = navigator.onLine;
+            document.getElementById('online-status').textContent = isOnline ? 'Yes ✓' : 'No ✗';
+            document.getElementById('status-message').textContent = isOnline 
+                ? 'Your connection has been restored!' 
+                : 'Your device is offline. Reconnecting...';
+            
+            if (isOnline) {
+                setTimeout(() => location.reload(), 1500);
+            }
+        };
+        
+        // Listen for online/offline events
+        window.addEventListener('online', updateStatus);
+        window.addEventListener('offline', updateStatus);
+        
+        // Initial check
+        updateStatus();
+        
+        // Navigate to dashboard (uses cached version)
+        function goToDashboard() {
+            window.location.href = '/dashboard';
+        }
+    </script>
 </body>
 </html>
