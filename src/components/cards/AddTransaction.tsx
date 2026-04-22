@@ -72,15 +72,42 @@ export default function AddTransactionCard() {
   const selectedAccount = accounts?.find(acc=>String(acc.id)===String(form.accountId));
   const remainingBalance = selectedAccount?Number(selectedAccount.remaining_balance):Number(0);
 
-  const handleAmountChange=(e:React.ChangeEvent<HTMLInputElement>)=>{
-    const val = e.target.value;
-    setForm({...form, amount:val});
-    if(val && Number(val)>remainingBalance){
-      if(form.type==='debit') setAmountError(true)
-    }else{
+  // const handleAmountChange=(e:React.ChangeEvent<HTMLInputElement>)=>{
+  //   const val = e.target.value;
+  //   setForm({...form, amount:val});
+  //   if(val && Number(val)>remainingBalance){
+  //     if(form.type==='debit') setAmountError(true)
+  //   }else{
+  //     setAmountError(false);
+  //   }
+  // }
+    // 1. Helper to format display (Handles INR/USD etc.)
+  const getFormattedDisplay = (value: string) => {
+    if (!value) return "";
+    const currency = selectedAccount?.currency_code || 'INR';
+    const parts = value.split(".");
+    const formattedInt = new Intl.NumberFormat(currency === 'INR' ? 'en-IN' : 'en-US').format(Number(parts[0]));
+    return parts.length > 1 ? `${formattedInt}.${parts[1]}` : formattedInt;
+  };
+
+  // 2. Updated Handler
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Strip commas and non-numeric chars (except decimal)
+    const rawVal = e.target.value.replace(/,/g, "");
+    
+    // Validation: Only allow digits and one decimal point
+    if (rawVal !== "" && !/^\d*\.?\d*$/.test(rawVal)) return;
+
+    setForm({ ...form, amount: rawVal });
+
+    // Validation against balance
+    if (rawVal && Number(rawVal) > remainingBalance) {
+      if (form.type === 'debit') setAmountError(true);
+    } else {
       setAmountError(false);
     }
-  }
+  };
+
 
   useEffect(() => {
     if (success) {
@@ -232,7 +259,8 @@ export default function AddTransactionCard() {
               <input required
               placeholder="Display name"
               className="glass px-4 py-3 rounded-2xl w-full text-sm text-white outline-none"
-                value={form.displayName} onChange={(e) => setForm({ ...form, displayName: e.target.value })}
+              value={form.displayName} 
+              onChange={(e) => setForm({ ...form, displayName: e.target.value })}
               />
             </div>
 
@@ -242,13 +270,19 @@ export default function AddTransactionCard() {
                </label>
               <input
                 required
-                type="number"
+                type="text"
+                inputMode="decimal"
                 placeholder="0.00"
                 step="any"
-                className={`glass px-4 py-2 rounded-2xl w-full text-lg font-semibold outline-none transition-all 
-                ${AmountError ? 'border-red-500 border-2 animate-shake bg-red-500/5' : 'focus:border-white/40'} 
-                placeholder:text-white/20`}
-                value={form.amount}
+                className=
+                // {`glass px-4 py-2 rounded-2xl w-full text-lg font-semibold outline-none transition-all 
+                // ${AmountError ? 'border-red-500 border-2 animate-shake bg-red-500/5' : 'focus:border-white/40'} 
+                // placeholder:text-white/20`}
+                {clsx(
+                  "glass px-4 py-3 rounded-2xl w-full text-lg font-semibold outline-none transition-all placeholder:text-white/20",
+                  AmountError ? 'border-red-500 border-2 animate-shake bg-red-500/5' : 'focus:border-white/40'
+                )}
+                value={getFormattedDisplay(form.amount)}
                 onChange={handleAmountChange}
               />
                 {AmountError && (

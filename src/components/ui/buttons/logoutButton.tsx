@@ -2,11 +2,10 @@
 import { useAuth } from "@/src/context/authContext";
 import { ArrowRightEndOnRectangleIcon } from "@heroicons/react/24/outline";
 import {useRouter } from "next/navigation";
-import { ToastContainer } from "react-toastify";
-import { toastShowLoading, toastShowSuccess } from "@/src/utils/toastUtils";
+import { useState } from "react";
+import clsx from "clsx";
 import { logoutUser } from "@/src/services/authService";
 import getLogger from "@/src/services/logger-service";
-import clsx from "clsx";
 
 interface ButtonProps{
     className?: string;
@@ -15,47 +14,60 @@ interface ButtonProps{
 export default function LogoutButton({className}: ButtonProps){
     const {isLoggedIn, logout} = useAuth();
     const router = useRouter();
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
 
     const handleLogout = async()=>{
         try{
+            setIsLoggingOut(true);
             const response:{success:boolean, message:string} = await logoutUser() as {success:boolean, message:string};
 
             if(response.success){
                 logout(); //frontend state + cookies
+                await new Promise(res => setTimeout(res, 500)); // Brief delay for UI feedback
                 router.replace('/');
             }
         } catch (err) {
             const logger = getLogger('logoutButton');
             logger.error('Error during logout', err);
+            setIsLoggingOut(false);
         }
     }
 
     return(
-        <>
-            <button 
-                onClick={()=>{
-                    const toastID = toastShowLoading('Logging Out...');
-                    if(isLoggedIn){
-                        setTimeout(()=>{
-                            handleLogout();
-                            toastShowSuccess("Logged out Successfully", Number(600), String(toastID));
-                        }, 600);
-                    }else{
-                        router.replace('/auth/login')
-                    }
-                }}
-                className={clsx(
-                    "flex items-center gap-2 transition-colors duration-200",
-                    "focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded",
-                    className
-                )}
-                aria-label="Logout from account"
-                type="button"
-            >
-                <ArrowRightEndOnRectangleIcon className="w-5 h-5" />
-                <span className="hidden sm:inline text-sm">Logout</span>
-            </button>
-            <ToastContainer/>
-        </>
+        <button 
+            onClick={()=>{
+                if(isLoggedIn){
+                    handleLogout();
+                }else{
+                    router.replace('/auth/login')
+                }
+            }}
+            disabled={isLoggingOut}
+            className={clsx(
+                "flex items-center gap-2 transition-all duration-200",
+                "focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded",
+                isLoggingOut && "opacity-60 cursor-wait",
+                className
+            )}
+            aria-label="Logout from account"
+            aria-busy={isLoggingOut}
+            type="button"
+        >
+            {isLoggingOut ? (
+                <>
+                    <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    <span className="hidden sm:inline text-sm">Logging out...</span>
+                </>
+            ) : (
+                <>
+                    <ArrowRightEndOnRectangleIcon className="w-5 h-5" />
+                    <span className="hidden sm:inline text-sm">Logout</span>
+                </>
+            )}
+        </button>
     )
 }
+// }

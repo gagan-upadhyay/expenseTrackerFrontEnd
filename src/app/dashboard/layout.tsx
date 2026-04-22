@@ -1,6 +1,6 @@
 import React from "react";
 import SideBar from "@/src/components/dashboard/Sidebar";
-// import ToggleTheme from "@/src/components/dashboard/ToggleTheme";
+import DashboardNavbar from "@/src/components/navbar/dashboardNavbar";
 import { UserProvider } from "@/src/context/userContext";
 import ThemeSync from "@/src/components/dashboard/ThemeSync";
 import { AccountProvider } from "@/src/context/accountContext";
@@ -16,15 +16,21 @@ export default function DashBoardLayout({children}: {children:React.ReactNode}){
                 <TransactionProvider>
                     <ThemeSync/>
                     <SidebarProvider>
-                        <div className="flex h-full flex-col sm:flex-row sm:overflow-hidden">
-                            
-                            {/* <div className="flex-grow p-6 sm:p-12 sm:overflow-y-auto"> */}
+                        {/* Navbar for Desktop (lg screens and up) */}
+                        <div className="hidden lg:block">
+                            <DashboardNavbar />
+                        </div>
+
+                        {/* Sidebar for Mobile & Tablet */}
+                        <div className="flex h-screen flex-col lg:flex-row lg:overflow-hidden">
+                            <div className="lg:hidden">
                                 <SideBar/>
-                                <MainContent>
-                                    <Breadcrumbs/>
+                            </div>
+                            
+                            <MainContent>
+                                <Breadcrumbs/>
                                 {children}
-                                </MainContent>
-                            {/* </div> */}
+                            </MainContent>
                         </div>
                     </SidebarProvider>
                 </TransactionProvider>
