@@ -12,7 +12,7 @@ export default function Page() {
 
   return (
     <AuthGuard>
-      <main className="relative p-4 max-w-[1600px] mx-auto min-h-screen">
+      <main className="relative max-w-[1600px] min-h-screen">
         
         {accounts?.length === 0 ? (
           <div className="h-[80vh] glass backdrop-blur-md rounded-[2.5rem] w-full flex flex-col justify-center items-center border border-white/10 shadow-2xl">
@@ -26,8 +26,8 @@ export default function Page() {
           </div>
         ) : (
           <>
-            <div className="flex items-center justify-between mb-8 mt-4">
-               <h1 className={`${lusitana.className} font-bold text-2xl md:text-3xl tracking-tight`}>
+            <div className="flex items-center justify-between">
+               <h1 className={`${lusitana.className} font-bold text-2xl mb-5 md:text-3xl tracking-tight`}>
                   Dashboard<span className="text-indigo-500">.</span>
                </h1>
             </div>

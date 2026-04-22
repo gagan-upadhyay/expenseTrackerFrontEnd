@@ -271,3 +271,6 @@ input[type=number] {
   background-size: 40px 40px;
 }
 
+.mask-fade {
+  mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+}

@@ -64,7 +64,7 @@ export const UserProvider=({children}:{children:React.ReactNode})=>{
                     setUser({...userData,
                         profile_picture:userData.profile_picture && userData.profile_picture.startsWith("http")?userData.profile_picture:null,
                     });
-                    console.log('Value of user data:', userData);
+                    // console.log('Value of user data:', userData);
                     if(userData?.theme === 'light' || userData?.theme === 'dark'){
                         setUserTheme(userData.theme);
                     }

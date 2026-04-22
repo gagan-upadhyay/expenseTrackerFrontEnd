@@ -16,7 +16,7 @@ export default function DashBoardLayout({children}: {children:React.ReactNode}){
                 <TransactionProvider>
                     <ThemeSync/>
                     <SidebarProvider>
-                        <div className="flex h-screen flex-col sm:flex-row sm:overflow-hidden">
+                        <div className="flex h-full flex-col sm:flex-row sm:overflow-hidden">
                             
                             {/* <div className="flex-grow p-6 sm:p-12 sm:overflow-y-auto"> */}
                                 <SideBar/>

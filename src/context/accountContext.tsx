@@ -27,7 +27,7 @@ export const AccountProvider=({ children}:{ children:React.ReactNode }) => {
             const data = await getAccountByUser(`?base_currency=${baseCurrency}`);
             
             if(data?.account){
-                console.log("value of data.account", data);
+                // console.log("value of data.account", data);
             setTotals(data?.totals ?? null);
             setAccounts(data?.account ?? undefined);
             }

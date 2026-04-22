@@ -279,7 +279,7 @@ export default function LoginForm() {
     <form
       onSubmit={handleLogin}
       ref={formRef}
-      className="glass glass-hover relative w-full px-6 py-10 rounded-[2rem] border border-white/20 shadow-2xl transition-all duration-500"
+      className="glass glass-hover relative w-full px-6 py-10 rounded-2xl border border-white/20 shadow-2xl transition-all duration-500"
     >
       {/* Visual Accents */}
       <div className="glow-indigo -top-12 -right-12 opacity-30" />

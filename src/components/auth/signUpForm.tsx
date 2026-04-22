@@ -11,23 +11,42 @@ import {jwtDecode} from 'jwt-decode'
 import { toastShowError, toastShowSuccess } from "@/src/utils/toastUtils";
 import clsx from "clsx";
 import { getPasswordStrength } from "@/src/utils/passwordStrength";
+import { gsap } from "gsap";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 
 export default function RegisterForm(){
-    const nameRef = useRef<HTMLInputElement>(null);
-    const AUTH_SERVICE = process.env.NEXT_PUBLIC_AUTH_SERVICE;
-    const [firstName, setFirstName] = useState<string>("");
-    const [lastName, setLastName] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
-    const [email, setEmail] = useState<string>("");
-    const [success, setSuccess] = useState<boolean|null>(null);
-    const [error, setError] = useState<string|null>(null);
-
-    const router = useRouter();
+  const nameRef = useRef<HTMLInputElement>(null);
+  const AUTH_SERVICE = process.env.NEXT_PUBLIC_AUTH_SERVICE;
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [success, setSuccess] = useState<boolean|null>(null);
+  const [error, setError] = useState<string|null>(null);
+  const [eyeOpen, setEyeOpen] = useState<boolean>(false);
     
-    const strength = getPasswordStrength(password);
+  //refs here
+  const firstNameRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
-    const {accessToken, setAccessToken} = useAuth();
+  const router = useRouter();
+    
+  const strength = getPasswordStrength(password);
+
+  const {accessToken, setAccessToken} = useAuth();
+
+  // initial focus and gsap animation
+  useEffect(()=>{
+    if(firstNameRef.current) firstNameRef.current.focus();
+    if(!formRef.current) return;
+
+    gsap.fromTo(
+      formRef.current,
+      {opacity:0, y:40, scale:0.95},
+      {opacity:1, y:0, scale:1, duration:0.6, ease:"power3.out"}
+    )
+  },[]);
 
     useEffect(() => {
         const token = document.cookie
@@ -171,14 +190,18 @@ export default function RegisterForm(){
     // )
 
   return (
-    <div className="relative group">
-      {/* Outer Border Glow */}
-      <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+    // <div className="relative group">
+    //   {/* Outer Border Glow */}
+    //   {/* <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div> */}
       
       <form
+      ref={formRef}
         onSubmit={handleRegister}
-        className="glass relative w-full px-8 py-10 rounded-2xl border border-white/10 shadow-2xl flex flex-col gap-6"
+        className="glass relative w-full px-8 py-10 rounded-2xl border border-white/10 shadow-2xl flex flex-col gap-6 transition-all duration-500"
       >
+              {/* Visual Accents */}
+      <div className="glow-indigo -top-12 -right-12 opacity-30" />
+      <div className="glow-purple -bottom-12 -left-12 opacity-30" />
         <div className="text-center">
           <h1 className="text-2xl font-black uppercase tracking-[0.2em] text-white opacity-90">
             Create Account
@@ -194,6 +217,7 @@ export default function RegisterForm(){
             <div className="space-y-1">
               <label className="text-[10px] font-black uppercase text-white/30 ml-1">First Name</label>
               <input
+                ref={firstNameRef}
                 required
                 placeholder="John"
                 onChange={(e) => setFirstName(e.target.value)}
@@ -227,12 +251,21 @@ export default function RegisterForm(){
           <div className="space-y-1">
             <label className="text-[10px] font-black uppercase text-white/30 ml-1">Secure Password</label>
             <input
-              type="password"
+              type={eyeOpen?"text":"password"}
               required
               placeholder="••••••••"
               onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-white/5 border border-white/10 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-indigo-500/50 transition-all"
             />
+            {password && (
+              <button
+                type="button"
+                onClick={() => setEyeOpen(!eyeOpen)}
+                className="absolute right-10 top-81 hover:opacity-100 transition-opacity opacity-50"
+              >
+                {eyeOpen ? <EyeIcon className="w-5 h-5" /> : <EyeSlashIcon className="w-5 h-5" />}
+              </button>
+            )}
             {password && (
               <div className="px-1 pt-2">
                 <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
@@ -255,7 +288,7 @@ export default function RegisterForm(){
           </Link>
         </p>
       </form>
-    </div>
+    // </div>
   );
 // }
 

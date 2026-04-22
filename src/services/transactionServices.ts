@@ -47,7 +47,7 @@ export async function fetchAllTransactions(queryString: string = ""): Promise<Tr
         });
 
         const result = await safeParseJsonResult(res, TransactionsSchema);
-        console.log('value of result:', result);
+        // console.log('value of result:', result);
 
         if (result.ok) {
             return result?.data;

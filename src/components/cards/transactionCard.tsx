@@ -80,7 +80,7 @@ export default function TransactionCard({ pageClass }: TransactionCardProps) {
         {!isDashboard && (
           <Button 
             href="/transactions/add" 
-            className="glass-hover  z-40 !rounded-xl md:!rounded-xl !p-2 md:!py-1.5 md:!px-4 !text-xs font-bold uppercase tracking-wider flex items-center justify-center"
+            className="glass-hover z-40 !rounded-xl md:!rounded-xl !p-2 md:!py-1.5 md:!px-4 !text-xs font-bold uppercase tracking-wider flex items-center justify-center"
           >
             {/* Shown only on Mobile */}
             <PlusIcon className="w-5 h-5 md:hidden" />

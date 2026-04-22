@@ -49,13 +49,13 @@ export function PWARegister() {
       setShowInstallBanner(true);
       setDismissedInstall(false);
 
-      // Auto-hide after 4 seconds if not dismissed
+      // Auto-hide after 10 seconds if not dismissed
       if (autoHideTimer.current) clearTimeout(autoHideTimer.current);
       autoHideTimer.current = setTimeout(() => {
         if (mounted) {
           setShowInstallBanner(false);
         }
-      }, 4000);
+      }, 10000);
     };
 
     let mounted = true;

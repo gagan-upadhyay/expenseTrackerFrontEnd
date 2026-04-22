@@ -44,7 +44,7 @@ export default function CardWrapper({ title }: CardProps) {
       ) : title === 'Wallet' ? (
         <WalletCard parentClass={parentClass} />
       ) : title === 'Transactions' ? (
-        <TransactionCard pageClass="h-full max-h-[500px] overflow-y-auto scrollbar-hide" />
+        <TransactionCard pageClass="h-full overflow-hidden no-scrollbar max-h-[500px]" />
       ) : title === 'Monthly Spent' ? (
         <ExpenseChart />
       ) : title === 'Savings' ? (

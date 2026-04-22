@@ -48,7 +48,7 @@ export default function NavLinks(){
             
             {shouldShowButton && isLoggedIn && (
                 <LogoutButton
-                    isClass={classNames(theme==='light'?{'text-gray-500':true,'hover:text-gray-800 transition-colors duration-200': true}:
+                    className={classNames(theme==='light'?{'text-gray-500':true,'hover:text-gray-800 transition-colors duration-200': true}:
                         {
                             'text-neutral-300':true,
                             'hover:text-neutral-800 transition-colors duration-200':true,

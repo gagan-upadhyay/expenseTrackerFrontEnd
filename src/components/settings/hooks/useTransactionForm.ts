@@ -100,9 +100,11 @@ import { useState, useEffect, FormEvent, ChangeEvent } from "react";
 import { saveOneTransaction, uploadTransactionReceipt } from "@/src/services/transactionServices";
 import { toastShowError, toastShowSuccess } from "@/src/utils/toastUtils";
 import { useTransactions } from "@/src/context/transactionContext";
+import { useAccounts } from "@/src/context/accountContext";
 
 export function useTransactionForm() {
   const { fetchTransactions } = useTransactions();
+  const {refreshAccounts} = useAccounts();
   const today = new Date().toISOString().split('T')[0];
 
   const [form, setForm] = useState({
@@ -169,7 +171,7 @@ export function useTransactionForm() {
       );
 
       if (typeof data === 'string') {
-        await fetchTransactions();
+        await Promise.all([fetchTransactions(), refreshAccounts()]);
         setSuccess(true);
         toastShowSuccess(data, 1000);
         // Reset Form
@@ -185,6 +187,8 @@ export function useTransactionForm() {
           isPayable:true,
         });
         setPreview(null);
+        
+        
       } else {
         throw new Error("Failed to save transaction");
       }

@@ -12,6 +12,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import ShakingDeleteButton from "../ui/buttons/DeleteButton";
 import { Button } from "../ui/buttons/buttons";
 import { useFileUpload } from "../settings/hooks/useFileUploads";
+import { getCurrencySymbol } from "@/src/utils/getCurrencySymbol";
+import { formatCurrency } from "@/src/utils/currencyFormatter";
 
 export default function AddTransactionCard() {
   const { transactions } = useTransactions();
@@ -179,7 +181,7 @@ export default function AddTransactionCard() {
               <option value="" className="text-black">Choose account...</option>
               {accounts?.map((acc) => (
                 <option key={acc.id} value={acc.id} className="text-black">
-                  {acc.account_type.toUpperCase()} — {acc.currency_code} ({acc.remaining_balance})
+                  {acc.account_type.toUpperCase()}: {getCurrencySymbol(acc.currency_code)}{formatCurrency(Number(acc.remaining_balance), acc.currency_code)}
                 </option>
               ))}
             </select>
