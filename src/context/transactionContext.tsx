@@ -106,6 +106,7 @@ export const TransactionProvider = ({ children }: { children: React.ReactNode })
 
         try {
             console.log("4. Checks passed. Sending PATCH to backend...");
+            console.log('Value of transactionIdL', transac)
             const res:{success:boolean, error:null|string, message:string|null} = await updateTransactionApiService(transactionId, payload) as {success:boolean, error:null|string, message:string|null};
             console.log("Value of res:", res);
             if (res.success) {

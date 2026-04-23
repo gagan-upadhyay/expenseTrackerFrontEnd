@@ -119,125 +119,74 @@ export default function PayablesReceiptsCard() {
       </div>
 
       {/* ================= RECEIPTS ================= */}
-      {/* BOTTOM SECTION: RECEIPTS (Category Grouped) */}
-<div className="flex flex-col min-h-0 border-t border-white/10 pt-4">
-  
-  {/* HEADER */}
-  <div className="flex items-center justify-between mb-3 px-1">
-    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 flex items-center gap-2">
-      <PhotoIcon className="w-4 h-4" /> Receipt Gallery
-    </h4>
-  </div>
-
-  {/* ---------------- LOGIC ---------------- */}
-
-  {/* GROUP RECEIPTS */}
-  {(() => {
-    if (!transactions) {
-      // 🔥 SKELETON STATE
-      return (
-        <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div
-              key={i}
-              className="aspect-square rounded-xl bg-white/5 animate-pulse"
-            />
-          ))}
+      <div className="flex flex-col min-h-0 border-t border-white/10 pt-4">
+        <div className="flex items-center justify-between mb-3 px-1">
+          <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 flex items-center gap-2">
+            <PhotoIcon className="w-4 h-4" /> Receipt Gallery
+          </h4>
         </div>
-      );
-    }
 
-    const groupedReceipts = transactions
-      .filter(t => t.reference && t.reference.trim() !== "")
-      .reduce((acc: Record<string, Transaction[]>, tx) => {
-        const category = tx.category_code || "others";
+        <div className="overflow-y-auto no-scrollbar grid md:grid-cols-4 grid-cols-3 gap-2 pr-1 pb-4 h-[290px] mask-fade-bottom">
 
-        if (!acc[category]) acc[category] = [];
-        acc[category].push(tx);
-
-        return acc;
-      }, {});
-
-    const getCategoryLabel = (code: string) => {
-      const map: Record<string, string> = {
-        food: "🍔 Food",
-        travel: "✈️ Travel",
-        shopping: "🛍️ Shopping",
-        bills: "💡 Bills",
-        entertainment: "🎬 Fun",
-        others: "📦 Others"
-      };
-
-      return map[code] || `📦 ${code}`;
-    };
-
-    // 🔥 EMPTY STATE
-    if (Object.keys(groupedReceipts).length === 0) {
-      return (
-        <div className="h-40 flex flex-col items-center justify-center space-y-3 glass bg-white/5 border border-dashed border-white/10 rounded-2xl">
-          <p className="text-[10px] font-bold opacity-30">
-            No receipts uploaded yet
-          </p>
-          <Button href="/transactions/add" className="text-xs glass-hover">
-            Upload First Receipt
-          </Button>
-        </div>
-      );
-    }
-
-    // 🔥 CATEGORY GROUPED VIEW
-    return (
-      <div className="overflow-y-auto no-scrollbar space-y-4 pr-1 pb-4 h-[290px] mask-fade-bottom">
-        {Object.entries(groupedReceipts).map(([category, receipts]) => (
-          <div key={category}>
-            
-            {/* CATEGORY HEADER */}
-            <p className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-2 px-1">
-              {getCategoryLabel(category)}
-            </p>
-
-            {/* GRID */}
-            <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
-              {receipts.slice(0, 6).map((receipt) => (
-                <div
-                  key={receipt.id}
-                  className="group relative aspect-square glass rounded-xl overflow-hidden border border-white/10"
-                >
-                  {/* SKELETON LOADER */}
-                  {!loadingImages[receipt.id] && (
-                    <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-transparent via-white/5 to-transparent" />
-                  )}
-
-                  {/* IMAGE */}
-                  <Image
-                    src={receipt.reference!}
-                    alt="Receipt"
-                    fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    className="object-cover opacity-40 group-hover:opacity-100 transition-all duration-500 cursor-pointer"
-                    onClick={() => setSelectedTransaction(receipt)}
-                    onLoad={() =>
-                      setLoadingImages(prev => ({
-                        ...prev,
-                        [receipt.id]: true
-                      }))
-                    }
+          {/* 🔥 RECEIPT SKELETON */}
+              {loading && (
+              <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="aspect-square rounded-xl bg-white/5 animate-pulse border border-white/5"
                   />
+                ))}
+              </div>
+            )}
 
-                  {/* HOVER OVERLAY */}
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-[10px] font-bold transition">
-                    View
-                  </div>
-                </div>
-              ))}
+          {/* ✅ RECEIPTS */}
+          {!loading && recentReceipts.length > 0 && recentReceipts.map((receipt) => (
+            <div key={receipt.id} className="group relative aspect-square glass rounded-xl overflow-hidden border border-white/10">
+              
+              {!loadingImages[receipt.id] && (
+                <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+              )}
+
+              <Image 
+                src={receipt.reference!} 
+                alt="Receipt"
+                fill 
+                className="object-cover opacity-40 group-hover:opacity-100 transition-all duration-500 cursor-pointer"
+                onClick={() => setSelectedTransaction(receipt)}
+                onLoad={()=>setLoadingImages(prev=>({...prev, [receipt.id]:true}))}
+              />
             </div>
-          </div>
-        ))}
-      </div>
-    );
-  })()}
+          ))}
 
-</div>
+          {/* 🔥 EMPTY RECEIPT PLACEHOLDER */}
+          {!loading && recentReceipts.length === 0 && (
+            <div className="col-span-full flex flex-col items-center justify-center h-full space-y-3 glass bg-white/5 border border-dashed border-white/10 rounded-2xl">
+              <PhotoIcon className="w-6 h-6 opacity-20" />
+              <p className="text-[10px] font-bold opacity-30">
+                No receipts uploaded
+              </p>
+              <p className="text-[9px] opacity-20">
+                Attach receipts to transactions to view here
+              </p>
+            </div>
+          )}
+
+        </div>
+      </div>
+
+      {/* ================= MODAL ================= */}
+      <ImagePreviewModal
+        isOpen={!!selectedTransaction} 
+        onEdit={selectedTransaction?.id||''}
+        onClose={() => setSelectedTransaction(null)} 
+        imageUrl={selectedTransaction?.reference || ''} 
+        title={selectedTransaction?.display_name || "Receipt Reference"} 
+        onDelete={selectedTransaction ? 
+          () => handleDeleteReceipt(selectedTransaction.id, selectedTransaction.account_id) : 
+          undefined
+        } 
+      />
     </div>
   );
 }

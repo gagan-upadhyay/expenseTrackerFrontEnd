@@ -72,7 +72,7 @@ export default function EditTransactionPage() {
     }else{
         console.warn('TransactionId not found');
     }
-  }, [params.id, transactions, isInitialized]);
+  }, [params.transactionId, transactions, isInitialized]);
 
   // 2. Handle Submit (Override default handleSubmit for Update logic)
     const handleUpdate = async (e: React.FormEvent) => {
@@ -108,7 +108,7 @@ export default function EditTransactionPage() {
                 occurred_at: new Date(form.occurred_at).toISOString(),
             }
             console.log(`Value of updateData:${updateData}`);
-            const result = await updateTransaction(params.id as string, form.accountId, updateData);
+            const result = await updateTransaction(params.transactionId as string, form.accountId, updateData);
             console.log(`Value of result from page:${result}`);
             setSuccess(true);
             setTimeout(() => router.push('/transactions'), 2000);
