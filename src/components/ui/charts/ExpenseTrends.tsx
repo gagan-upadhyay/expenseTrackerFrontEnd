@@ -98,7 +98,7 @@ export function ExpenseTrendChart(
             <LineChart
               data={chartData}
               syncId="analytics"
-              margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+              margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
             >
               {/* Gradient */}
               <defs>
@@ -128,7 +128,17 @@ export function ExpenseTrendChart(
               />
 
               {/* Y Axis (IMPORTANT — SCALE ADDED) */}
+              {/* <YAxis
+                tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
+                tick={{
+                  fontSize: 10,
+                  fill: "rgba(255,255,255,0.3)",
+                }}
+                axisLine={false}
+                tickLine={false}
+              /> */}
               <YAxis
+                width={35} // ✅ removes reserved space
                 tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
                 tick={{
                   fontSize: 10,
@@ -137,7 +147,6 @@ export function ExpenseTrendChart(
                 axisLine={false}
                 tickLine={false}
               />
-
               {/* Tooltip */}
               <Tooltip
                 formatter={(value: number) => formatCurrency(value)}
