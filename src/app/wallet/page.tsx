@@ -1,283 +1,394 @@
+// 'use client';
+
+// import AuthGuard from "@/src/components/auth/Guards/AuthGuard";
+// import { useAccounts } from "@/src/context/accountContext";
+// import { useTransactions } from "@/src/context/transactionContext";
+// import { useMemo, useState } from "react";
+// import clsx from "clsx";
+// import {
+//   ArrowTrendingUpIcon,
+//   ArrowTrendingDownIcon,
+//   CreditCardIcon,
+// } from "@heroicons/react/24/outline";
+// import { formatCurrency } from "@/src/utils/currencyFormatter";
+// // import AddTransactionCard from "@/src/components/cards/AddTransaction";
+// import TransactionCard from "@/src/components/cards/transactionCard";
+// // import TransactionCard from "@/src/components/transactions/TransactionCard";
+
+// type SavingsMetrics = {
+//   type: 'savings';
+//   balance: number;
+//   inflow: number;
+//   outflow: number;
+//   netGrowth: number;
+// };
+
+// type CreditMetrics = {
+//   type: 'credit';
+//   balance: number;
+//   creditUsed: number;
+//   creditLimit: number;
+//   percentUsed: number;
+//   availableCredit: number;
+// };
+
+// type AccountMetrics = SavingsMetrics | CreditMetrics | null;
+
+// export default function WalletPage() {
+//   const { accounts, loading } = useAccounts();
+//   const { transactions } = useTransactions();
+
+//   const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
+
+//   /* ---------------- SELECTED ACCOUNT ---------------- */
+//   const selectedAccount = useMemo(() => {
+//     if (selectedAccountId && accounts) {
+//       return accounts.find(a => a.id === selectedAccountId) || accounts?.[0];
+//     }
+//     return accounts?.[0];
+//   }, [accounts, selectedAccountId]);
+
+//   /* ---------------- FILTERED TRANSACTIONS ---------------- */
+//   const filteredTransactions = useMemo(() => {
+//     if (!transactions || !selectedAccount) return [];
+//     return transactions.filter(tx => tx.account_id === selectedAccount.id);
+//   }, [transactions, selectedAccount]);
+
+//   /* ---------------- METRICS ---------------- */
+//   const accountMetrics = useMemo((): AccountMetrics => {
+//     if (!selectedAccount || !transactions) return null;
+
+//     const accountTxs = transactions.filter(tx => tx.account_id === selectedAccount.id);
+
+//     const incomeTxs = accountTxs.filter(tx => tx.type === 'credit');
+//     const expenseTxs = accountTxs.filter(tx => tx.type === 'debit');
+
+//     const totalIncome = incomeTxs.reduce((sum, tx) => sum + Number(tx.amount), 0);
+//     const totalExpense = expenseTxs.reduce((sum, tx) => sum + Number(tx.amount), 0);
+
+//     if (selectedAccount.account_type === 'credit') {
+//       const creditUsed = totalExpense;
+//       const creditLimit = 100000;
+
+//       return {
+//         type: 'credit',
+//         balance: Number(selectedAccount.remaining_balance),
+//         creditUsed,
+//         creditLimit,
+//         percentUsed: (creditUsed / creditLimit) * 100,
+//         availableCredit: creditLimit - creditUsed,
+//       };
+//     }
+
+//     return {
+//       type: 'savings',
+//       balance: Number(selectedAccount.remaining_balance),
+//       inflow: totalIncome,
+//       outflow: totalExpense,
+//       netGrowth: totalIncome - totalExpense,
+//     };
+//   }, [selectedAccount, transactions]);
+
+//   if (loading || !selectedAccount) return null;
+
+//   return (
+//     <AuthGuard>
+//       <div className="h-screen overflow-y-auto scrollbar-hide px-6 pb-10 space-y-6">
+
+//         {/* ---------------- HEADER ---------------- */}
+//         <div>
+//           <h1 className="text-3xl font-bold tracking-tight">
+//             Wallet Overview
+//           </h1>
+//           <p className="text-xs opacity-40 tracking-widest uppercase">
+//             Account Intelligence
+//           </p>
+//         </div>
+
+//         {/* ---------------- ACCOUNT SELECTOR ---------------- */}
+//         {accounts && accounts.length > 1 && (
+//           <div className="flex flex-wrap gap-2">
+//             {accounts.map(account => (
+//               <button
+//                 key={account.id}
+//                 onClick={() => setSelectedAccountId(account.id)}
+//                 className={clsx(
+//                   "px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all",
+//                   selectedAccount.id === account.id
+//                     ? "glass bg-indigo-500/20 border border-indigo-400/30"
+//                     : "glass hover:bg-white/10 border border-white/10"
+//                 )}
+//               >
+//                 {account.account_type}
+//               </button>
+//             ))}
+//           </div>
+//         )}
+
+//         {/* ---------------- WALLET SUMMARY (GLASS) ---------------- */}
+//         {accountMetrics && accountMetrics.type === "savings" && (
+//           <div className="glass rounded-2xl p-6 border border-white/10">
+
+//             <p className="text-[10px] uppercase opacity-40 mb-2">
+//               Account Balance
+//             </p>
+
+//             <h2 className="text-3xl font-bold mb-6">
+//               {formatCurrency(accountMetrics.balance, selectedAccount.currency_code)}
+//             </h2>
+
+//             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+//               {/* INFLOW */}
+//               <div className="glass p-4 rounded-xl">
+//                 <div className="flex items-center gap-2 mb-2">
+//                   <ArrowTrendingUpIcon className="w-4 h-4 text-green-400" />
+//                   <span className="text-xs opacity-50">Inflow</span>
+//                 </div>
+//                 <p className="text-lg font-bold text-green-400">
+//                   +{formatCurrency(accountMetrics.inflow, selectedAccount.currency_code)}
+//                 </p>
+//               </div>
+
+//               {/* OUTFLOW */}
+//               <div className="glass p-4 rounded-xl">
+//                 <div className="flex items-center gap-2 mb-2">
+//                   <ArrowTrendingDownIcon className="w-4 h-4 text-red-400" />
+//                   <span className="text-xs opacity-50">Outflow</span>
+//                 </div>
+//                 <p className="text-lg font-bold text-red-400">
+//                   -{formatCurrency(accountMetrics.outflow, selectedAccount.currency_code)}
+//                 </p>
+//               </div>
+
+//               {/* NET */}
+//               <div className="glass p-4 rounded-xl">
+//                 <p className="text-xs opacity-50 mb-2">Net Growth</p>
+//                 <p className={clsx(
+//                   "text-lg font-bold",
+//                   accountMetrics.netGrowth >= 0 ? "text-indigo-400" : "text-orange-400"
+//                 )}>
+//                   {formatCurrency(accountMetrics.netGrowth, selectedAccount.currency_code)}
+//                 </p>
+//               </div>
+
+//             </div>
+//           </div>
+//         )}
+
+//         {/* ---------------- CREDIT VIEW ---------------- */}
+//         {accountMetrics && accountMetrics.type === "credit" && (
+//           <div className="glass rounded-2xl p-6 border border-white/10">
+
+//             <div className="flex items-center gap-2 mb-4">
+//               <CreditCardIcon className="w-5 h-5 text-indigo-400" />
+//               <span className="text-sm font-bold">Credit Overview</span>
+//             </div>
+
+//             <div className="mb-4">
+//               <div className="flex justify-between text-xs opacity-60 mb-1">
+//                 <span>Usage</span>
+//                 <span>{accountMetrics.percentUsed.toFixed(1)}%</span>
+//               </div>
+
+//               <div className="w-full h-3 bg-white/10 rounded-full overflow-hidden">
+//                 <div
+//                   className="h-full bg-indigo-400"
+//                   style={{ width: `${accountMetrics.percentUsed}%` }}
+//                 />
+//               </div>
+//             </div>
+
+//             <div className="grid grid-cols-3 gap-4 text-sm">
+//               <div>
+//                 <p className="opacity-40">Limit</p>
+//                 <p className="font-bold">
+//                   {formatCurrency(accountMetrics.creditLimit, selectedAccount.currency_code)}
+//                 </p>
+//               </div>
+
+//               <div>
+//                 <p className="opacity-40">Used</p>
+//                 <p className="text-red-400 font-bold">
+//                   {formatCurrency(accountMetrics.creditUsed, selectedAccount.currency_code)}
+//                 </p>
+//               </div>
+
+//               <div>
+//                 <p className="opacity-40">Available</p>
+//                 <p className="text-green-400 font-bold">
+//                   {formatCurrency(accountMetrics.availableCredit, selectedAccount.currency_code)}
+//                 </p>
+//               </div>
+//             </div>
+//           </div>
+//         )}
+
+//         {/* ---------------- TRANSACTIONS ---------------- */}
+//         <div className="h-[500px]">
+//           <TransactionCard
+//             pageClass="h-full"
+//             transactions={filteredTransactions}   // 🔥 IMPORTANT
+//           />
+//         </div>
+
+//       </div>
+//     </AuthGuard>
+//   );
+// }
+
 'use client';
 
 import AuthGuard from "@/src/components/auth/Guards/AuthGuard";
-import CardWrapper from "@/src/components/cards/cardDetails";
 import { useAccounts } from "@/src/context/accountContext";
 import { useTransactions } from "@/src/context/transactionContext";
-import { getCurrencySymbol } from "@/src/utils/getCurrencySymbol";
-import clsx from "clsx";
 import { useMemo, useState } from "react";
+import clsx from "clsx";
 import { formatCurrency } from "@/src/utils/currencyFormatter";
-import { ArrowTrendingUpIcon, ArrowTrendingDownIcon, CreditCardIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon,
+  CreditCardIcon
+} from "@heroicons/react/24/outline";
+import TransactionCard from "@/src/components/cards/transactionCard";
 
-type SavingsMetrics = {
-    type: 'savings';
-    balance: number;
-    inflow: number;
-    outflow: number;
-    netGrowth: number;
-};
+export default function WalletPage() {
+  const { accounts, loading } = useAccounts();
+  const { transactions } = useTransactions();
 
-type CreditMetrics = {
-    type: 'credit';
-    balance: number;
-    creditUsed: number;
-    creditLimit: number;
-    percentUsed: number;
-    availableCredit: number;
-};
+  const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
 
-type AccountMetrics = SavingsMetrics | CreditMetrics | null;
+  const selectedAccount = useMemo(() => {
+    if (!accounts) return null;
+    return accounts.find(a => a.id === selectedAccountId) || accounts[0];
+  }, [accounts, selectedAccountId]);
 
-export default function WalletPage(){
-    const { accounts, loading } = useAccounts();
-    const { transactions } = useTransactions();
-    const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
+  const metrics = useMemo(() => {
+    if (!selectedAccount || !transactions) return null;
 
-    const selectedAccount = useMemo(() => {
-        if (selectedAccountId && accounts) {
-            return accounts.find(a => a.id === selectedAccountId) || accounts?.[0];
-        }
-        return accounts?.[0];
-    }, [accounts, selectedAccountId]);
+    const txs = transactions.filter(t => t.account_id === selectedAccount.id);
 
-    // Calculate account-specific metrics
-    const accountMetrics = useMemo(() => {
-        if (!selectedAccount || !transactions) {
-            return null;
-        }
+    const income = txs
+      .filter(t => t.type === "credit")
+      .reduce((a, b) => a + Number(b.amount), 0);
 
-        const accountTxs = transactions.filter(tx => tx.account_id === selectedAccount.id);
-        const incomeTxs = accountTxs.filter(tx => tx.type === 'credit');
-        const expenseTxs = accountTxs.filter(tx => tx.type === 'debit');
+    const expense = txs
+      .filter(t => t.type === "debit")
+      .reduce((a, b) => a + Number(b.amount), 0);
 
-        const totalIncome = incomeTxs.reduce((sum, tx) => sum + parseFloat(tx.amount || '0'), 0);
-        const totalExpense = expenseTxs.reduce((sum, tx) => sum + parseFloat(tx.amount || '0'), 0);
+    return {
+      balance: Number(selectedAccount.remaining_balance),
+      income,
+      expense,
+      net: income - expense,
+    };
+  }, [selectedAccount, transactions]);
 
-        switch (selectedAccount.account_type) {
-            case 'savings':
-                return {
-                    type: 'savings',
-                    balance: parseFloat(selectedAccount.remaining_balance),
-                    inflow: totalIncome,
-                    outflow: totalExpense,
-                    netGrowth: totalIncome - totalExpense,
-                } as SavingsMetrics;
-            
-            case 'credit':
-                // For credit: simulate credit used and remaining
-                const creditUsed = totalExpense;
-                const creditLimit = 100000; // Default or from account details
-                const percentUsed = (creditUsed / creditLimit) * 100;
-                return {
-                    type: 'credit',
-                    balance: parseFloat(selectedAccount.remaining_balance),
-                    creditUsed: creditUsed,
-                    creditLimit: creditLimit,
-                    percentUsed: percentUsed,
-                    availableCredit: creditLimit - creditUsed,
-                } as CreditMetrics;
-            
-            default:
-                return {
-                    type: 'savings',
-                    balance: parseFloat(selectedAccount.remaining_balance),
-                    inflow: totalIncome,
-                    outflow: totalExpense,
-                    netGrowth: totalIncome - totalExpense,
-                } as SavingsMetrics;
-        }
-    }, [selectedAccount, transactions]);
+  if (loading || !selectedAccount || !metrics) return null;
 
-    if (loading) {
-        return (
-            <div className="w-full relative items-center justify-center">
-                <AuthGuard>
-                    <div className="animate-pulse space-y-4">
-                        <div className="h-32 bg-slate-200 dark:bg-slate-700 rounded-lg"></div>
-                        <div className="h-48 bg-slate-200 dark:bg-slate-700 rounded-lg"></div>
-                    </div>
-                </AuthGuard>
+  return (
+    <AuthGuard>
+      <div className="p-6 space-y-6">
+
+        {/* 🔥 MAIN GLASS CONTAINER */}
+        <div className="relative rounded-[2rem] p-8 glass backdrop-blur-xl border border-white/10 overflow-hidden">
+
+          {/* GLOW */}
+          <div className="glow glow-indigo -top-20 -right-20 pointer-events-none" />
+          <div className="glow glow-purple -bottom-20 -left-20 pointer-events-none" />
+
+          {/* HEADER ROW */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+
+            {/* Account Selector */}
+            <div className="flex gap-2 flex-wrap">
+              {accounts?.map(acc => (
+                <button
+                  key={acc.id}
+                  onClick={() => setSelectedAccountId(acc.id)}
+                  className={clsx(
+                    "px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all",
+                    selectedAccount.id === acc.id
+                      ? "bg-white/10 text-white border border-white/20"
+                      : "text-white/40 hover:text-white hover:bg-white/5"
+                  )}
+                >
+                  {acc.account_type}
+                </button>
+              ))}
             </div>
-        );
-    }
 
-    if (!selectedAccount) {
-        return (
-            <div className="w-full relative items-center justify-center">
-                <AuthGuard>
-                    <div className="text-center py-10">
-                        <p className="text-slate-600 dark:text-slate-400">No accounts found</p>
-                    </div>
-                </AuthGuard>
+            {/* Account Type Badge */}
+            <div className="flex items-center gap-2 text-xs opacity-60">
+              <CreditCardIcon className="w-4 h-4" />
+              {selectedAccount.account_type.toUpperCase()}
             </div>
-        );
-    }
+          </div>
 
-    return(
-        <div className="w-full relative space-y-6 pb-10">
-            <AuthGuard>
-                {/* Header */}
-                <div className="mt-6">
-                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Wallet</h1>
-                    <p className="text-slate-600 dark:text-slate-400 mt-1">Manage your accounts and view balances</p>
-                </div>
+          {/* BALANCE */}
+          <div className="mb-8">
+            <p className="text-xs uppercase tracking-widest opacity-40 mb-2">
+              Total Balance
+            </p>
 
-                {/* Account Selector */}
-                {accounts && accounts.length > 1 && (
-                    <div className="flex flex-wrap gap-2">
-                        {accounts.map(account => (
-                            <button
-                                key={account.id}
-                                onClick={() => setSelectedAccountId(account.id)}
-                                className={clsx(
-                                    "px-4 py-2 rounded-lg font-medium transition-all duration-200",
-                                    selectedAccount?.id === account.id
-                                        ? "bg-indigo-600 text-white dark:bg-indigo-500"
-                                        : "bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-600"
-                                )}
-                            >
-                                {account.account_type.charAt(0).toUpperCase() + account.account_type.slice(1)}
-                            </button>
-                        ))}
-                    </div>
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+              {formatCurrency(metrics.balance, selectedAccount.currency_code)}
+            </h1>
+          </div>
+
+          {/* METRICS ROW */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            {/* INFLOW */}
+            <div className="glass glass-sm rounded-xl p-4 flex flex-col gap-2">
+              <div className="flex items-center gap-2 text-green-400">
+                <ArrowTrendingUpIcon className="w-4 h-4" />
+                <span className="text-xs uppercase tracking-wider">Inflow</span>
+              </div>
+              <p className="text-lg font-bold">
+                +{formatCurrency(metrics.income, selectedAccount.currency_code)}
+              </p>
+            </div>
+
+            {/* OUTFLOW */}
+            <div className="glass glass-sm rounded-xl p-4 flex flex-col gap-2">
+              <div className="flex items-center gap-2 text-red-400">
+                <ArrowTrendingDownIcon className="w-4 h-4" />
+                <span className="text-xs uppercase tracking-wider">Outflow</span>
+              </div>
+              <p className="text-lg font-bold">
+                -{formatCurrency(metrics.expense, selectedAccount.currency_code)}
+              </p>
+            </div>
+
+            {/* NET */}
+            <div className="glass glass-sm rounded-xl p-4 flex flex-col gap-2">
+              <div className="text-xs uppercase tracking-wider opacity-50">
+                Net
+              </div>
+              <p
+                className={clsx(
+                  "text-lg font-bold",
+                  metrics.net >= 0 ? "text-green-400" : "text-red-400"
                 )}
+              >
+                {metrics.net >= 0 ? "+" : ""}
+                {formatCurrency(metrics.net, selectedAccount.currency_code)}
+              </p>
+            </div>
 
-                {/* Account Type: Savings */}
-                {accountMetrics && accountMetrics.type === 'savings' && (
-                    <div className="space-y-6">
-                        {/* Main Balance Card */}
-                        <div className={clsx(
-                            "p-8 rounded-lg border",
-                            "bg-white dark:bg-slate-800",
-                            "border-slate-200 dark:border-slate-700"
-                        )}>
-                            <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Account Balance</p>
-                            <h2 className="text-4xl font-bold text-slate-900 dark:text-white mb-6">
-                                {formatCurrency(accountMetrics.balance, selectedAccount.currency_code)}
-                            </h2>
-
-                            {/* In/Out Stats */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div className={clsx(
-                                    "p-4 rounded-lg",
-                                    "bg-green-50 dark:bg-green-900/20",
-                                    "border border-green-200 dark:border-green-800"
-                                )}>
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <ArrowTrendingUpIcon className="w-5 h-5 text-green-600 dark:text-green-400" />
-                                        <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Inflow</p>
-                                    </div>
-                                    <p className="text-xl font-bold text-green-600 dark:text-green-400">
-                                        +{formatCurrency(accountMetrics.inflow, selectedAccount.currency_code)}
-                                    </p>
-                                </div>
-
-                                <div className={clsx(
-                                    "p-4 rounded-lg",
-                                    "bg-red-50 dark:bg-red-900/20",
-                                    "border border-red-200 dark:border-red-800"
-                                )}>
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <ArrowTrendingDownIcon className="w-5 h-5 text-red-600 dark:text-red-400" />
-                                        <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Outflow</p>
-                                    </div>
-                                    <p className="text-xl font-bold text-red-600 dark:text-red-400">
-                                        -{formatCurrency(accountMetrics.outflow, selectedAccount.currency_code)}
-                                    </p>
-                                </div>
-
-                                <div className={clsx(
-                                    "p-4 rounded-lg",
-                                    accountMetrics.netGrowth >= 0 
-                                        ? "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800"
-                                        : "bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800"
-                                )}>
-                                    <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Net Growth</p>
-                                    <p className={clsx(
-                                        "text-xl font-bold",
-                                        accountMetrics.netGrowth >= 0
-                                            ? "text-blue-600 dark:text-blue-400"
-                                            : "text-orange-600 dark:text-orange-400"
-                                    )}>
-                                        {accountMetrics.netGrowth >= 0 ? '+' : ''}{formatCurrency(accountMetrics.netGrowth, selectedAccount.currency_code)}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Account Type: Credit */}
-                {accountMetrics && accountMetrics.type === 'credit' && (
-                    <div className="space-y-6">
-                        {/* Credit Limit Card */}
-                        <div className={clsx(
-                            "p-8 rounded-lg border",
-                            "bg-white dark:bg-slate-800",
-                            "border-slate-200 dark:border-slate-700"
-                        )}>
-                            <div className="flex items-center gap-2 mb-4">
-                                <CreditCardIcon className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
-                                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Credit Account</p>
-                            </div>
-
-                            {/* Credit Usage Progress */}
-                            <div className="mb-6">
-                                <div className="flex justify-between items-center mb-2">
-                                    <p className="font-semibold text-slate-900 dark:text-white">Credit Used</p>
-                                    <p className="text-lg font-bold text-slate-900 dark:text-white">
-                                        {accountMetrics.percentUsed.toFixed(1)}%
-                                    </p>
-                                </div>
-                                <div className="w-full h-4 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                                    <div
-                                        className={clsx(
-                                            "h-full transition-all duration-300",
-                                            accountMetrics.percentUsed < 50 
-                                                ? "bg-green-500 dark:bg-green-400"
-                                                : accountMetrics.percentUsed < 80
-                                                ? "bg-yellow-500 dark:bg-yellow-400"
-                                                : "bg-red-500 dark:bg-red-400"
-                                        )}
-                                        style={{ width: `${accountMetrics.percentUsed}%` }}
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Credit Stats */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600">
-                                    <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Credit Limit</p>
-                                    <p className="text-xl font-bold text-slate-900 dark:text-white">
-                                        {formatCurrency(accountMetrics.creditLimit, selectedAccount.currency_code)}
-                                    </p>
-                                </div>
-
-                                <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-                                    <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Used</p>
-                                    <p className="text-xl font-bold text-red-600 dark:text-red-400">
-                                        {formatCurrency(accountMetrics.creditUsed, selectedAccount.currency_code)}
-                                    </p>
-                                </div>
-
-                                <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-                                    <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Available</p>
-                                    <p className="text-xl font-bold text-green-600 dark:text-green-400">
-                                        {formatCurrency(accountMetrics.availableCredit, selectedAccount.currency_code)}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Default View (fallback) */}
-                <div className="grid gap-6">
-                    <CardWrapper title='Wallet'/>
-                    <CardWrapper title="Transactions"/>
-                </div>
-            </AuthGuard> 
+          </div>
+          
         </div>
-    )
+
+         <div className="h-[500px]">
+         <TransactionCard
+            pageClass="h-full"
+            // transactions={filteredTransactions}   // 🔥 IMPORTANT
+          />
+        </div>
+
+      </div>
+    </AuthGuard>
+  );
 }

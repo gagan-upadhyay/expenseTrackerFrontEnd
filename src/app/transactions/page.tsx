@@ -8,13 +8,8 @@ export default function Page(){
     
 
     return(
-           <AuthGuard>
-                {/* <CardWrapper title={'Transactions'}/> */}
-                {/* In your Page.tsx grid */}
-                {/* <div className=" "> */}
-                    <CardWrapper title="Transactions" />
-                {/* </div> */}
-
-           </AuthGuard> 
+        <AuthGuard>
+            <CardWrapper title="Transactions" />
+        </AuthGuard> 
     )
 }

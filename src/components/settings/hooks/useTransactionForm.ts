@@ -133,6 +133,7 @@ export function useTransactionForm() {
 
   // FIX: Handle the ChangeEvent from the input
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    
     const file = e.target.files?.[0];
     if (file) {
       setPreview(URL.createObjectURL(file));

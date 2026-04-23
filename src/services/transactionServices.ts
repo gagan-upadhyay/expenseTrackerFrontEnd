@@ -131,12 +131,14 @@ export async function uploadTransactionReceipt(file:File){
       method:"PUT",
       headers:{
         "x-ms-blob-type":"BlockBlob",
-        "Content-Type":file.type
+        "Content-Type":compressedFile.type
       },
       body:compressedFile
     });
+
     return {success:true, blobName:res.blobName}
     }catch(err){
+        // console.log(`Error:${err}`);
         return{   
             success: false, 
             blobName: undefined, 

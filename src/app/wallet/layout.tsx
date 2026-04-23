@@ -17,14 +17,14 @@ export default function WalletLayout({children}: {children:React.ReactNode}){
                 <TransactionProvider>
                     <ThemeSync/>
                     <SidebarProvider>
-                        <div className="flex h-screen flex-col sm:flex-row sm:overflow-hidden">
+                        <div className="flex h-full flex-col sm:flex-row sm:overflow-hidden">
                             {/* <div className="w-full flex-none sm:w-64"> */}
                                 <SideBar/>
                             {/* </div> */}
                             
                             <SideBar/>
                             
-                                <div className="flex-grow sm:overflow-y-auto no-scrollbar">
+                                <div className="flex-grow  sm:overflow-y-auto no-scrollbar">
                                     <MainContent>
                                 {/* <Breadcrumbs/> */}
                                     {children}

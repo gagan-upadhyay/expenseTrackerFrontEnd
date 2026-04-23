@@ -239,13 +239,13 @@ export default function AccountsDetailsCard({ parentClass }: Props) {
   // const currency = accounts[0]?.currency_code || 'USD';
 
   return (
-    <div className={clsx(parentClass, "w-full mt-6 relative flex flex-col h-[80vh] md:h-auto overflow-hidden")}>
+    <div className={clsx(parentClass, "w-full mb-10 relative flex flex-col h-[80vh] md:h-auto overflow-hidden")}>
       {/* Glow effects */}
       <div className="glow glow-indigo -top-10 -right-10"></div>
       <div className="glow glow-purple -bottom-10 -left-10"></div>
 
       {/* Header and totals */}
-      <div className="glass p-4 rounded-2xl mb-4 shrink-0">
+      <div className="glass p-4 rounded-2xl mb-4 ">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div className="flex items-center justify-between w-full md:w-auto">
             <div className="flex items-center gap-3">
@@ -300,10 +300,10 @@ export default function AccountsDetailsCard({ parentClass }: Props) {
       </div>
 
       {/* Per-account cards */}
-      <div className="flex-1 overflow-y-auto pr-1 pb-24 md:pb-4 scroll-smooth">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="flex-1 overflow-y-auto no-scrollbar pr-1 pb-24 md:pb-4 scroll-smooth">
+        <div className="grid grid-cols-1  md:grid-cols-2 gap-4">
           {accounts?.map((acc) => (
-            <div key={acc.id} className="glass p-4 rounded-2xl border border-white/5 flex flex-col justify-between hover:border-white/20 transition-all">
+            <div key={acc.id} className="glass  p-4 rounded-2xl border border-white/5 flex flex-col justify-between hover:border-white/20 transition-all">
              
               <div className="flex items-center justify-between">
                 

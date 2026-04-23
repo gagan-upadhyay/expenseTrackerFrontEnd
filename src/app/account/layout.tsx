@@ -13,19 +13,17 @@ export default function DashBoardLayout({children}: {children:React.ReactNode}){
     return (
         <UserProvider>
             <AccountProvider>
-                {/* <TransactionProvider> */}
                     <ThemeSync/>
                     <SidebarProvider>
-                        <div className="flex h-screen flex-col sm:flex-row sm:overflow-hidden no-scrollbar">
+                        <div className="flex h-full flex-col sm:flex-row sm:overflow-hidden">
                             <SideBar/>
-                            <div className="flex-grow sm:overflow-y-auto no-scrollbar">
+                            <div className="flex-grow sm:overflow-y-auto ">
                                 <MainContent>
                                     {children}
                                 </MainContent>
                             </div>
                         </div>
                     </SidebarProvider>
-                {/* </TransactionProvider> */}
             </AccountProvider>
         </UserProvider>
     );

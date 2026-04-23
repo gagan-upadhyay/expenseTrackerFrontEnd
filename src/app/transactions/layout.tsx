@@ -14,7 +14,7 @@ export default function TransactionLayout({children}: {children:React.ReactNode}
             <AccountProvider>
                 <TransactionProvider>
                     <ThemeSync/>
-                    <div className="flex h-screen w-full flex-col sm:flex-row sm:overflow-hidden">
+                    <div className="flex h-full w-full flex-col sm:flex-row sm:overflow-hidden">
                         {/* <div className="w-full flex-none sm:w-64"> */}
                         <SidebarProvider>
                             <SideBar/>

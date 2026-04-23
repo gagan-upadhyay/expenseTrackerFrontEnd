@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useTransactions } from "@/src/context/transactionContext";
 import { useAccounts } from "@/src/context/accountContext";
@@ -8,7 +8,7 @@ import { useTransactionForm } from "@/src/components/settings/hooks/useTransacti
 import { 
   ArrowPathIcon, 
   PhotoIcon, 
-  CalendarIcon, 
+//   CalendarIcon, 
   WalletIcon, 
   TagIcon, 
   DocumentTextIcon, 
@@ -37,9 +37,14 @@ export default function EditTransactionPage() {
   const [isDirty, setIsDirty] = useState<boolean>(false);
   const { proceedWithCheck } = useUnsavedChanges(isDirty, success);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [ imageUploadError, setImageUploadError] = useState<string | null>(null);
 
     useEffect(() => {
-    if (isInitialized) setIsDirty(true);
+    if (isInitialized) {
+        setIsDirty(true);
+        setImageUploadError(null);
+
+    };
     }, [form, preview, isInitialized]);
 
   // 1. Find the transaction and populate form
@@ -70,37 +75,48 @@ export default function EditTransactionPage() {
   }, [params.id, transactions, isInitialized]);
 
   // 2. Handle Submit (Override default handleSubmit for Update logic)
-  const handleUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if(loading) return;
-    try{
-        let finalReference = preview;
-        if(form.reference instanceof File){
-            const uploadRes = await uploadTransactionReceipt(form.reference);
-            if(uploadRes?.success && uploadRes.blobName){
-                finalReference = uploadRes.blobName;
-            }else{
-                throw new Error("Failed to uplaod new receipt");
+    const handleUpdate = async (e: React.FormEvent) => {
+        console.log('inside handlUpdate');
+        e.preventDefault();
+        if(loading) return;
+        try{
+            let finalReference = preview;
+
+            if (form.reference instanceof File) {
+                const uploadRes = await uploadTransactionReceipt(form.reference);
+
+                if (uploadRes.success && uploadRes.blobName) {
+                    finalReference = uploadRes.blobName;
+                    console.log("✅ Upload success:", finalReference);
+                } else {
+                    console.log("❌ Upload failed:", uploadRes.error);
+
+                    // ✅ show error to user
+                    setImageUploadError(uploadRes.error || "Upload failed");
+
+                    // optional: stop form submission
+                    return;
+                }
             }
-        }
+            const updateData = {
+                category_code: form.category,
+                amount:(form.amount),
+                display_name:form.displayName,
+                type:form.type,
+                description:form.description,
+                reference:finalReference,
+                occurred_at: new Date(form.occurred_at).toISOString(),
+            }
+            console.log(`Value of updateData:${updateData}`);
+            const result = await updateTransaction(params.id as string, form.accountId, updateData);
+            console.log(`Value of result from page:${result}`);
+            setSuccess(true);
+            setTimeout(() => router.push('/transactions'), 2000);
 
-        const updateData = {
-            category_code: form.category,
-            amount:(form.amount),
-            display_name:form.displayName,
-            type:form.type,
-            description:form.description,
-            reference:finalReference,
-            occurred_at: new Date(form.occurred_at).toISOString(),
-        }
-        await updateTransaction(params.id as string, form.accountId, updateData);
-        setSuccess(true);
-        setTimeout(() => router.push('/transactions'), 2000);
-
-    }catch(err:any){
-        console.warn("Update failed:", err.message);
-    }    
-  };
+        }catch(err:any){
+            console.warn("Update failed:", err.message);
+        }    
+    };
 
   if (!isInitialized) return (
     <div className="h-screen flex items-center justify-center bg-black">
@@ -110,7 +126,7 @@ export default function EditTransactionPage() {
 
   return (
     <AuthGuard>
-        <div className="max-w-2xl mx-auto p-4 mt-5 sm:p-6 pb-20">
+        <div className=" sm:p-6 h-full pb-20">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
             <button 
@@ -126,7 +142,7 @@ export default function EditTransactionPage() {
             {/* Glows */}
             <div className="glow glow-indigo -top-20 -right-20 opacity-20" />
             
-            <form onSubmit={handleUpdate} className="space-y-6 relative z-10">
+            <form onSubmit={handleUpdate} className="space-y-6 h-full relative z-10">
             
             {/* Account & Category Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -201,7 +217,9 @@ export default function EditTransactionPage() {
                     alt="Receipt" 
                     fill 
                     
-                    className="object-cover" 
+                    className={clsx("object-cover",
+                        imageUploadError?'border-red-400':''
+                     )}
                     // style={{ height: 'auto' }} 
                     sizes="(max-width: 768px) 100vw, 50vw"
                     />
@@ -224,11 +242,13 @@ export default function EditTransactionPage() {
                     <input type="file" className="hidden" onChange={handleFileChange} />
                 </label>
                 )}
+                <p className="text-red-400 text-sm">{imageUploadError?imageUploadError:''}</p>
             </div>
 
             {/* Date & Submit */}
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <div className="flex-1">
+                    {/* <CalendarIcon className=" flex absolute mt-4 w-5 h-5" /> */}
                     <input 
                     type="date"
                     className="glass w-full p-4 rounded-2xl text-sm outline-none border border-white/5 [color-scheme:dark] bg-transparent"
@@ -244,7 +264,7 @@ export default function EditTransactionPage() {
                 {loading ? <ArrowPathIcon className="w-5 h-5 animate-spin mx-auto" /> : "Save Changes"}
                 </Button>
             </div>
-            </form>
+        </form>
 
             {/* Success Overlay */}
             <AnimatePresence>
