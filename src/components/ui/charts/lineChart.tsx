@@ -1,97 +1,3 @@
-// "use client";
-
-// import {
-//   CartesianGrid,
-//   Line,
-//   LineChart,
-//   XAxis,
-//   Tooltip,
-//   ResponsiveContainer,
-// } from "recharts";
-// import clsx from "clsx";
-// import { useAccounts } from "@/src/context/accountContext";
-// import LineChartSkeleton from "../../skeletons/lineChartSkeleton";
-
-// export function SavingsChart() {
-//   const {loading} = useAccounts();
-//   if(loading) return <LineChartSkeleton/>
-//   return (
-//     <div
-//       className={clsx(
-//         "relative flex flex-col rounded-2xl p-6",
-//         "glass glass-hover smooth-theme",
-//         "overflow-hidden"
-//       )}
-//     >
-//       {/* Glow */}
-//       <div className="glow glow-indigo -top-10 -right-10"></div>
-//       <div className="glow glow-purple -bottom-10 -left-10"></div>
-
-//       {/* Header */}
-//       <div className="mb-4 text-center">
-//         <h3 className="text-lg font-semibold">Savings Trend</h3>
-//         <p className="text-xs opacity-70">Last 6 months</p>
-//       </div>
-
-//       {/* Chart */}
-//       <div className="w-full h-60">
-//         <ResponsiveContainer>
-//           <LineChart data={chartData}>
-            
-//             {/* Soft grid */}
-//             <CartesianGrid
-//               strokeDasharray="3 3"
-//               stroke="rgba(255,255,255,0.1)"
-//               vertical={false}
-//             />
-
-//             <XAxis
-//               dataKey="month"
-//               tickLine={false}
-//               axisLine={false}
-//               tick={{ fontSize: 12, fill: "gray" }}
-//             />
-
-//             <Tooltip
-//               contentStyle={{
-//                 background: "rgba(0,0,0,0.8)",
-//                 border: "none",
-//                 borderRadius: "8px",
-//                 color: "#fff",
-//               }}
-//             />
-
-//             {/* Gradient line */}
-//             <defs>
-//               <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
-//                 <stop offset="0%" stopColor="#818CF8" />
-//                 <stop offset="50%" stopColor="#A78BFA" />
-//                 <stop offset="100%" stopColor="#F472B6" />
-//               </linearGradient>
-//             </defs>
-
-//             <Line
-//               type="monotone"
-//               dataKey="value"
-//               stroke="url(#lineGradient)"
-//               strokeWidth={3}
-//               dot={{
-//                 r: 4,
-//                 strokeWidth: 2,
-//                 fill: "#0f172a",
-//               }}
-//               activeDot={{
-//                 r: 6,
-//               }}
-//             />
-//           </LineChart>
-//         </ResponsiveContainer>
-//       </div>
-//     </div>
-//   );
-// }
-
-
 "use client";
 import React, { useState, useMemo } from "react";
 import {
@@ -104,52 +10,119 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useAccounts } from "@/src/context/accountContext";
-import { useTransactions } from "@/src/context/transactionContext";
 import LineChartSkeleton from "../../skeletons/lineChartSkeleton";
+import { useDrilldown } from "@/src/Hooks/AnalyticsHooks/useDrillDown";
+import { useAnomalies } from "@/src/Hooks/AnalyticsHooks/useAnomalies";
+import { Transaction } from "@/src/utils/definitions";
+import { Area } from "recharts";
+import { useTransactions } from "@/src/context/transactionContext";
+
 
 export function SavingsChart() {
   const { accounts, loading: accountsLoading } = useAccounts();
-  const { transactions, loading: transLoading } = useTransactions();
+  const {transactions} = useTransactions();
   
   const [selectedAccountId, setSelectedAccountId] = useState<string>("all");
+  const {setDrill} = useDrilldown();
+  const anomalies = useAnomalies(transactions || []);
+//   const anomalyMonths = new Set(
+//   anomalies.map(a =>
+//     new Date(a.occurred_at).toLocaleString("default", { month: "short" })
+//   )
+// );
+const anomalyMonths = new Set(
+  anomalies.map(a => {
+    const d = new Date(a.occurred_at);
+    return `${d.getFullYear()}-${d.getMonth()}`;
+  })
+);
+  // const chartData = useMemo(() => {
+  //   if (!transactions) return [];
+
+  //   // 1. Filter transactions by account
+  //   const filtered = transactions.filter(t => 
+  //     selectedAccountId === "all" || t.account_id === selectedAccountId
+  //   );
+
+  //   // 2. Group by month and calculate net change (Credit - Debit)
+  //   const monthlyData: Record<string, number> = {};
+    
+  //   // Sort transactions by date first
+  //   const sorted = [...filtered].sort((a, b) => 
+  //     new Date(a.occurred_at).getTime() - new Date(b.occurred_at).getTime()
+  //   );
+
+  //   sorted.forEach(t => {
+  //     const date = new Date(t.occurred_at);
+  //     // const monthYear = date.toLocaleString('default', { month: 'short' });
+  //     const monthYear = date.toLocaleString('default', { 
+  //       month: 'short',
+  //       year: '2-digit'
+  //     });
+  //     const amount = Number(t.amount);
+  //     const change = t.type === 'credit' ? amount : -amount;
+      
+  //     monthlyData[monthYear] = (monthlyData[monthYear] || 0) + change;
+  //   });
+
+  //   // 3. Convert to cumulative trend (Balance progression)
+  //   let cumulativeBalance = 0;
+  //   return Object.entries(monthlyData).map(([month, change]) => {
+  //     cumulativeBalance += change;
+  //     return { month, value: cumulativeBalance };
+  //   }).slice(-6); // Last 6 months
+  // }, [transactions, selectedAccountId]);
 
   const chartData = useMemo(() => {
-    if (!transactions) return [];
+  if (!transactions?.length) return [];
 
-    // 1. Filter transactions by account
-    const filtered = transactions.filter(t => 
-      selectedAccountId === "all" || t.account_id === selectedAccountId
-    );
+  const filtered = transactions.filter(t => 
+    selectedAccountId === "all" || t.account_id === selectedAccountId
+  );
 
-    // 2. Group by month and calculate net change (Credit - Debit)
-    const monthlyData: Record<string, number> = {};
-    
-    // Sort transactions by date first
-    const sorted = [...filtered].sort((a, b) => 
-      new Date(a.occurred_at).getTime() - new Date(b.occurred_at).getTime()
-    );
+  const monthlyMap = new Map<string, number>();
 
-    sorted.forEach(t => {
-      const date = new Date(t.occurred_at);
-      const monthYear = date.toLocaleString('default', { month: 'short' });
-      const amount = Number(t.amount);
-      const change = t.type === 'credit' ? amount : -amount;
-      
-      monthlyData[monthYear] = (monthlyData[monthYear] || 0) + change;
+  filtered.forEach(t => {
+    const date = new Date(t.occurred_at);
+
+    // 🔥 USE ISO KEY FOR SORTING
+    const key = `${date.getFullYear()}-${date.getMonth()}`;
+
+    const amount = Number(t.amount);
+    const change = t.type === "credit" ? amount : -amount;
+
+    monthlyMap.set(key, (monthlyMap.get(key) || 0) + change);
+  });
+
+  // ✅ SORT PROPERLY
+  const sorted = Array.from(monthlyMap.entries())
+    .sort((a, b) => {
+      const [ay, am] = a[0].split("-").map(Number);
+      const [by, bm] = b[0].split("-").map(Number);
+      return new Date(ay, am).getTime() - new Date(by, bm).getTime();
     });
 
-    // 3. Convert to cumulative trend (Balance progression)
-    let cumulativeBalance = 0;
-    return Object.entries(monthlyData).map(([month, change]) => {
-      cumulativeBalance += change;
-      return { month, value: cumulativeBalance };
-    }).slice(-6); // Last 6 months
-  }, [transactions, selectedAccountId]);
+  // ✅ BUILD CUMULATIVE TREND
+  let cumulative = 0;
 
-  if (accountsLoading || transLoading) return <LineChartSkeleton />;
+  return sorted.map(([key, value]) => {
+    const [year, month] = key.split("-").map(Number);
+
+    cumulative += value;
+
+    return {
+      month: new Date(year, month).toLocaleString("default", {
+        month: "short",
+      }),
+      value: cumulative,
+    };
+  }).slice(-6);
+
+}, [transactions, selectedAccountId]);
+  if (accountsLoading || !transactions) return <LineChartSkeleton />;
 
   return (
-    <div className="relative flex flex-col rounded-2xl p-6 glass backdrop-blur-xl border border-white/10 h-full overflow-hidden transition-all duration-500">
+    <div className="relative flex flex-col rounded-2xl p-6 glass backdrop-blur-xl border border-white/10 overflow-hidden transition-all duration-500">
       {/* Glows */}
       <div className="glow glow-indigo -top-10 -right-10 pointer-events-none" />
       <div className="glow glow-purple -bottom-10 -left-10 pointer-events-none" />
@@ -187,7 +160,17 @@ export function SavingsChart() {
               </linearGradient>
             </defs>
 
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+            <Area
+              type="monotone"
+              dataKey="value"
+              fill="url(#areaGradient)"
+              stroke="none"
+            />
+
+            <CartesianGrid 
+            strokeDasharray="3 3" 
+            stroke="rgba(255,255,255,0.05)" 
+            vertical={false} />
 
             <XAxis 
               dataKey="month" 
@@ -196,9 +179,10 @@ export function SavingsChart() {
               tick={{ fontSize: 10, fill: "rgba(255,255,255,0.4)", fontWeight: 'bold' }} 
             />
             
-            <YAxis 
-              hide={true} 
-              domain={['auto', 'auto']} 
+            <YAxis
+              tick={{ fontSize: 10, fill: "rgba(255,255,255,0.3)" }}
+              axisLine={false}
+              tickLine={false}
             />
 
             <Tooltip
@@ -219,8 +203,28 @@ export function SavingsChart() {
               dataKey="value"
               stroke="url(#lineGradient)"
               strokeWidth={4}
-              dot={{ r: 4, strokeWidth: 2, fill: "#1e1b4b", stroke: "#A78BFA" }}
-              activeDot={{ r: 7, strokeWidth: 0, fill: "#fff" }}
+              // dot={{ r: 4, strokeWidth: 2, fill: "#1e1b4b", stroke: "#A78BFA" }}
+              dot={(props: any) => {
+              const { key, ...rest } = props;
+
+              const dateKey = props.payload?.dateKey; // we’ll fix this below
+              const isAnomaly = anomalyMonths.has(dateKey);
+
+              if (!isAnomaly) {
+                return <circle key={key} {...rest} r={3} />;
+              }
+
+              return (
+                <circle
+                  key={key}
+                  {...rest}
+                  r={6}
+                  fill="#ff4d4f"
+                  onClick={() => setDrill("anomaly", props.payload)}
+                  className="cursor-pointer animate-pulse"
+                />
+              );
+            }}              activeDot={{ r: 7, strokeWidth: 0, fill: "#fff" }}
               animationDuration={1500}
             />
           </LineChart>

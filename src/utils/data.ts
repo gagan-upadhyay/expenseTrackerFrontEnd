@@ -90,7 +90,7 @@ export const passwordUtility = async (
 
 //------------------------Refresh Token------------------------------------
 export const refreshToken = async () => {
-    return apiFetch(`${AUTH_SERVICE}/api/v1/auth/refresh/`, {
+    return apiFetch(`${AUTH_SERVICE}/api/v1/auth/refresh`, {
         method: 'POST',
         credentials:'include',
     });

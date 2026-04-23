@@ -8,12 +8,11 @@ import UserProfile from "./userProfile";
 import { useSidebar } from "@/src/context/sidebarContext";
 import { useIsMobile } from "@/src/Hooks/useIsMobile";
 import SideBarActions from "./sideBarActions";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Bars3Icon, XMarkIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 export default function Sidebar() {
-  const { collapsed } = useSidebar();
+  const { collapsed, toggleSidebar } = useSidebar();
   const isMobile = useIsMobile();
-
   const [open, setOpen] = useState(false);
 
   const expanded = isMobile ? open : !collapsed;
@@ -54,7 +53,7 @@ export default function Sidebar() {
           "border-r border-slate-200 dark:border-slate-700",
           "transition-all duration-300 ease-in-out",
           "bg-white dark:bg-slate-900",
-          expanded ? "w-64" : "w-20",
+          expanded ? "w-50" : "w-20",
           isMobile
             ? open
               ? "translate-x-0 shadow-xl"
@@ -79,10 +78,35 @@ export default function Sidebar() {
           </button>
         )}
 
+        {/* Desktop Toggle Button */}
+        {!isMobile && (
+          <button
+            onClick={toggleSidebar}
+            className={clsx(
+              "absolute -right-3 top-6 z-60 rounded-full p-1.5",
+              "bg-white dark:bg-slate-800",
+              "border border-slate-200 dark:border-slate-700",
+              "text-slate-600 dark:text-slate-400",
+              "hover:bg-slate-50 dark:hover:bg-slate-700",
+              "hover:text-slate-900 dark:hover:text-white",
+              "transition-all duration-200",
+              "focus:outline-none focus:ring-2 focus:ring-indigo-500",
+              "shadow-sm"
+            )}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {collapsed ? (
+              <ChevronRightIcon className="w-4 h-4" />
+            ) : (
+              <ChevronLeftIcon className="w-4 h-4" />
+            )}
+          </button>
+        )}
+
         {/* Sidebar Content */}
         <div className="flex flex-col overflow-y-auto h-full">
           {/* Header */}
-          <div className="flex md:flex-col transition-all duration-500 items-center gap-2 p-4 border-b border-slate-200 dark:border-slate-700">
+          {/* <div className="flex md:flex-col transition-all duration-500 items-center gap-2 p-4 border-b border-slate-200 dark:border-slate-700">
             <div className={clsx(
               "h-10 w-10 rounded-lg",
               "bg-gradient-to-br from-indigo-500 to-indigo-600",
@@ -102,13 +126,13 @@ export default function Sidebar() {
               <p className="font-bold text-slate-900 dark:text-white text-sm">Expense Tracker</p>
               <p className="text-xs text-slate-500 dark:text-slate-400">Smart Finance</p>
             </div>
-          </div>
+          </div> */}
 
           {/* User Profile */}
           <UserProfile expanded={expanded} />
 
           {/* Navigation Sections */}
-          <div className="flex-1 flex flex-col gap-2 py-4 overflow-y-auto">
+          <div className="flex-1 flex flex-col gap-2 py-4 overflow-y-auto no-scrollbar">
             {SIDEBAR_SECTIONS.map((section, idx) => (
               <SidebarSection
                 key={idx}
@@ -119,7 +143,7 @@ export default function Sidebar() {
           </div>
 
           {/* Actions - Bottom */}
-          <div className="border-t border-slate-200 dark:border-slate-700 p-3">
+          <div className="border-t border-slate-200 dark:border-slate-700 p-3 ">
             <SideBarActions expanded={expanded} />
           </div>
         </div>

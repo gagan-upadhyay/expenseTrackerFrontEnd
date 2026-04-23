@@ -25,8 +25,14 @@ export const loginWithEmail = async (email: string, password: string) => {
 
 
 export const logoutUser = async () => {
-  // if you need the raw response, call apiFetch and ignore return value
-  return apiFetch(`${AUTH_SERVICE}/api/v1/auth/logout`, { method: 'POST' });
+  try {
+    // Try to logout via API, but don't fail if it doesn't work
+    await apiFetch(`${AUTH_SERVICE}/api/v1/auth/logout`, { method: 'POST' });
+  } catch (error) {
+    // If logout fails (e.g., token expired), just continue with client-side cleanup
+    console.warn('API logout failed, proceeding with client-side logout:', error);
+  }
+  return { success: true, message: 'Logged out successfully' };
 };
 
 export const forgotPassword = async (email: string) => {

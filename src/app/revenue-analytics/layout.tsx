@@ -14,20 +14,21 @@ export default function TransactionLayout({children}: {children:React.ReactNode}
             <AccountProvider>
                 <TransactionProvider>
                     <ThemeSync/>
-                    <div className="flex h-screen w-full flex-col sm:flex-row sm:overflow-hidden">
+                    {/* <div className="flex h-screen w-full flex-col sm:flex-row sm:overflow-hidden"> */}
                         {/* <div className="w-full flex-none sm:w-64"> */}
                         <SidebarProvider>
-                            <SideBar/>
+                             <div className="hidden lg:block">
+                                <SideBar/>
+                            </div>
                             
                                 {/* <Breadcrumbs/> */}
-                                <div className="flex-grow sm:overflow-y-auto no-scrollbar">
+                                <div className="lg:ml-0 transition-all duration-300">
                                     <MainContent>
-                                    {children}
+                                        {children}
                                     </MainContent>
                                 </div>
-                            
                         </SidebarProvider>
-                    </div>
+                    {/* </div> */}
                 </TransactionProvider>
             </AccountProvider>
         </UserProvider>

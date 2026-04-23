@@ -23,20 +23,20 @@ export default function UserProfile({ expanded }: UserProfileProps) {
         <>
           <Image
             alt="User Profile"
-            width={48}
+            width={50}
             height={48}
             unoptimized
             src={user?.profile_picture || "/profilePicture.jpg"}
-            className="rounded-lg border-2 border-indigo-500 object-cover flex-shrink-0"
+            className="rounded-full border-2 border-indigo-500  "
           />
           {expanded && (
             <div className="text-center transition-all duration-300">
               <p className="text-sm font-semibold text-slate-900 dark:text-white">
                 {user ? `${user.firstname} ${user.lastname}` : "User"}
               </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              {/* <p className="text-xs text-slate-500 dark:text-slate-400">
                 {user?.email || "email"}
-              </p>
+              </p> */}
             </div>
           )}
         </>

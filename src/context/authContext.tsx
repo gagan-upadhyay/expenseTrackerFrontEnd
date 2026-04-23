@@ -22,7 +22,7 @@ const AUTH_SERVICE = process.env.NEXT_PUBLIC_AUTH_SERVICE;
 
 // ✅ Use raw fetch to avoid circular 401 handling in apiFetch
 export const refreshTokenApi = async () => {
-    const url = `${AUTH_SERVICE}/api/v1/auth/refresh/`;
+    const url = `${AUTH_SERVICE}/api/v1/auth/refresh`;
     const res = await fetch(url, {
         method: 'POST',
         credentials: 'include', // CRITICAL: This sends the httpOnly refreshToken

@@ -11,9 +11,9 @@ export default function Page(){
            <AuthGuard>
                 {/* <CardWrapper title={'Transactions'}/> */}
                 {/* In your Page.tsx grid */}
-                <div className="lg:col-span-2 lg:row-span-5 h-full overflow-visible">
+                {/* <div className=" "> */}
                     <CardWrapper title="Transactions" />
-                </div>
+                {/* </div> */}
 
            </AuthGuard> 
     )

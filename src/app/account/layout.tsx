@@ -7,7 +7,7 @@ import { AccountProvider } from "@/src/context/accountContext";
 // import { TransactionProvider } from "@/src/context/transactionContext";
 import { SidebarProvider } from "@/src/context/sidebarContext";
 import MainContent from "@/src/components/layout/MainContent";
-import Breadcrumbs from "@/src/components/ui/Breadcrumbs";
+// import Breadcrumbs from "@/src/components/ui/Breadcrumbs";
 
 export default function DashBoardLayout({children}: {children:React.ReactNode}){
     return (
@@ -16,20 +16,14 @@ export default function DashBoardLayout({children}: {children:React.ReactNode}){
                 {/* <TransactionProvider> */}
                     <ThemeSync/>
                     <SidebarProvider>
-                        
-                            
-                                <SideBar/>
+                        <div className="flex h-screen flex-col sm:flex-row sm:overflow-hidden no-scrollbar">
+                            <SideBar/>
+                            <div className="flex-grow sm:overflow-y-auto no-scrollbar">
                                 <MainContent>
-
-                                    <Breadcrumbs/>
-                                {/* <div className="flex h-screen flex-col sm:flex-row sm:overflow-hidden overflow-y-auto overflow-x-hidden"> */}
-                                    {/* <div className="flex-grow p-6 sm:p-12 sm:overflow-y-auto"> */}
                                     {children}
-                                {/* </div> */}
-                            {/* </div> */}
                                 </MainContent>
-                            
-                        
+                            </div>
+                        </div>
                     </SidebarProvider>
                 {/* </TransactionProvider> */}
             </AccountProvider>

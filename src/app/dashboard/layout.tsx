@@ -17,20 +17,26 @@ export default function DashBoardLayout({children}: {children:React.ReactNode}){
                     <ThemeSync/>
                     <SidebarProvider>
                         {/* Navbar for Desktop (lg screens and up) */}
-                        <div className="hidden lg:block">
+                        {/* <div className="hidden lg:block">
                             <DashboardNavbar />
+                        </div> */}
+
+                        {/* Desktop Sidebar - Always visible, overlaps content */}
+                        <div className="hidden lg:block">
+                            <SideBar/>
                         </div>
 
-                        {/* Sidebar for Mobile & Tablet */}
-                        <div className="flex h-screen flex-col lg:flex-row lg:overflow-hidden">
-                            <div className="lg:hidden">
-                                <SideBar/>
-                            </div>
-                            
+                        {/* Main Content Area - Adjusts based on sidebar state */}
+                        <div className="lg:ml-0 transition-all duration-300">
                             <MainContent>
                                 <Breadcrumbs/>
                                 {children}
                             </MainContent>
+                        </div>
+
+                        {/* Mobile Sidebar */}
+                        <div className="lg:hidden">
+                            <SideBar/>
                         </div>
                     </SidebarProvider>
                 </TransactionProvider>

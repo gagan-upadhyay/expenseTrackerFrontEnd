@@ -10,26 +10,28 @@ import MainContent from "@/src/components/layout/MainContent";
 import Breadcrumbs from "@/src/components/ui/Breadcrumbs";
 
 
-export default function DashBoardLayout({children}: {children:React.ReactNode}){
+export default function WalletLayout({children}: {children:React.ReactNode}){
     return (
         <UserProvider>
             <AccountProvider>
                 <TransactionProvider>
                     <ThemeSync/>
-                    {/* <div className="flex h-screen flex-col sm:flex-row sm:overflow-hidden"> */}
-                        {/* <div className="w-full flex-none sm:w-64">
+                    <SidebarProvider>
+                        <div className="flex h-screen flex-col sm:flex-row sm:overflow-hidden">
+                            {/* <div className="w-full flex-none sm:w-64"> */}
+                                <SideBar/>
+                            {/* </div> */}
+                            
                             <SideBar/>
-                        </div> */}
-                        <SidebarProvider>
-                            <SideBar/>
-                            <MainContent>
-                                {/* <div className="flex-grow p-6 sm:p-12 sm:overflow-y-auto"> */}
-                                <Breadcrumbs/>
+                            
+                                <div className="flex-grow sm:overflow-y-auto no-scrollbar">
+                                    <MainContent>
+                                {/* <Breadcrumbs/> */}
                                     {children}
-                                {/* </div> */}
                             </MainContent>
-                        </SidebarProvider>
-                    {/* </div> */}
+                                </div>
+                        </div>
+                    </SidebarProvider>
                 </TransactionProvider>
             </AccountProvider>
         </UserProvider>

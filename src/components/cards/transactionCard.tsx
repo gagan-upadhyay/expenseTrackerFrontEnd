@@ -55,7 +55,7 @@ export default function TransactionCard({ pageClass }: TransactionCardProps) {
     <div className={clsx(
       "relative w-full h-full flex flex-col rounded-[1rem] glass backdrop-blur-xl border border-white/10 overflow-hidden transition-all duration-500",
       pageClass,
-      !isDashboard && "mt-5"
+      // !isDashboard && "mt-5"
     )}>
       {/* Hide Scrollbar Utility */}
       <style jsx global>{`
